@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.1/howler.min.js"></script>
+<script>
+    function myplay(item) {
+        var sound = new Howl({
+            src: ['../static/assets/audio/contrast1/words/' + item + '.mp3'],
+        });
+        sound.play()
+    }
+</script>
+
+
+<!-- <button onclick="play('feet')">Play Audio</button> -->
+
+<img src="../static/assets/img/contrast1/fish.jpg" style="width: 300px;" onclick='myplay("fish")'>
+
+
+</body>
+
+</html>

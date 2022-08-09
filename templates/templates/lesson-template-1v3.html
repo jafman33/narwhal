@@ -1,0 +1,389 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, viewport-fit=cover" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#000000">
+    <title>3L-Ranch</title>
+    <meta name="description" content="3L-Ranch">
+    <meta name="keywords" content="bootstrap 5, mobile template, cordova, phonegap, mobile, html" />
+    <link rel="icon" type="image/png" href="../static/assets/img/favicon.png" sizes="32x32">
+    <link rel="apple-touch-icon" sizes="180x180" href="../static/assets/img/icon/192x192.png">
+    <link rel="stylesheet" href="../static/assets/css/style.css">
+    <link rel="manifest" href="../static/manifest/manifest.json">
+
+    <!-- center player -->
+    <style>
+        lottie-player {
+            margin: 0 auto;
+        }
+    </style>
+
+
+
+
+    <script>
+        // document.addEventListener("DOMContentLoaded", function(event) {
+
+        // });
+
+        // Resize Caller
+        function resizeSlider1() {
+            var myslider1 = new Splide('#slider1', {
+                arrows: boolean = false,
+                pagination: bolean = false,
+                start: number = 2,
+                perMove: 1,
+            }).mount();
+            // myslider1.emit('resize');
+        }
+
+        function resizeSlider2() {
+            var myslider2 = new Splide('#slider2', {
+                arrows: boolean = false,
+                pagination: bolean = false,
+                start: number = 2,
+                perMove: 1,
+            }).mount();
+            // myslider2.emit('resize');
+        }
+
+        // function resizeSlider3() {
+        //     var myslider3 = new Splide('#slider3', {
+        //         arrows: boolean = false,
+        //         pagination: bolean = false,
+        //         start: number = 2,
+        //         perMove: 1,
+        //     }).mount();
+        //     myslider3.emit('resize');
+        // }
+
+        // Navigators & Resize callers
+        function setLearnActive() {
+            document.getElementById("learn-spill").play();
+            const someTabTriggerEl = document.querySelector('#learn-tab')
+            const tab = new bootstrap.Tab(someTabTriggerEl)
+            tab.show()
+            resizeSlider1();
+        }
+
+        function setPracticeActive() {
+            document.getElementById("practice-spill").play();
+            const someTabTriggerEl = document.querySelector('#practice-tab')
+            const tab = new bootstrap.Tab(someTabTriggerEl)
+            tab.show()
+            resizeSlider2();
+        }
+
+        function setGameActive() {
+            document.getElementById("game-spill").play();
+            const someTabTriggerEl = document.querySelector('#game-tab')
+            const tab = new bootstrap.Tab(someTabTriggerEl)
+            tab.show()
+                // resizeSlider3();
+        }
+    </script>
+
+
+</head>
+
+<body>
+
+    <!-- loader -->
+    <div id="loader">
+        <div class="spinner-border text-primary" role="status"></div>
+    </div>
+    <!-- * loader -->
+
+    <!-- App Header -->
+    <div class="appHeader bg-primary text-light no-border">
+        <div class="left">
+            <a href="{{ url_for('my_lessons') }}" class="headerButton">
+                <ion-icon name="chevron-back-outline"></ion-icon>
+            </a>
+        </div>
+        <div class="pageTitle">Lesson {{ data['phoneme'] }} </div>
+        <div class="right"></div>
+    </div>
+    <!-- * App Header -->
+
+
+    <!-- Extra Header -->
+    <div class="extraHeader p-0">
+        <ul class="nav nav-tabs lined" id="myTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="intro-tab" data-bs-toggle="tab" data-bs-target="#intro" type="button" role="tab" aria-controls="intro" aria-selected="true" onclick="speakonLoad();">Intro</button>
+                <audio id='intro-spill' src="{{ sayit(lang='en-us', text= 'Intro Verbiage') }}" preload="none"></audio>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="learn-tab" data-bs-toggle="tab" data-bs-target="#learn" type="button" role="tab" aria-controls="learn" aria-selected="false" onclick="setLearnActive();">Learn</button>
+                <audio id='learn-spill' src="{{ sayit(lang='en-us', text= 'Click on the pictures to hear the difference! Swipe left to get started!') }}" preload="none"></audio>
+                <audio id='slider1-animation' src="{{ sayit(lang='en-us', text= 'Click on the pictures to hear the difference!') }}" preload="none"></audio>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="practice-tab" data-bs-toggle="tab" data-bs-target="#practice" type="button" role="tab" aria-controls="practice" aria-selected="false" onclick="setPracticeActive();">Practice</button>
+                <audio id='practice-spill' src="{{ sayit(lang='en-us', text= 'Lets see if you can hear the difference! Listen carefully and click on the right picture. Swipe left to get started!') }}" preload="none"></audio>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="game-tab" data-bs-toggle="tab" data-bs-target="#game" type="button" role="tab" aria-controls="game" aria-selected="false" onclick="setGameActive();">Game</button>
+                <audio id='game-spill' src="{{ sayit(lang='en-us', text= 'Game Verbiage') }}" preload="none"></audio>
+            </li>
+        </ul>
+    </div>
+    <!-- * Extra Header -->
+
+
+    <!-- App Capsule -->
+    <div id="appCapsule" class="extra-header-active">
+
+
+        <div class="tab-content">
+
+            <div class="tab-pane active" id="intro" role="tabpanel" aria-labelledby="intro-tab" style="background-color: #ffffff;">
+
+                <div class="section full text-center" style="background-color: #ffffff;">
+
+                    <div class="wide-block pt-2 pb-2">
+
+                        <!-- card content-->
+                        <div class="card">
+
+                            <!-- Page Audio -->
+                            <audio id='rhyme' src="{{ sayit(lang='en-us', text= data['poem'].audio) }}" preload="none"></audio>
+                            <audio id='instruction' src="{{ sayit(lang='en-us', text= 'Vowel Contrast Instructions T.B.D.') }}" preload="none"></audio>
+
+                            <!-- Header -->
+                            <div class="card-header">
+                                Vowel Contrast : {{ data['contrast'].first }} / {{ data['contrast'].second }}
+                                <a href="#" data-bs-toggle="tooltip" onclick='document.getElementById("instruction").play();'>
+                                    <!-- {{ data['poem'].title }} -->
+                                    <ion-icon name="volume-medium-outline"></ion-icon>
+                                </a>
+                            </div>
+
+                            <!-- Lesson Image -->
+                            <div class="text-center">
+                                <img src="../static/assets/img/sample/photo/{{data['phoneme']}}_.jpg" loading="lazy" alt="image" class="imaged w-50 mb-0">
+                            </div>
+
+                            <!-- Poem Title -->
+                            <h4 style="margin-top:0px;">
+                                {{ data['poem'].title }}
+                                <a href="#" data-bs-toggle="tooltip" onclick='document.getElementById("rhyme").play();'>
+                                    <!-- {{ data['poem'].title }} -->
+                                    <ion-icon name="volume-medium-outline"></ion-icon>
+                                </a>
+                            </h4>
+                            <!-- Poem Lines -->
+                            {% for lineNo in data['poem'].lines %}
+                            <div class="text-muted">
+                                {{lineNo.line}}
+                            </div>
+                            {% endfor %}
+
+                            <!-- card-footer -->
+                            <div class="card-footer mt-3">
+                                <button type="button" class="btn btn-primary btn-sm" onclick="setLearnActive();">Get Started!</button>
+                            </div>
+
+
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="tab-pane" id="learn" role="tabpanel" aria-labelledby="learn-tab" style="background-color: #ffffff;">
+
+                <div class="carousel-slider splide" id="slider1" style="text-align:center;">
+                    <div class="splide__track">
+                        <ul class="splide__list">
+
+                            <!-- Intro Slide -->
+                            <li class="splide__slide p-0">
+                                <lottie-player src="https://assets10.lottiefiles.com/packages/lf20_thgo4z9g.json" background="transparent" speed="0.75" style="width: 300px; height: 270px;" loop autoplay></lottie-player>
+                                <lottie-player src="https://assets2.lottiefiles.com/packages/lf20_HW7ZtQ.json" background="transparent" speed="1" style="width: 50px; height: 50px;" loop autoplay></lottie-player>
+
+                                <div class="section mb-0">
+                                    <h4>Start Learning!</h4>
+                                    <h5 style="color:grey;">
+                                        Click on the pictures to hear the sound.
+                                        <br> Can you hear the difference?
+                                    </h5>
+                                </div>
+                            </li>
+
+                            <!-- Loop -->
+                            {% for pairNo in data['contrast'].words %}
+
+                            <li class="splide__slide mt-5">
+                                <!-- Loop Audio -->
+                                <audio id={{pairNo.first}} src="{{ sayit(lang='en-us', text=pairNo.first) }}" preload="none"></audio>
+                                <audio id={{pairNo.second}} src="{{ sayit(lang='en-us', text=pairNo.second) }}" preload="none"></audio>
+
+                                <!-- Image Template -->
+                                <div class="section ms-5 me-5">
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <div class="card product-card-lingov2">
+                                                <div class="card-body-lingov2">
+                                                    <img class="image-lingov2" src="{{ url_for('static', filename='assets/img/contrast') }}{{data['phoneme']}}/{{pairNo.first}}.jpg" loading="lazy" alt="{{pairNo.first}}" style="width:100%" onclick='document.getElementById("{{pairNo.first}}").play();'>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-12  mt-4 mb-1">
+                                            <div class="card product-card-lingov2">
+                                                <div class="card-body-lingov2">
+                                                    <img class="image-lingov2" src="{{ url_for('static', filename='assets/img/contrast') }}{{data['phoneme']}}/{{pairNo.second}}.jpg" loading="lazy" alt="{{pairNo.second}}" style="width:100%" onclick='document.getElementById("{{pairNo.second}}").play();'>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Animation Button-->
+                                <lottie-player onclick='document.getElementById("slider1-animation").play();' src="https://assets2.lottiefiles.com/packages/lf20_HW7ZtQ.json" background="transparent" speed="0.5" style="width: 50px; height: 50px;" loop autoplay></lottie-player>
+
+                            </li>
+
+                            <!-- loop end -->
+                            {% endfor %}
+
+                            <!-- Closing Slider Splide 1 -->
+                            <li class="splide__slide mt-0">
+                                <lottie-player src="https://assets4.lottiefiles.com/packages/lf20_dflqwg4a.json" background="transparent" speed="1" style="width: 300px; height: 300px;" loop autoplay></lottie-player>
+                                <div class="section mb-0">
+                                    <h4>Well done!</h4>
+                                    <p>Ready to check your skills?</p>
+                                    <!-- button -->
+                                    <button type="button" class="btn btn-primary btn-sm" onclick="setPracticeActive();">Practice</button>
+                                </div>
+                            </li>
+
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="tab-pane" id="practice" role="tabpanel" aria-labelledby="practice-tab" style="background-color: #ffffff;">
+                <div class="carousel-slider splide" id="slider2" style="text-align:center;">
+                    <div class="splide__track">
+                        <ul class="splide__list">
+
+                            <!-- Intro Slide -->
+                            <li class="splide__slide p-0">
+                                <lottie-player src="https://assets10.lottiefiles.com/temp/lf20_XEB0JO.json" background="transparent" speed="1" style="width: 300px; height: 300px;" loop autoplay></lottie-player>
+                                <lottie-player src="https://assets1.lottiefiles.com/private_files/lf30_7jlfrmnv.json" background="transparent" speed="0.5" style="width: 50px; height: 50px;" loop autoplay></lottie-player>
+
+                                <div class="section mb-0">
+                                    <h4>Can you hear the difference?</h4>
+                                    <h5 style="color:grey; text-align: center;">
+                                        1. Listen to the sound
+                                        <br> 2. Click on the correct picture!
+                                    </h5>
+                                </div>
+                            </li>
+
+                            <!-- Loop -->
+                            {% for pairNo in data['contrast'].words %}
+
+                            <li class="splide__slide mt-5">
+
+                                <!-- Image Template -->
+                                <div class="section ms-5 me-5">
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <div class="card product-card-lingov2">
+                                                <div class="card-body-lingov2">
+                                                    <img class="image-lingov2" src="{{ url_for('static', filename='assets/img/contrast') }}{{data['phoneme']}}/{{pairNo.first}}.jpg" loading="lazy" alt="{{pairNo.first}}" style="width:100%" onclick='document.getElementById("{{pairNo.first}}_quiz").play();'>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-12  mt-4 mb-1">
+                                            <div class="card product-card-lingov2">
+                                                <div class="card-body-lingov2">
+                                                    <img class="image-lingov2" src="{{ url_for('static', filename='assets/img/contrast') }}{{data['phoneme']}}/{{pairNo.second}}.jpg" loading="lazy" alt="{{pairNo.second}}" style="width:100%" onclick='document.getElementById("{{pairNo.second}}_quiz").play();'>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Randomizer - isOdd()  -->
+                                {% if range(1, 11) | random % 2 == 0 %}
+                                <!-- Sounds -->
+                                <audio id="{{pairNo.first}}_quiz_btn" src="{{ sayit(lang='en-us', text='click on ' + pairNo.first) }}" preload="none"></audio>
+                                <audio id="{{pairNo.first}}_quiz" src="{{ sayit(lang='en-us', text='Thats Correct!' + pairNo.first) }}" preload="none"></audio>
+                                <audio id="{{pairNo.second}}_quiz" src="{{ sayit(lang='en-us', text='Try again!. You clicked on ' + pairNo.second) }}" preload="none"></audio>
+                                <!-- Animation Button -->
+                                <lottie-player onclick='document.getElementById("{{pairNo.first}}_quiz_btn").play();' src="https://assets1.lottiefiles.com/private_files/lf30_7jlfrmnv.json" background="transparent" speed="0.5" style="width: 50px; height: 50px;" loop autoplay></lottie-player>
+
+                                <!--  -->
+                                {% else %}
+                                <!-- Sounds -->
+                                <audio id="{{pairNo.second}}_quiz_btn" src="{{ sayit(lang='en-us', text='click on ' + pairNo.second) }}" preload="none"></audio>
+                                <audio id="{{pairNo.first}}_quiz" src="{{ sayit(lang='en-us', text='Try again!. You clicked on ' + pairNo.first) }}" preload="none"></audio>
+                                <audio id="{{pairNo.second}}_quiz" src="{{ sayit(lang='en-us', text='Thats Correct!' + pairNo.second) }}" preload="none"></audio>
+                                <!-- Animation Button -->
+                                <lottie-player onclick='document.getElementById("{{pairNo.second}}_quiz_btn").play();' src="https://assets1.lottiefiles.com/private_files/lf30_7jlfrmnv.json" background="transparent" speed="0.5" style="width: 50px; height: 50px;" loop autoplay></lottie-player>
+                                <!--  -->
+                                {% endif %}
+
+                            </li>
+                            <!-- loop end -->
+                            {% endfor %}
+
+                            <!-- Closing Slider -->
+                            <li class="splide__slide mt-0">
+                                <lottie-player src="https://assets6.lottiefiles.com/packages/lf20_ld8FMO.json" background="transparent" speed="0.5" style="width: 300px; height: 300px;" loop autoplay></lottie-player>
+                                <div class="section mb-0">
+                                    <h4>Well done!</h4>
+                                    <p>Want to play a game?</p>
+                                    <!-- button -->
+                                    <button type="button" class="btn btn-primary btn-sm" onclick="setGameActive();">Start</button>
+                                </div>
+                            </li>
+
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="tab-pane" id="game" role="tabpanel" aria-labelledby="game-tab" style="background-color: #ffffff;">
+                Game here...
+            </div>
+
+
+        </div>
+
+
+
+
+        <!--  -->
+
+    </div>
+    <!-- * App Capsule -->
+
+    <!-- ============== Js Files ==============  -->
+    <!-- Bootstrap -->
+    <script src="../static/assets/js/lib/bootstrap.min.js"></script>
+    <!-- Ionicons -->
+    <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+    <!-- Splide -->
+    <script src="../static/assets/js/plugins/splide/splide.min.js"></script>
+    <!-- ProgressBar js -->
+    <script src="../static/assets/js/plugins/progressbar-js/progressbar.min.js"></script>
+    <!-- Base Js File -->
+    <script src="../static/assets/js/base.js"></script>
+    <!-- Lottie-Player -->
+    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+
+</body>
+
+</html>

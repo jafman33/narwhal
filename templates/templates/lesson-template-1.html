@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, viewport-fit=cover" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#000000">
+    <title>3L-Ranch</title>
+    <meta name="description" content="3L-Ranch">
+    <meta name="keywords" content="bootstrap 5, mobile template, cordova, phonegap, mobile, html" />
+    <link rel="icon" type="image/png" href="../static/assets/img/favicon.png" sizes="32x32">
+    <link rel="apple-touch-icon" sizes="180x180" href="../static/assets/img/icon/192x192.png">
+    <link rel="stylesheet" href="../static/assets/css/style.css">
+    <link rel="manifest" href="../static/manifest/manifest.json">
+    <!-- Form Template -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/lingo_form.css') }}">
+    <!--  Dynamic read TTS example:  -->
+</head>
+
+<body>
+
+    <!-- loader -->
+    <div id="loader">
+        <div class="spinner-border text-primary" role="status"></div>
+    </div>
+    <!-- * loader -->
+
+    <!-- App Header -->
+    <div class="appHeader bg-primary text-light no-border">
+        <div class="left">
+            <a href="{{ url_for('my_lessons') }}" class="headerButton">
+                <ion-icon name="chevron-back-outline"></ion-icon>
+            </a>
+        </div>
+        <div class="pageTitle">Lesson {{ data['phoneme'] }} - Vowel Contrast : {{ data['contrast'].first }} / {{ data['contrast'].second }} </div>
+        <div class="right"></div>
+    </div>
+    <!-- * App Header -->
+
+    <!-- Extra Header -->
+    <!-- <div class="extraHeader p-0">
+        <div class="form-wizard-section">
+            <a href="component-form-wizard.html" class="button-item active">
+                <strong>1</strong>
+                <p>Check</p>
+            </a>
+            <a href="component-form-wizard.html" class="button-item">
+                <strong>2</strong>
+                <p>Enter Address</p>
+            </a>
+            <a href="component-form-wizard.html" class="button-item">
+                <strong>3</strong>
+                <p>Payment</p>
+            </a>
+            <a href="component-form-wizard.html" class="button-item">
+                <strong>
+                    <ion-icon name="checkmark-outline"></ion-icon>
+                </strong>
+                <p>Order Done</p>
+            </a>
+        </div>
+    </div> -->
+    <!-- * Extra Header -->
+
+    <!-- App Capsule -->
+    <div id="appCapsule" class="extra-header-active">
+
+
+        <div class="col-md-12" style="text-align: center;">
+
+            <!-- Begin Form -->
+            <form id="regForm" method="post">
+
+                <div class="all-steps" id="all-steps">
+                    <!-- intro -->
+                    <span class="step"></span>
+                    <!-- loop -->
+                    {% for pairNo in data['contrast'].words %}
+                    <!-- practice -->
+                    <span class="step"></span>
+                    <!-- test -->
+                    <span class="step"></span>
+                    <!-- endloop -->
+                    {% endfor %}
+                </div>
+
+                <!-- Audio Instruction for the whole page -->
+                <audio id='instruction' src="{{ sayit(lang='en-us', text='Click on the pictures to hear the pronunciation.') }}"></audio>
+
+                <!-- Intro -->
+                <div class="tab">
+
+                    <!-- Audio -->
+                    <audio id='rhyme' src="{{ sayit(lang='en-us', text= data['poem'].audio) }}"></audio>
+
+                    <!-- Green Audio Button -->
+                    <button type="button" class="btn btn-icon btn-success rounded-circle mb-1" onclick='document.getElementById("rhyme").play();'>
+                            <ion-icon name="volume-medium-outline"></ion-icon>
+                        </button>
+
+                    <!-- Poem Title -->
+                    <h4 style="margin-top: 20px">"{{ data['poem'].title }}"</h4>
+
+                    <!-- Poem -->
+                    {% for lineNo in data['poem'].lines %}
+                    <p style="color: gray; font-size:13px; margin-bottom: 0px">
+                        {{lineNo.line}}
+                    </p>
+                    {% endfor %}
+                    <div style="margin-bottom: 20px"></div>
+
+                </div>
+
+                <!-- loop start -->
+                {% for pairNo in data['contrast'].words %}
+                <div class="tab">
+
+                    <!-- audio -->
+                    <audio id={{pairNo.first}} src="{{ sayit(lang='en-us', text=pairNo.first) }}"></audio>
+                    <audio id={{pairNo.second}} src="{{ sayit(lang='en-us', text=pairNo.second) }}"></audio>
+
+                    <!-- Green Audio Button -->
+                    <button type="button" class="btn btn-icon btn-success rounded-circle mb-1" onclick='document.getElementById("instruction").play();'>
+                            <ion-icon name="volume-medium-outline"></ion-icon>
+                        </button>
+
+                    <!-- Polaroid Template -->
+                    <div class="row py-2" style="margin-top: 10px">
+
+                        <div class="col">
+                            <div class="lingo_polaroid">
+                                <img src="{{ url_for('static', filename='assets/img/contrast') }}{{data['phoneme']}}/{{pairNo.first}}.jpg" alt="{{pairNo.first}}" style="width:100%" onclick='document.getElementById("{{pairNo.first}}").play();'>
+                            </div>
+                        </div>
+
+                        <div class="col">
+                            <div class="lingo_polaroid">
+                                <img src="{{ url_for('static', filename='assets/img/contrast') }}{{data['phoneme']}}/{{pairNo.second}}.jpg" alt="{{pairNo.second}}" style="width:100%" onclick='document.getElementById("{{pairNo.second}}").play();'>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- quiz -->
+                <div class="tab">
+
+                    <!-- Green Audio Button -->
+                    <button type="button" class="btn btn-icon btn-success rounded-circle mb-1" onclick='document.getElementById("{{pairNo.first}}_quiz_btn").play();'>
+                            <ion-icon name="volume-medium-outline"></ion-icon>
+                        </button>
+
+                    <div class="row py-2" style="margin-top: 10px">
+
+                        <div class="col">
+                            <div class="lingo_polaroid">
+                                <img src="{{ url_for('static', filename='assets/img/contrast') }}{{data['phoneme']}}/{{pairNo.first}}.jpg" alt="{{pairNo.first}}" style="width:100%" onclick='document.getElementById("{{pairNo.first}}_quiz").play();'>
+                            </div>
+                            <!-- <div class="lingo_container">
+                                    <p>{{pairNo.first}}</p>
+                                </div> -->
+                        </div>
+
+                        <div class="col">
+                            <div class="lingo_polaroid">
+                                <img src="{{ url_for('static', filename='assets/img/contrast') }}{{data['phoneme']}}/{{pairNo.second}}.jpg" alt="{{pairNo.second}}" style="width:100%" onclick='document.getElementById("{{pairNo.second}}_quiz").play();'>
+                            </div>
+                            <!-- <div class="lingo_container">
+                                    <p>{{pairNo.second}}</p>
+                                </div> -->
+                        </div>
+
+                    </div>
+
+                    <!-- if odd  -->
+                    {% if loop.index0 % 2 == 0 %}
+                    <audio id="{{pairNo.first}}_quiz_btn" src="{{ sayit(lang='en-us', text='click on ' + pairNo.first) }}"></audio>
+                    <audio id="{{pairNo.first}}_quiz" src="{{ sayit(lang='en-us', text='Thats Correct!' + pairNo.first) }}"></audio>
+                    <audio id="{{pairNo.second}}_quiz" src="{{ sayit(lang='en-us', text='Try again!. You clicked on ' + pairNo.second) }}"></audio>
+                    <!--  -->
+                    {% else %}
+                    <audio id="{{pairNo.first}}_quiz_btn" src="{{ sayit(lang='en-us', text='click on ' + pairNo.second) }}"></audio>
+                    <audio id="{{pairNo.first}}_quiz" src="{{ sayit(lang='en-us', text='Try again!. You clicked on ' + pairNo.first) }}"></audio>
+                    <audio id="{{pairNo.second}}_quiz" src="{{ sayit(lang='en-us', text='Thats Correct!' + pairNo.second) }}"></audio>
+                    <!--  -->
+                    {% endif %}
+
+                </div>
+                <!-- loop end -->
+                {% endfor %}
+
+
+                <!-- Buttons -->
+                <div style="overflow:auto;" id="nextprevious">
+                    <div style="float:center;" style="margin-top: 30px">
+                        <button type="button" class="btn btn-primary btn-sm" id="prevBtn" onclick="nextPrev(-1)">Previous</button>
+                        <button type="button" class="btn btn-success btn-sm" id="nextBtn" name="nextBtn" onclick="nextPrev(1)">Next</button>
+                    </div>
+                </div>
+
+                <!-- last slide -->
+                <div class="thanks-message text-center" id="text-message"> <img src="https://i.imgur.com/O18mJ1K.png" width="100" class="mb-4">
+                    <h3>Way to Go!</h3> <span>Ready to try a new lesson?</span>
+                    <input type="submit" id="buttonId" class="btn btn-success btn-block" name="btn" value="Click to Finish!">
+                </div>
+
+
+            </form>
+
+
+
+
+        </div>
+
+
+
+
+    </div>
+    <!-- * App Capsule -->
+
+
+    <!-- ============== Js Files ==============  -->
+    <!-- Bootstrap -->
+    <script src="../static/assets/js/lib/bootstrap.min.js"></script>
+    <!-- Ionicons -->
+    <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+    <!-- Splide -->
+    <script src="../static/assets/js/plugins/splide/splide.min.js"></script>
+    <!-- ProgressBar js -->
+    <script src="../static/assets/js/plugins/progressbar-js/progressbar.min.js"></script>
+    <!-- Base Js File -->
+    <script src="../static/assets/js/base.js"></script>
+    <!-- Lingo Form -->
+    <script src="{{ url_for('static', filename='assets/js/lingo_form.js') }}"></script>
+
+</body>
+
+</html

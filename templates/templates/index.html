@@ -1,0 +1,173 @@
+{% extends 'layout.html' %}
+
+<!--  -->
+{% block content %}
+
+<!-- App Header -->
+<div class="appHeader bg-primary text-light">
+    <div class="left">
+        <a href="#" class="headerButton" data-bs-toggle="offcanvas" data-bs-target="#sidebarPanel">
+            <ion-icon name="menu-outline"></ion-icon>
+        </a>
+    </div>
+    <div class="pageTitle">
+        Home
+    </div>
+    <!-- <div class="right">
+        <a href="#" class="headerButton toggle-searchbox">
+            <ion-icon name="search-outline"></ion-icon>
+        </a>
+    </div> -->
+</div>
+<!-- * App Header -->
+
+<!-- App Capsule -->
+<div id="appCapsule">
+
+    <div class="header-large-title">
+        <!-- <h1 class="title">Discover</h1> -->
+        <img src="../static/assets/img/logo.png" style="width: 200px; margin-left: -50px; margin-bottom: -10px" alt="icon">
+        <h4 class="subtitle">Welcome to 3L-Ranch Beta</h4>
+    </div>
+
+    <div class="section full mt-3 mb-3">
+
+        <!-- carousel multiple -->
+        <div class="carousel-multiple splide">
+            <div class="splide__track">
+                <ul class="splide__list">
+
+                    <!-- Loop Here! -->
+                    {% for status in lessons_status %}
+
+                    <!-- First show the lessons under "in progress" -->
+                    {% if status == 'in-progress' %}
+                    <li class="splide__slide">
+                        <div class="card">
+                            <a href="{{ url_for('lesson', phonemeNo = loop.index0) }}">
+                                <img src="../static/assets/img/sample/photo/{{loop.index0}}_.jpg" class="card-img-top" alt="image">
+                            </a>
+                            <div class="card-body pt-2">
+                                <h4 class="mb-0">Lesson {{loop.index0}}</h4>
+                                <div class="text-muted" style="font-size:12px">
+                                    Lesson Title
+                                </div>
+                                <div style="font-size:10px; color:#FE9500; margin-bottom: 0px">
+                                    In Progress
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    <!--  -->
+                    {% endif %}
+                    <!--  -->
+                    {% endfor %}
+
+                    <!--  -->
+                    {% for status in lessons_status %}
+                    <!-- then Show the lessons not started -->
+                    {% if status == 'not-started' %}
+                    <li class="splide__slide">
+                        <div class="card">
+                            <a href="{{ url_for('lesson', phonemeNo = loop.index0) }}">
+                                <img src="../static/assets/img/sample/photo/{{loop.index0}}_.jpg" class="card-img-top" alt="image">
+                            </a>
+                            <div class="card-body pt-2">
+                                <h4 class="mb-0">Lesson {{loop.index0}}</h4>
+                                <div class="text-muted" style="font-size:12px">
+                                    Lesson Title
+                                </div>
+                                <div style="font-size:10px; color:#6C7C94; margin-bottom: 0px">
+                                    Start Now!
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    <!--  -->
+                    {% endif %}
+                    <!--  -->
+                    {% endfor %}
+
+                    <!-- Loop Here! -->
+                    {% for status in lessons_status %}
+                    <!-- then Show the lessons not started -->
+                    {% if status == 'completed' %}
+                    <li class="splide__slide">
+                        <div class="card">
+                            <a href="{{ url_for('lesson', phonemeNo = loop.index0) }}">
+                                <img src="../static/assets/img/sample/photo/{{loop.index0}}_.jpg" class="card-img-top" alt="image">
+                            </a>
+                            <div class="card-body pt-2">
+                                <h4 class="mb-0">Lesson {{loop.index0}}</h4>
+                                <div class="text-muted" style="font-size:12px">
+                                    Lesson Title
+                                </div>
+                                <div style="font-size:10px; color:#34C759; margin-bottom: 0px">
+                                    Completed
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    <!--  -->
+                    {% endif %}
+                    <!--  -->
+                    {% endfor %}
+
+                </ul>
+            </div>
+        </div>
+        <!-- * carousel multiple -->
+
+    </div>
+
+    <!-- <div class="section mt-3 mb-3">
+        <div class="card">
+            <img src="../static/assets/img/sample/photo/wide4_.jpg" class="card-img-top" alt="image">
+            <div class="card-body">
+                <h6 class="card-subtitle">Discover</h6>
+                <h5 class="card-title">How to Play</h5>
+                <p class="card-text">
+                    New to 3L-Ranch? Here's how to get started!
+                </p>
+                <a href="{{ url_for('how_to_play') }}" class="btn btn-primary">
+                    <ion-icon name="book-outline"></ion-icon>
+                    Learn
+                </a>
+            </div>
+        </div>
+    </div> -->
+
+    <div class="section mt-3 mb-3">
+        <div class="card">
+            <img src="../static/assets/img/sample/photo/wide2_.jpg" class="card-img-top" alt="image">
+            <div class="card-body">
+                <h6 class="card-subtitle">Discover</h6>
+                <h5 class="card-title">Lesson List</h5>
+                <p class="card-text">
+                    Go to lessons
+                </p>
+                <a href="{{ url_for('my_lessons') }}" class="btn btn-primary">
+                    <ion-icon name="layers-outline"></ion-icon>
+                    Get Started
+                </a>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- app footer -->
+    <div class="appFooter">
+        <img src="../static/assets/img/sample/photo/logo2.jpg" style="width: 100px; margin: 0px;" alt="icon">
+        <!-- class="footer-logo mb-2"> -->
+        <div class="footer-title">
+            Copyright © Triple-L Ranch <span class="yearNow"></span>. <br>All Rights Reserved.
+        </div>
+        <div>The 3L-Ranch mission here</div>
+
+    </div>
+    <!-- * app footer -->
+
+</div>
+<!-- * App Capsule -->
+
+{% endblock %}

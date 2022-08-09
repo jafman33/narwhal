@@ -1,0 +1,117 @@
+{% extends 'layout.html' %}
+
+<!--  -->
+{% block content %}
+
+<!-- App Header -->
+<div class="appHeader bg-primary text-light">
+    <div class="left">
+        <a href="#" class="headerButton" data-bs-toggle="offcanvas" data-bs-target="#sidebarPanel">
+            <ion-icon name="menu-outline"></ion-icon>
+        </a>
+    </div>
+    <div class="pageTitle">Lessons</div>
+    <!-- <div class="right">
+    </div> -->
+</div>
+<!-- * App Header -->
+
+<!-- App Capsule -->
+<div id="appCapsule">
+
+    <div class="listview-title mt-2">Completed</div>
+    <ul class="listview image-listview media mb-2">
+
+        {% for status in lessons_status %}
+        <!--  -->
+        {% if status == 'completed' %}
+        <!--  -->
+        <li>
+            <a href="{{ url_for('lesson', phonemeNo = loop.index0) }}" class="item">
+                <div class="imageWrapper">
+                    <img src="../static/assets/img/sample/photo/{{loop.index0}}_.jpg" alt="image" class="imaged w64">
+                </div>
+                <div class="in">
+                    <div>
+                        Lesson {{loop.index0}}
+                        <div class="text-muted">
+                            Lesson Title
+                        </div>
+                    </div>
+                    <span class="badge badge-success">
+                            <ion-icon name="checkmark-circle-outline"></ion-icon>
+                        </span>
+                </div>
+            </a>
+        </li>
+        <!--  -->
+        {% endif %}
+        <!--  -->
+        {% endfor %}
+    </ul>
+
+    <div class="listview-title mt-2">In Progress</div>
+    <ul class="listview image-listview media mb-2">
+
+        {% for status in lessons_status %}
+        <!--  -->
+        {% if status == 'in-progress' %}
+        <!--  -->
+        <li>
+            <a href="{{ url_for('lesson', phonemeNo = loop.index0) }}" class="item">
+                <div class="imageWrapper">
+                    <img src="../static/assets/img/sample/photo/{{loop.index0}}_.jpg" alt="image" class="imaged w64">
+                </div>
+                <div class="in">
+                    <div>
+                        Lesson {{loop.index0}}
+                        <div class="text-muted">
+                            Lesson Title
+                        </div>
+                    </div>
+                    <div class="chip chip-outline chip-warning ms-05 mb-05">
+                        <span class="chip-label">Incomplete</span>
+                    </div>
+                </div>
+            </a>
+        </li>
+        <!--  -->
+        {% endif %}
+        <!--  -->
+        {% endfor %}
+    </ul>
+
+    <div class="listview-title mt-2">Not Started</div>
+
+    <ul class="listview image-listview media mb-2">
+        {% for status in lessons_status %}
+        <!--  -->
+        {% if status == 'not-started' %}
+        <!--  -->
+        <li>
+            <a href="{{ url_for('lesson', phonemeNo = loop.index0) }}" class="item">
+                <div class="imageWrapper">
+                    <img src="../static/assets/img/sample/photo/{{loop.index0}}_.jpg" alt="image" class="imaged w64">
+                </div>
+                <div class="in">
+                    <div>
+                        Lesson {{loop.index0}}
+                        <div class="text-muted">
+                            Lesson Title
+                        </div>
+                    </div>
+                    <span class="text-muted">Start</span>
+                </div>
+            </a>
+        </li>
+        <!--  -->
+        {% endif %}
+        <!--  -->
+        {% endfor %}
+    </ul>
+
+
+</div>
+<!-- * App Capsule -->
+
+{% endblock %}

@@ -6323,6 +6323,11 @@ textarea,
     top: 56px;
 }
 
+.toast-box.toast-top-top.show {
+    /* top: 56px; */
+    top: 0px;
+}
+
 .toast-box.toast-bottom {
     top: auto;
     bottom: -100%;

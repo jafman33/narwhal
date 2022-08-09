@@ -7,8 +7,8 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#000000">
-    <title>Cyber-Chat</title>
-    <meta name="description" content="Cyber Chat">
+    <title>Narwhal</title>
+    <meta name="description" content="Narwhal">
     <!-- <meta name="keywords" content="bootstrap 5, mobile template, cordova, phonegap, mobile, html" /> -->
     <link rel="icon" type="image/png" href="../static/assets/img/favicon.png" sizes="32x32">
     <link rel="apple-touch-icon" sizes="180x180" href="../static/assets/img/icon/192x192.png">
@@ -69,10 +69,9 @@
                     <img src="../static/assets/img/sample/avatar/avatar.png" alt="image" class="imaged rounded">
                 </div>
                 <div class="in">
-                    <strong>{{ user_data["username"] }}</strong>
+                    <strong>{{ user_data["firstname"] }} {{ user_data["lastname"] }}</strong>
                     <div class="text-muted">
-                        <ion-icon name="location"></ion-icon>
-                        Active
+                        {{ user_data["usertype"] }}
                     </div>
                 </div>
                 <a href="#" class="close-sidebar-button" data-bs-dismiss="offcanvas">
@@ -111,17 +110,6 @@
                         </div>
                         <div class="in">
                             Tasks
-                        </div>
-                    </a>
-                </li>
-
-                <li>
-                    <a href="{{ url_for('payments') }}" class="item">
-                        <div class="icon-box bg-primary">
-                            <ion-icon name="logo-usd"></ion-icon>
-                        </div>
-                        <div class="in">
-                            Payments
                         </div>
                     </a>
                 </li>

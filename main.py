@@ -1,24 +1,19 @@
 from app import app
-from config import socketio, client, stripe_keys
+from config import socketio, client
 
-import hashlib, time
+import hashlib
 from functools import wraps
 from datetime import datetime
 import pytz
-import stripe
-
-import json
 
 from flask import (
     Flask,
     render_template,
-    jsonify,
     request,
     flash,
     redirect,
     url_for,
     session,
-    Response,
     make_response, 
     send_from_directory
 )
@@ -26,6 +21,7 @@ from flask import (
 from flask_socketio import join_room
 from faunadb import query as q
 from faunadb.objects import Ref
+import re
 
 
 # Login decorator to ensure user is logged in before accessing certain routes
@@ -44,253 +40,143 @@ def login_required(f):
 def index():
     return redirect(url_for("login"))
 
-@app.route("/fund", methods=["GET", "POST"])
-def fund():
-    return render_template("fund.html")
-
-@app.route("/payments", methods=["GET", "POST"])
-def payments():
-    return render_template("payments.html")
-
-@app.route("/stake", methods=["GET", "POST"])
-def stake():
-    return render_template("stake.html")
-
-def order_amount(offer):
-    stake = int(offer)
-    return stake
-
-# For recurring charges
-def charge_customer(customerId):
-    # Lookup the saved card (you can store multiple PaymentMethods on a Customer)
-    payment_methods = stripe.PaymentMethod.list(
-        customer=customerId,
-        type='card'
-    )
-
-    # Charge the customer and payment method immediately
-    payment_intent = stripe.PaymentIntent.create(
-        amount=2000,
-        currency='usd',
-        customer=customerId,
-        payment_method=payment_methods.data[0].id,
-        off_session=True,
-        confirm=True
-    )
-    if payment_intent.status == 'succeeded':
-        print('Successfully charged card off session')
-
-# Create the payment intent
-@app.route('/create-payment-intent', methods=['POST'])
-def create_payment():
-    
-    # Alternatively, set up a webhook to listen for the payment_intent.succeeded event
-    # and attach the PaymentMethod to a new Customer
-    # customer = stripe.Customer.create()
-    payload = request.data
-    
-    try:
-        data = json.loads(payload)
-        # Create a PaymentIntent with the order amount and currency
-        intent = stripe.PaymentIntent.create(   
-            amount = order_amount(data["offer"]),
-            currency='usd',
-            # customer=customer['id'],
-            setup_future_usage='off_session',
-            automatic_payment_methods={'enabled': True,},
-        )
-        
-        # Return the PaymentIntent’s client secret in the response to finish the payment on the client.
-        return jsonify({'clientSecret': intent['client_secret']})
-    except Exception as e:
-        return jsonify(error=str(e)), 403
-    return 
-
-
-
-@app.route("/create-setup-intent", methods=["POST"])
-@login_required
-def create_setup():
-    
-    customer = stripe.Customer.create()
-    
-    try:
-        intent = stripe.SetupIntent.create(
-            # customer=session['customer_id'],
-            customer=customer["id"],
-            payment_method_types=["card", "us_bank_account"],
-        )
-        
-        return jsonify({'clientSecret': intent['client_secret']})
-    except Exception as e:
-        return jsonify(error=str(e)), 403
-    return 
-
-
-
-
-# @app.route('/webhook', methods=['POST'])
-# def webhook():
-#     event = None
-#     payload = request.data
-
-#     try:
-#         event = json.loads(payload)
-#     except:
-#         print('⚠️  Webhook error while parsing basic request.' + str(e))
-#         return jsonify(success=False)
-#     if endpoint_secret:
-#         # Only verify the event if there is an endpoint secret defined
-#         # Otherwise use the basic event deserialized with json
-#         sig_header = request.headers.get('stripe-signature')
-#         try:
-#             event = stripe.Webhook.construct_event(
-#                 payload, sig_header, endpoint_secret
-#             )
-#         except stripe.error.SignatureVerificationError as e:
-#             print('⚠️  Webhook signature verification failed.' + str(e))
-#             return jsonify(success=False)
-
-#     # Handle the event
-#     if event and event['type'] == 'payment_intent.succeeded':
-#         payment_intent = event['data']['object']  # contains a stripe.PaymentIntent
-#         print('Payment for {} succeeded'.format(payment_intent['amount']))
-#         # Then define and call a method to handle the successful payment intent.
-#         # handle_payment_intent_succeeded(payment_intent)
-#     elif event['type'] == 'payment_method.attached':
-#         payment_method = event['data']['object']  # contains a stripe.PaymentMethod
-#         # Then define and call a method to handle the successful attachment of a PaymentMethod.
-#         # handle_payment_method_attached(payment_method)
-#     else:
-#         # Unexpected event type
-#         print('Unhandled event type {}'.format(event['type']))
-
-#     return jsonify(success=True)
-
-
-@app.route("/config")
-def get_publishable_key():
-    stripe_config = {"publicKey": stripe_keys["publishable_key"]}
-    return jsonify(stripe_config)
-
-@app.route("/tasks")
-def tasks():
-    return render_template("tasks.html")
-
-@app.route("/success")
-def stake_success():
-    return render_template("staked.html")
-
-@app.route("/cancelled")
-def stake_cancelled():
-    return render_template("stake.html")
 
 # Register a new user and hash password
 @app.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "POST":
+        
         # To setup validator for email
+        firstname = request.form["firstname"]
+        lastname = request.form["lastname"]
         email = request.form["email"].strip().lower()
-        username = request.form["username"].strip().lower()
         password = request.form["password"]
+        type = request.form["type"] 
+        
         # Make sure no ther user with similar credentials is already registered
         try:
-            user = client.query(q.get(q.match(q.index("users_index"), username)))
-            flash("Username already exists.")
-            return redirect(url_for("register"))
+            user = client.query(q.get(q.match(q.index("userEmail_index"), email)))
+            if user:
+                flash("Email already exists.")
+                return redirect(url_for('register'))
+        
         except:
-            # new lines for payments
-            customer = stripe.Customer.create()
-            customer["email"] = email
-            customer["name"] = username
             
-            user = client.query(
-                q.create(
-                    q.collection("users"),
-                    {
-                        "data": {
-                            "username": username,
-                            "email": email,
-                            "password": hashlib.sha512(password.encode()).hexdigest(),
-                            "date": datetime.now(pytz.UTC),
-                            "customer": customer["id"],
-                        }
-                    },
+            if not firstname or not lastname or not password or not email or not password:
+                flash("Please fill out the form completely.")
+                return redirect(url_for('register'))
+            
+            else:
+        
+            # Todo - add check for terms and conditions
+                user = client.query(
+                    q.create(
+                        q.collection("users"),
+                        {
+                            "data": {
+                                "usertype": type,
+                                "firstname": firstname,
+                                "lastname": lastname,
+                                "email": email,
+                                "password": hashlib.sha512(password.encode()).hexdigest(),
+                                "date": datetime.now(pytz.UTC),
+                            }
+                        },
+                    )
                 )
-            )
-            # Create a new chat list for newly registered userß
-            chat = client.query(
-                q.create(
-                    q.collection("chats"),
-                    {
-                        "data": {
-                            "user_id": user["ref"].id(),
-                            "chat_list": [],
-                        }
-                    },
+                
+                # Create a new chat list for newly registered userß
+                chat = client.query(
+                    q.create(
+                        q.collection("chats"),
+                        {
+                            "data": {
+                                "user_id": user["ref"].id(),
+                                "chat_list": [],
+                            }
+                        },
+                    )
                 )
-            )
-            return redirect(url_for('login'))
-            # Redirect to home page direcltly!
-            # return redirect(url_for('home'))
-    return render_template("register.html")
-
-# Register a new user and hash password
-@app.route("/terms", methods=["GET"])
-def terms():
-    return render_template("terms.html")
-
+                
+                # Create new session for newly logged in user
+                session["user"] = {
+                    "id": user["ref"].id(),
+                    "firstname": user["data"]["firstname"],
+                    "lastname": user["data"]["lastname"],
+                    "email": user["data"]["email"],
+                    "usertype": user["data"]["usertype"],
+                    "loggedin": True,
+                }
+                            
+                return redirect(url_for("about"))
+            
+    return render_template("common/register.html")
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
+        
         # To add email validator here
         email = request.form["email"].strip().lower()
         password = request.form["password"]
-            
+
         try:
-            # Query the data base for the inputted email address
-            user = client.query(q.get(q.match(q.index("user_index"), email)))
-            if (
-                hashlib.sha512(password.encode()).hexdigest()
-                == user["data"]["password"]
-            ):
+            # Query the data base for the inputed email address
+            user = client.query(q.get(q.match(q.index("userEmail_index"), email)))
+
+            if (hashlib.sha512(password.encode()).hexdigest() == user["data"]["password"]):
+                
                 # Create new session for newly logged in user
                 session["user"] = {
                     "id": user["ref"].id(),
-                    "username": user["data"]["username"],
+                    "firstname": user["data"]["firstname"],
+                    "lastname": user["data"]["lastname"],
                     "email": user["data"]["email"],
+                    "usertype": user["data"]["usertype"],
                     "loggedin": True,
-                    "customer": user["data"]["customer_id"]
                 }
-                
+                            
                 return redirect(url_for("home"))
-                # return redirect(url_for("chat"))
-
+        
             else:
                 raise Exception()
         except Exception as e:
             flash("Invalid credentials, please try again!")
             return redirect(url_for("login"))
-    return render_template("login.html")
+    return render_template("common/login.html")
 
-@app.route('/logout')
+
+
+# Register a new user and hash password
+@app.route("/intro", methods=["GET", "POST"])
 @login_required
-def logout():
-    session.pop('user', None)
-    return redirect(url_for('login'))
+def intro():
+    if session["user"]['usertype'] == 'Project Manager':
+        return render_template("pm/intro.html", user_data=session["user"])
+    elif session["user"]['usertype'] == 'Engineering Talent':
+        return render_template("talent/intro.html", user_data=session["user"])
+    else:
+        return None
 
 @app.route("/home", methods=["GET","POST"])
 @login_required
 def home():
-    return render_template("home.html", user_data=session["user"])
+    if session["user"]['usertype'] == 'Project Manager':
+        return render_template("pm/home.html", user_data=session["user"])
+    elif session["user"]['usertype'] == 'Engineering Talent':
+        return render_template("talent/home.html", user_data=session["user"])
+    else:
+      return None
 
 @app.route("/profile", methods=["GET","POST"])
 @login_required
 def profile():
-    return render_template("profile.html", user_data=session["user"])
-
-
+    if session["user"]['usertype'] == 'Project Manager':
+        return render_template("pm/profile.html", user_data=session["user"])
+    elif session["user"]['usertype'] == 'Engineering Talent':
+        return render_template("talent/profile.html", user_data=session["user"])
+    else:
+        return None
 
 
 @app.route("/contacts", methods=["GET","POST"])
@@ -439,7 +325,7 @@ def text():
              
 
     return render_template(
-        "page-chat.html",
+        "chat.html",
         user_data=session["user"],
         room_id=room_id,
         data=data,
@@ -498,6 +384,18 @@ def chatting_event(json, methods=["GET", "POST"]):
         include_self=False,
     )
     
+    
+# Register a new user and hash password
+@app.route("/terms", methods=["GET"])
+def terms():
+    return render_template("common/terms.html")
+
+@app.route('/logout')
+@login_required
+def logout():
+    session.pop('user', None)
+    return redirect(url_for('login'))
+
 @app.route('/service-worker.js')
 def sw():
     response = make_response(
@@ -509,6 +407,7 @@ def sw():
     response.headers['Content-Type'] = 'application/javascript'
     # response.headers['Cache-Control'] = 'no-cache'
     return response
+
 
 
 if __name__ == "__main__":

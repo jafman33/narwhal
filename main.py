@@ -85,6 +85,30 @@ def register():
                     )
                 )
                 
+                # user = client.query(
+                #     q.create(
+                #         q.collection("profiles"),
+                #         {
+                #             "data": {
+                #                 "user_id": user["ref"].id(),
+                #                 "photo": [],
+                #                 "education":
+                #                     {
+                #                         "major": [],
+                #                         "school": [],
+                #                         "gpa": [],
+                #                     },
+                #                 "experience":
+                #                     {
+                #                         "employer": [],
+                #                         "title": [],
+                #                         "daterange": [],
+                #                     },
+                #                 }
+                #             }
+                #         )
+                #     )
+                
                 # Create a new chat list for newly registered userß
                 chat = client.query(
                     q.create(
@@ -155,6 +179,23 @@ def intro():
         return render_template("pm/intro.html", user_data=session["user"])
     elif session["user"]['usertype'] == 'Engineering Talent':
         return render_template("talent/intro.html", user_data=session["user"])
+    else:
+        return None
+    
+@app.route("/projects", methods=["GET", "POST"])
+@login_required
+def projects():
+    return render_template("common/projects.html", user_data=session["user"])
+
+    
+# Register a new user and hash password
+@app.route("/profile-wizard", methods=["GET", "POST"])
+@login_required
+def profile_wizard():
+    if session["user"]['usertype'] == 'Project Manager':
+        return render_template("pm/profile-wizard.html", user_data=session["user"])
+    elif session["user"]['usertype'] == 'Engineering Talent':
+        return render_template("talent/profile-wizard.html", user_data=session["user"])
     else:
         return None
 

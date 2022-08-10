@@ -2099,9 +2099,9 @@ a.badge-dark {
 
 .card .card-subtitle {
     color: #4F5050;
-    font-weight: 500;
+    font-weight: 1000;
     letter-spacing: .01em;
-    font-size: 11px;
+    font-size: 14px;
     text-transform: uppercase;
     margin-bottom: 8px;
     margin-top: -4px;
@@ -5528,7 +5528,7 @@ textarea,
 .carousel-slider .splide__pagination {
     position: fixed;
     width: 100%;
-    bottom: 120px;
+    bottom: 40px;
 }
 
 .carousel-slider .splide__pagination button {

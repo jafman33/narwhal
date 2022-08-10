@@ -414,7 +414,7 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.carousel-slider').forEach(carousel => new Splide(carousel, {
         perPage: 1,
         rewind: false,
-        type: "loop",
+        type: "slide",
         gap: 16,
         padding: 16,
         arrows: false,

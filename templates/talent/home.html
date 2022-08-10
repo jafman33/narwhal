@@ -4,14 +4,14 @@
 {% block content %}
 
 <!-- App Header -->
-<div class="appHeader bg-primary text-light">
+<div class="appHeader bg-primary scrolled">
     <div class="left">
         <a href="#" class="headerButton" data-bs-toggle="offcanvas" data-bs-target="#sidebarPanel">
             <ion-icon name="menu-outline"></ion-icon>
         </a>
     </div>
     <div class="pageTitle">
-        Home
+        <img src="../static/assets/img/logo.png" style="width: 100px; margin: 0px; filter: brightness(0) invert(1);" alt="icon">
     </div>
     <!-- <div class="right">
         <a href="#" class="headerButton toggle-searchbox">
@@ -24,13 +24,12 @@
 <!-- App Capsule -->
 <div id="appCapsule">
 
-    <div class="header-large-title">
-        <!-- <h1 class="title">Discover</h1> -->
-        <img src="../static/assets/img/logo.png" style="width: 100px; margin: 0px;" alt="icon">
-        <h4 class="subtitle">Welcome to Cyber-Text</h4>
-    </div>
 
     <div class="section full mt-3 mb-3">
+
+        <!-- 
+            These widgets show up until you complete your profile!
+         -->
 
         <!-- carousel multiple -->
         <div class="carousel-multiple splide">
@@ -40,7 +39,7 @@
                         <div class="card">
                             <img src="../static/assets/img/sample/photo/d2.jpg" class="card-img-top" alt="image">
                             <div class="card-body pt-2">
-                                <h4 class="mb-0">Reusable components</h4>
+                                <h4 class="mb-0">Add Experience</h4>
                             </div>
                         </div>
                     </li>
@@ -48,23 +47,7 @@
                         <div class="card">
                             <img src="../static/assets/img/sample/photo/d3.jpg" class="card-img-top" alt="image">
                             <div class="card-body pt-2">
-                                <h4 class="mb-0">Great for phones</h4>
-                            </div>
-                        </div>
-                    </li>
-                    <li class="splide__slide">
-                        <div class="card">
-                            <img src="../static/assets/img/sample/photo/d4.jpg" class="card-img-top" alt="image">
-                            <div class="card-body pt-2">
-                                <h4 class="mb-0">Change the styles in sass</h4>
-                            </div>
-                        </div>
-                    </li>
-                    <li class="splide__slide">
-                        <div class="card">
-                            <img src="../static/assets/img/sample/photo/d6.jpg" class="card-img-top" alt="image">
-                            <div class="card-body pt-2">
-                                <h4 class="mb-0">Sketch source file </h4>
+                                <h4 class="mb-0">Add Education</h4>
                             </div>
                         </div>
                     </li>
@@ -72,7 +55,31 @@
                         <div class="card">
                             <img src="../static/assets/img/sample/photo/d5.jpg" class="card-img-top" alt="image">
                             <div class="card-body pt-2">
-                                <h4 class="mb-0">Written with structure</h4>
+                                <h4 class="mb-0">Add Projects</h4>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="splide__slide">
+                        <div class="card">
+                            <img src="../static/assets/img/sample/photo/d4.jpg" class="card-img-top" alt="image">
+                            <div class="card-body pt-2">
+                                <h4 class="mb-0">Add Skills</h4>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="splide__slide">
+                        <div class="card">
+                            <img src="../static/assets/img/sample/photo/d6.jpg" class="card-img-top" alt="image">
+                            <div class="card-body pt-2">
+                                <h4 class="mb-0">Add Publications</h4>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="splide__slide">
+                        <div class="card">
+                            <img src="../static/assets/img/sample/photo/d5.jpg" class="card-img-top" alt="image">
+                            <div class="card-body pt-2">
+                                <h4 class="mb-0">Add Patents</h4>
                             </div>
                         </div>
                     </li>
@@ -88,15 +95,34 @@
         <div class="card">
             <img src="../static/assets/img/sample/photo/wide2.jpg" class="card-img-top" alt="image">
             <div class="card-body">
-                <h6 class="card-subtitle">Discover</h6>
-                <h5 class="card-title">About Cyber-Text</h5>
+                <h2 class="card-subtitle">Project Title</h2>
                 <p class="card-text">
-                    Whats New?
+                    Project Details
                 </p>
-                <a href="#" class="btn btn-primary">
-                    <ion-icon name="layers-outline"></ion-icon>
-                    Get Started
-                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="section mt-3 mb-3">
+        <div class="card">
+            <img src="../static/assets/img/sample/photo/wide2.jpg" class="card-img-top" alt="image">
+            <div class="card-body">
+                <h2 class="card-subtitle">Project Title</h2>
+                <p class="card-text">
+                    Project Details
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section mt-3 mb-3">
+        <div class="card">
+            <img src="../static/assets/img/sample/photo/wide2.jpg" class="card-img-top" alt="image">
+            <div class="card-body">
+                <h2 class="card-subtitle">Project Title</h2>
+                <p class="card-text">
+                    Project Details
+                </p>
             </div>
         </div>
     </div>
@@ -104,12 +130,11 @@
 
     <!-- app footer -->
     <div class="appFooter">
-        <img src="../static/assets/img/logo.png" style="width: 100px; margin: 0px;" alt="icon">
+        <img src="../static/assets/img/logo.png" style="width: 100px; margin-bottom: 10px;" alt="icon">
         <!-- class="footer-logo mb-2"> -->
         <div class="footer-title">
-            Copyright © Cyber-Text <span class="yearNow"></span>. <br>All Rights Reserved.
+            Copyright © Narwhal <span class="yearNow"></span>. <br>All Rights Reserved.
         </div>
-        <!-- <div>The 3L-Ranch mission here</div> -->
 
     </div>
     <!-- * app footer -->

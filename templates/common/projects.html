@@ -1,220 +1,178 @@
-<!doctype html>
-<html lang="en">
+{% extends 'talent/layout.html' %}
 
-<head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, viewport-fit=cover" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="theme-color" content="#000000">
-    <title>Mobilekit Mobile UI Kit</title>
-    <meta name="description" content="Mobilekit HTML Mobile UI Kit">
-    <meta name="keywords" content="bootstrap 5, mobile template, cordova, phonegap, mobile, html" />
-    <link rel="icon" type="image/png" href="../static/assets/img/favicon.png" sizes="32x32">
-    <link rel="apple-touch-icon" sizes="180x180" href="../static/assets/img/icon/192x192.png">
-    <link rel="stylesheet" href="../static/assets/css/style.css">
-    <link rel="manifest" href="../static/manifest/manifest.json">
-</head>
+<!--  -->
+{% block content %}
 
-<body>
 
-    <!-- loader -->
-    <div id="loader">
-        <div class="spinner-border text-primary" role="status"></div>
+<!-- App Header -->
+<div class="appHeader bg-primary text-light">
+    <div class="left">
+        <a href="#" class="headerButton goBack">
+            <ion-icon name="chevron-back-outline"></ion-icon>
+        </a>
     </div>
-    <!-- * loader -->
+    <div class="pageTitle">Projects</div>
+    <div class="right">
+        <a href="#" class="headerButton toggle-searchbox">
+            <ion-icon name="search-outline"></ion-icon>
+        </a>
+    </div>
+</div>
+<!-- * App Header -->
 
-    <!-- App Header -->
-    <div class="appHeader bg-primary text-light">
-        <div class="left">
-            <a href="#" class="headerButton goBack">
-                <ion-icon name="chevron-back-outline"></ion-icon>
+<!-- Search Component -->
+<div id="search" class="appHeader">
+    <form class="search-form">
+        <div class="form-group searchbox">
+            <input type="text" class="form-control" placeholder="Search...">
+            <i class="input-icon">
+                    <ion-icon name="search-outline"></ion-icon>
+                </i>
+            <a href="#" class="ms-1 close toggle-searchbox">
+                <ion-icon name="close-circle"></ion-icon>
             </a>
         </div>
-        <div class="pageTitle">Tasks</div>
-        <div class="right">
-            <a href="#" class="headerButton" data-bs-toggle="modal" data-bs-target="#DialogClear">
-                <ion-icon name="trash-outline"></ion-icon>
-            </a>
-        </div>
-    </div>
-    <!-- * App Header -->
+    </form>
+</div>
+<!-- * Search Component -->
 
-    <!-- Extra Header -->
-    <div class="extraHeader p-0">
-        <ul class="nav nav-tabs lined" id="myTab" role="tablist">
-            <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="active-tab" data-bs-toggle="tab" data-bs-target="#active" type="button" role="tab" aria-controls="intro" aria-selected="true">Active</button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="history-tab" data-bs-toggle="tab" data-bs-target="#history" type="button" role="tab" aria-controls="history" aria-selected="false">History</button>
-            </li>
-        </ul>
-    </div>
-    <!-- * Extra Header -->
+<!-- Extra Header -->
+<div class="extraHeader p-0">
+    <ul class="nav nav-tabs lined" id="myTab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="active-tab" data-bs-toggle="tab" data-bs-target="#active" type="button" role="tab" aria-controls="intro" aria-selected="true">All</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="applied-tab" data-bs-toggle="tab" data-bs-target="#applied" type="button" role="tab" aria-controls="applied" aria-selected="false">Applied</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="engaged-tab" data-bs-toggle="tab" data-bs-target="#engaged" type="button" role="tab" aria-controls="engaged" aria-selected="false">Engaged</button>
+        </li>
+    </ul>
+</div>
+<!-- * Extra Header -->
 
+<!-- App Capsule -->
 
-    <div class="modal fade dialogbox" id="DialogClear" data-bs-backdrop="static" tabindex="-1" role="dialog">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Empty Cart</h5>
-                </div>
-                <div class="modal-body">
-                    All items will be deleted.
-                </div>
-                <div class="modal-footer">
-                    <div class="btn-inline">
-                        <a href="#" class="btn btn-text-secondary" data-bs-dismiss="modal">CLOSE</a>
-                        <a href="#" class="btn btn-text-primary" data-bs-dismiss="modal">DELETE</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- * Dialog Clear -->
+<div id="appCapsule" class="extra-header-active">
+    <div class="tab-content">
+        <div class="tab-pane active" id="active" role="tabpanel" aria-labelledby="active-tab">
 
-    <!-- App Capsule -->
+            <ul class="listview image-listview media mb-2">
 
-    <div id="appCapsule" class="extra-header-active">
-        <div class="tab-content">
-            <div class="tab-pane active" id="active" role="tabpanel" aria-labelledby="active-tab">
-
-                <div class="section mt-2">
-                    <!-- item -->
-                    <div class="card cart-item mb-2">
-                        <div class="card-body">
-                            <div class="in">
-                                <img src="../static/assets/img/sample/photo/product1.jpg" alt="product" class="imaged">
-                                <div class="text">
-                                    <h3 class="title" style="font-size:12px">{Your Task Name Goes in Here}</h3>
-                                    <p class="detail" style="font-size:12px">
-                                        12 Bids
-                                    </p>
-                                    <p class="detail" style="font-size:12px">
-                                        15 Views
-                                    </p>
-                                    <!-- <strong class="price">$ 5.99</strong> -->
-
-                                </div>
-                            </div>
-                            <div class="cart-item-footer">
-                                <a href="#" class="btn btn-primary btn-sm">End Early</a>
-                                <a href="#" class="btn btn-primary btn-sm">View Details</a>
+                <li>
+                    <a href="#" class="item">
+                        <div class="imageWrapper">
+                            <img src="../static/assets/img/sample/photo/3.jpg" alt="image" class="imaged w64">
+                        </div>
+                        <div class="in">
+                            <div>
+                                Project Title
+                                <div class="text-muted">Division Name</div>
+                                <div class="text-muted">Project Manager Name</div>
                             </div>
                         </div>
-                    </div>
-                    <!-- * item -->
-
-
-                </div>
-
-                <!-- Discount -->
-                <!-- <div class="section">
-                    <a href="#" class="btn btn-sm btn-text-secondary btn-block" data-bs-toggle="offcanvas" data-bs-target="#actionSheetDiscount">
-                        <ion-icon name="qr-code-outline"></ion-icon>
-                        Have a discount code?
                     </a>
-                </div> -->
+                </li>
 
-                <!-- Discount Action Sheet -->
-                <!-- <div class="offcanvas offcanvas-bottom action-sheet" tabindex="-1" id="actionSheetDiscount">
-                    <div class="offcanvas-header">
-                        <h5 class="offcanvas-title">Enter Discount Code</h5>
-                    </div>
-                    <div class="offcanvas-body">
-                        <div class="action-sheet-content">
-                            <form>
-                                <div class="form-group basic">
-                                    <div class="input-wrapper">
-                                        <label class="form-label" for="discount1">Discount Code</label>
-                                        <input type="text" class="form-control" id="discount1" placeholder="Enter your discount code">
-                                        <i class="clear-input">
-                                    <ion-icon name="close-circle"></ion-icon>
-                                </i>
-                                    </div>
-                                </div>
-
-                                <div class="form-group basic">
-                                    <button type="button" class="btn btn-primary btn-block" data-bs-dismiss="offcanvas">Apply
-                                Discount</button>
-                                </div>
-                            </form>
+                <li>
+                    <a href="#" class="item">
+                        <div class="imageWrapper">
+                            <img src="../static/assets/img/sample/photo/3.jpg" alt="image" class="imaged w64">
                         </div>
-                    </div>
-                </div> -->
-                <!-- * Discount Action Sheet -->
+                        <div class="in">
+                            <div>
+                                Project Title
+                                <div class="text-muted">Division Name</div>
+                                <div class="text-muted">Project Manager Name</div>
+                            </div>
+                        </div>
+                    </a>
+                </li>
 
-                <!-- Summary -->
-                <!-- <div class="section mt-2 mb-2">
-                    <div class="card">
-                        <ul class="listview flush transparent simple-listview">
-                            <li>Items <span class="text-muted">$ 54.20</span></li>
-                            <li>Shipping <span class="text-muted">$ 2.90</span></li>
-                            <li>Tax (10%)<span class="text-muted">$ 5.70</span></li>
-                            <li>Total<span class="text-primary font-weight-bold">$ 62.80</span></li>
-                        </ul>
-                    </div>
-                </div> -->
+                <li>
+                    <a href="#" class="item">
+                        <div class="imageWrapper">
+                            <img src="../static/assets/img/sample/photo/3.jpg" alt="image" class="imaged w64">
+                        </div>
+                        <div class="in">
+                            <div>
+                                Project Title
+                                <div class="text-muted">Division Name</div>
+                                <div class="text-muted">Project Manager Name</div>
+                            </div>
+                        </div>
+                    </a>
+                </li>
 
-                <!-- <div class="section mb-2">
-                    <a href="#" class="btn btn-primary btn-block ">Order Now</a>
-                </div> -->
+            </ul>
 
-            </div>
+        </div>
 
-            <div class="tab-pane" id="history" role="tabpanel" aria-labelledby="history-tab">
+        <div class="tab-pane" id="applied" role="tabpanel" aria-labelledby="applied-tab">
 
-            </div>
+            <ul class="listview image-listview media mb-2">
+
+                <li>
+                    <a href="#" class="item">
+                        <div class="imageWrapper">
+                            <img src="../static/assets/img/sample/photo/3.jpg" alt="image" class="imaged w64">
+                        </div>
+                        <div class="in">
+                            <div>
+                                Project Title
+                                <div class="text-muted">Division Name</div>
+                                <div class="text-muted">Project Manager Name</div>
+                            </div>
+                        </div>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="#" class="item">
+                        <div class="imageWrapper">
+                            <img src="../static/assets/img/sample/photo/3.jpg" alt="image" class="imaged w64">
+                        </div>
+                        <div class="in">
+                            <div>
+                                Project Title
+                                <div class="text-muted">Division Name</div>
+                                <div class="text-muted">Project Manager Name</div>
+                            </div>
+                        </div>
+                    </a>
+                </li>
+
+            </ul>
+
+        </div>
+
+        <div class="tab-pane" id="engaged" role="tabpanel" aria-labelledby="engaged-tab">
+
+            <ul class="listview image-listview media mb-2">
+
+                <li>
+                    <a href="#" class="item">
+                        <div class="imageWrapper">
+                            <img src="../static/assets/img/sample/photo/3.jpg" alt="image" class="imaged w64">
+                        </div>
+                        <div class="in">
+                            <div>
+                                Project Title
+                                <div class="text-muted">Division Name</div>
+                                <div class="text-muted">Project Manager Name</div>
+                            </div>
+                        </div>
+                    </a>
+                </li>
+
+            </ul>
+
         </div>
 
     </div>
-    <!-- * App Capsule -->
 
-    <!-- App Bottom Menu -->
-    <div class="appBottomMenu">
-        <a href="#" class="item">
-            <div class="col">
-                <ion-icon name="home-outline"></ion-icon>
-            </div>
-        </a>
-        <a href="#" class="item">
-            <div class="col">
-                <ion-icon name="cube-outline"></ion-icon>
-            </div>
-        </a>
-        <a href="#" class="item">
-            <div class="col">
-                <ion-icon name="chatbubble-ellipses-outline"></ion-icon>
-                <span class="badge badge-danger">5</span>
-            </div>
-        </a>
-        <a href="#" class="item">
-            <div class="col">
-                <ion-icon name="layers-outline"></ion-icon>
-            </div>
-        </a>
-        <a href="#" class="item" data-bs-toggle="offcanvas">
-            <div class="col">
-                <ion-icon name="menu-outline"></ion-icon>
-            </div>
-        </a>
-    </div>
-    <!-- * App Bottom Menu -->
+</div>
+<!-- * App Capsule -->
 
-
-    <!-- ============== Js Files ==============  -->
-    <!-- Bootstrap -->
-    <script src="../static/assets/js/lib/bootstrap.min.js"></script>
-    <!-- Ionicons -->
-    <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
-    <!-- Splide -->
-    <script src="../static/assets/js/plugins/splide/splide.min.js"></script>
-    <!-- ProgressBar js -->
-    <script src="../static/assets/js/plugins/progressbar-js/progressbar.min.js"></script>
-    <!-- Base Js File -->
-    <script src="../static/assets/js/base.js"></script>
-
-</body>
-
-</html>
+{% endblock %}

@@ -14,6 +14,13 @@
     <link rel="apple-touch-icon" sizes="180x180" href="../static/assets/img/icon/192x192.png">
     <link rel="stylesheet" href="../static/assets/css/style.css">
     <link rel="manifest" href="../static/manifest/manifest.json">
+
+    <style>
+        lottie-player {
+            margin: 0 auto;
+        }
+    </style>
+
 </head>
 
 <body>
@@ -66,12 +73,16 @@
             <!-- profile box -->
             <div class="profileBox">
                 <div class="image-wrapper">
+                    <!-- {% if user.data.selfie%} -->
+                    <img src="{{user.data.selfie}}" alt="image" class="imaged rounded">
+                    <!-- {% else %} -->
                     <img src="../static/assets/img/sample/avatar/avatar.png" alt="image" class="imaged rounded">
+                    <!-- {% endif %} -->
                 </div>
                 <div class="in">
-                    <strong>{{ user_data["firstname"] }} {{ user_data["lastname"] }}</strong>
+                    <strong>{{ user.data.firstname }} {{ user.data.lastname }}</strong>
                     <div class="text-muted">
-                        {{ user_data["usertype"] }}
+                        {{ user.data.usertype }}
                     </div>
                 </div>
                 <a href="#" class="close-sidebar-button" data-bs-dismiss="offcanvas">
@@ -277,6 +288,8 @@
     <script src="../static/assets/js/plugins/progressbar-js/progressbar.min.js"></script>
     <!-- Base Js File -->
     <script src="../static/assets/js/base.js"></script>
+    <!-- lootie -->
+    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
 
     <!-- <script>
         // Trigger welcome notification after 5 seconds

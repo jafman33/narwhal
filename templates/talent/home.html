@@ -27,62 +27,108 @@
 
     <div class="section full mt-3 mb-3">
 
+
+
         <!-- 
             These widgets show up until you complete your profile!
          -->
+
+        <div class="section mb-3">
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="card-subtitle">Profile Completion</h2>
+                    <p>Get noticed! Complete your profile.</p>
+                    <div class="progress">
+                        <div class="progress-bar" role="progressbar" style="width: 25%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">25%</div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <!-- carousel multiple -->
         <div class="carousel-multiple splide">
             <div class="splide__track">
                 <ul class="splide__list">
+
                     <li class="splide__slide">
                         <div class="card">
-                            <img src="../static/assets/img/sample/photo/d2.jpg" class="card-img-top" alt="image">
+                            <lottie-player src="https://assets3.lottiefiles.com/packages/lf20_z5kmjeap.json" background="transparent" speed="1" style="width: 100px; height: 100px; margin-top:40px; margin-bottom:10px" loop autoplay></lottie-player>
                             <div class="card-body pt-2">
-                                <h4 class="mb-0">Add Experience</h4>
+                                <div class="col-12 mt-2 text-center">
+                                    <a href="{{ url_for('personal') }}" class="btn btn-primary btn-sm">
+                                        <ion-icon name="add-circle-outline"></ion-icon> Personal
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </li>
+
                     <li class="splide__slide">
                         <div class="card">
-                            <img src="../static/assets/img/sample/photo/d3.jpg" class="card-img-top" alt="image">
+                            <lottie-player src="https://assets2.lottiefiles.com/packages/lf20_qdmxvg00.json" background="transparent" speed="1" style="width: 150px; height: 150px;" loop autoplay></lottie-player>
                             <div class="card-body pt-2">
-                                <h4 class="mb-0">Add Education</h4>
+                                <div class="col-12 mt-2 text-center">
+                                    <a href="{{ url_for('home') }}" class="btn btn-primary btn-sm">
+                                        <ion-icon name="add-circle-outline"></ion-icon> Experience
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </li>
+
                     <li class="splide__slide">
                         <div class="card">
-                            <img src="../static/assets/img/sample/photo/d5.jpg" class="card-img-top" alt="image">
+                            <lottie-player src="https://assets1.lottiefiles.com/packages/lf20_DMgKk1.json" background="transparent" speed="1" style="width: 150px; height: 150px;" loop autoplay></lottie-player>
                             <div class="card-body pt-2">
-                                <h4 class="mb-0">Add Projects</h4>
+                                <div class="col-12 mt-2 text-center">
+                                    <a href="{{ url_for('home') }}" class="btn btn-primary btn-sm">
+                                        <ion-icon name="add-circle-outline"></ion-icon> Education
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </li>
+
                     <li class="splide__slide">
                         <div class="card">
-                            <img src="../static/assets/img/sample/photo/d4.jpg" class="card-img-top" alt="image">
+                            <lottie-player src="https://assets2.lottiefiles.com/private_files/lf30_obidsi0t.json" background="transparent" speed="1" style="width: 150px; height: 150px;" loop autoplay></lottie-player>
                             <div class="card-body pt-2">
-                                <h4 class="mb-0">Add Skills</h4>
+                                <div class="col-12 mt-2 text-center">
+                                    <a href="{{ url_for('home') }}" class="btn btn-primary btn-sm">
+                                        <ion-icon name="add-circle-outline"></ion-icon> Skills
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </li>
+
                     <li class="splide__slide">
                         <div class="card">
-                            <img src="../static/assets/img/sample/photo/d6.jpg" class="card-img-top" alt="image">
+                            <lottie-player src="https://assets5.lottiefiles.com/packages/lf20_dts7rqmw.json" background="transparent" speed="1" style="width: 150px; height: 120px; margin-top:30px;" loop autoplay></lottie-player>
                             <div class="card-body pt-2">
-                                <h4 class="mb-0">Add Publications</h4>
+                                <div class="col-12 mt-2 text-center">
+                                    <a href="{{ url_for('home') }}" class="btn btn-primary btn-sm">
+                                        <ion-icon name="add-circle-outline"></ion-icon> Publications
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </li>
+
                     <li class="splide__slide">
                         <div class="card">
-                            <img src="../static/assets/img/sample/photo/d5.jpg" class="card-img-top" alt="image">
+                            <lottie-player src="https://assets9.lottiefiles.com/temp/lf20_hT22rr.json" background="transparent" speed="1" style="width: 150px; height: 150px;" loop autoplay></lottie-player>
                             <div class="card-body pt-2">
-                                <h4 class="mb-0">Add Patents</h4>
+                                <div class="col-12 mt-2 text-center">
+                                    <a href="{{ url_for('home') }}" class="btn btn-primary btn-sm">
+                                        <ion-icon name="add-circle-outline"></ion-icon> Patents
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </li>
+
+
                 </ul>
             </div>
         </div>
@@ -92,40 +138,42 @@
 
 
     <div class="section mt-3 mb-3">
-        <div class="card">
-            <img src="../static/assets/img/sample/photo/wide2.jpg" class="card-img-top" alt="image">
-            <div class="card-body">
-                <h2 class="card-subtitle">Project Title</h2>
-                <p class="card-text">
-                    Project Details
-                </p>
+        <a href="https://www.challenge.gov/?challenge=project-narwhal">
+            <div class="card">
+                <img src="../static/assets/img/sample/photo/wide_narwhal.png" class="card-img-top" alt="image">
+                <div class="card-body">
+                    <h2 class="card-subtitle m-0">Project Narwal</h2>
+                    <p class="card-text m-0" style="font-size: 14px;">
+                        Department of Defense - Navy
+                    </p>
+                    <p class="text-muted m-0" style="font-size: 14px;">
+                        Creating the Navy's Gig Economy App
+                    </p>
+                </div>
             </div>
-        </div>
+        </a>
     </div>
 
     <div class="section mt-3 mb-3">
-        <div class="card">
-            <img src="../static/assets/img/sample/photo/wide2.jpg" class="card-img-top" alt="image">
-            <div class="card-body">
-                <h2 class="card-subtitle">Project Title</h2>
-                <p class="card-text">
-                    Project Details
-                </p>
+        <a href="https://www.challenge.gov/?challenge=cause-of-death-elucidated-(code)-in-drug-overdose">
+            <div class="card">
+                <img src="../static/assets/img/sample/photo/wide_code.png" class="card-img-top" alt="image">
+                <div class="card-body">
+                    <h2 class="card-subtitle m-0">Code Challenge</h2>
+                    <p class="card-text m-0" style="font-size: 14px;">
+                        Department of Health and Human Services
+                    </p>
+                    <p class="text-muted m-0" style="font-size: 14px;">
+                        Improve public health response to the opioid epidemic
+                    </p>
+                </div>
             </div>
-        </div>
+        </a>
     </div>
 
-    <div class="section mt-3 mb-3">
-        <div class="card">
-            <img src="../static/assets/img/sample/photo/wide2.jpg" class="card-img-top" alt="image">
-            <div class="card-body">
-                <h2 class="card-subtitle">Project Title</h2>
-                <p class="card-text">
-                    Project Details
-                </p>
-            </div>
-        </div>
-    </div>
+
+
+
 
 
     <!-- app footer -->
@@ -141,5 +189,6 @@
 
 </div>
 <!-- * App Capsule -->
+
 
 {% endblock %}

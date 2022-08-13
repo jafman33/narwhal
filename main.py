@@ -1,5 +1,5 @@
 from app import app
-from config import socketio, client
+from config import socketio, client, s3, os
 
 import hashlib
 from functools import wraps
@@ -18,10 +18,13 @@ from flask import (
     send_from_directory
 )
 
+from werkzeug.utils import secure_filename
 from flask_socketio import join_room
 from faunadb import query as q
 from faunadb.objects import Ref
 import re
+import uuid
+
 
 
 # Login decorator to ensure user is logged in before accessing certain routes
@@ -62,7 +65,7 @@ def register():
         
         except:
             
-            if not firstname or not lastname or not password or not email or not password:
+            if not firstname or not lastname or not password or not email:
                 flash("Please fill out the form completely.")
                 return redirect(url_for('register'))
             
@@ -84,30 +87,6 @@ def register():
                         },
                     )
                 )
-                
-                # user = client.query(
-                #     q.create(
-                #         q.collection("profiles"),
-                #         {
-                #             "data": {
-                #                 "user_id": user["ref"].id(),
-                #                 "photo": [],
-                #                 "education":
-                #                     {
-                #                         "major": [],
-                #                         "school": [],
-                #                         "gpa": [],
-                #                     },
-                #                 "experience":
-                #                     {
-                #                         "employer": [],
-                #                         "title": [],
-                #                         "daterange": [],
-                #                     },
-                #                 }
-                #             }
-                #         )
-                #     )
                 
                 # Create a new chat list for newly registered userß
                 chat = client.query(
@@ -182,22 +161,13 @@ def intro():
     else:
         return None
     
+    
 @app.route("/projects", methods=["GET", "POST"])
 @login_required
 def projects():
     return render_template("common/projects.html", user_data=session["user"])
+ 
 
-    
-# Register a new user and hash password
-@app.route("/profile-wizard", methods=["GET", "POST"])
-@login_required
-def profile_wizard():
-    if session["user"]['usertype'] == 'Project Manager':
-        return render_template("pm/profile-wizard.html", user_data=session["user"])
-    elif session["user"]['usertype'] == 'Engineering Talent':
-        return render_template("talent/profile-wizard.html", user_data=session["user"])
-    else:
-        return None
 
 @app.route("/home", methods=["GET","POST"])
 @login_required
@@ -205,9 +175,12 @@ def home():
     if session["user"]['usertype'] == 'Project Manager':
         return render_template("pm/home.html", user_data=session["user"])
     elif session["user"]['usertype'] == 'Engineering Talent':
-        return render_template("talent/home.html", user_data=session["user"])
+        user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
+        return render_template("talent/home.html", user=user_data)
     else:
       return None
+  
+
 
 @app.route("/profile", methods=["GET","POST"])
 @login_required
@@ -219,6 +192,66 @@ def profile():
     else:
         return None
 
+ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+@app.route("/personal", methods=["GET","POST"])
+@login_required
+def personal():
+    if session["user"]['usertype'] == 'Project Manager':
+        # to-do...
+        return render_template("pm/personal.html", user_data=session["user"])
+    
+    elif session["user"]['usertype'] == 'Engineering Talent':
+        
+        # get values from fauna using id... pass them to render the form pre-populated
+        user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
+
+        if request.method == 'POST':
+            print('entered post')
+            
+            phone = request.form['phone']
+            city = request.form['city']
+            selfie = request.files['file']
+            uuid_ = uuid.uuid4()
+            
+            if selfie and allowed_file(selfie.filename):
+                filename = secure_filename('profile_photo-' + session["user"]["id"] + '-' + str(uuid_))
+                photoUrl = 'https://bidztr.s3.amazonaws.com/{}'.format(filename)
+                selfie.save("static/tmp/"+filename)
+                s3.upload_file(
+                    Bucket=app.config['S3_BUCKET'],
+                    Filename="static/tmp/"+filename,
+                    Key=filename)
+                os.remove("static/tmp/"+filename)
+                
+            if phone and city and selfie:                
+                update = client.query(
+                    q.update(
+                        q.ref(q.collection("users"), session["user"]["id"]),
+                        {
+                            "data": {
+                                "selfie": photoUrl,
+                                "phone": phone,
+                                "city": city,
+                            }
+                        }
+                    )
+                )
+            else:
+                flash("You must upload a photo, and include your phone number and your city.")
+                return redirect(url_for('personal'))
+            
+            if request.form['btn'] == 'Next':
+                return 'where should it go next!?'
+            else:
+                return redirect(url_for('personal'))
+
+        return render_template("talent/personal.html", user = user_data)
+    else:
+        return None
 
 @app.route("/contacts", methods=["GET","POST"])
 @login_required

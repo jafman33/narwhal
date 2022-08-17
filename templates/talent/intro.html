@@ -56,7 +56,7 @@
                 <ul class="splide__list">
                     <li class="splide__slide p-4">
                         <lottie-player src="https://assets1.lottiefiles.com/packages/lf20_M9p23l.json" background="transparent" speed="1" style="width: 200px; height: 200px;margin-bottom: 40px;" autoplay></lottie-player>
-                        <h2>Welcome {{user_data.firstname}}!</h2>
+                        <h2>Welcome {{user.firstname}}!</h2>
                         <p class="mt-4">
                             Congratulations on creating your talent account. You are one step closer to getting connected with projects that match your insterests and skills.
                         </p>
@@ -85,7 +85,7 @@
                             The journey begins by creating your profile. Narwhal your way to your next opportunity!
                         </p>
                         <div class="col-12 mt-5">
-                            <a href="{{ url_for('profile_wizard') }}" class="btn btn-success">Create Your Profile</a>
+                            <a href="{{ url_for('home') }}" class="btn btn-success">Create Your Profile</a>
                         </div>
                     </li>
                 </ul>

@@ -73,16 +73,12 @@
             <!-- profile box -->
             <div class="profileBox">
                 <div class="image-wrapper">
-                    <!-- {% if user.data.selfie%} -->
-                    <img src="{{user.data.selfie}}" alt="image" class="imaged rounded">
-                    <!-- {% else %} -->
-                    <img src="../static/assets/img/sample/avatar/avatar.png" alt="image" class="imaged rounded">
-                    <!-- {% endif %} -->
+                    <img src="{{user.data.profile.photo}}" alt="image" class="imaged rounded">
                 </div>
                 <div class="in">
-                    <strong>{{ user.data.firstname }} {{ user.data.lastname }}</strong>
+                    <strong>{{ user.data.account.firstname }} {{ user.data.account.lastname }}</strong>
                     <div class="text-muted">
-                        {{ user.data.usertype }}
+                        {{ user.data.account.usertype }}
                     </div>
                 </div>
                 <a href="#" class="close-sidebar-button" data-bs-dismiss="offcanvas">
@@ -275,6 +271,12 @@
     </div> -->
     <!-- * welcome notification -->
 
+    <!-- <script>
+        // Trigger welcome notification after 5 seconds
+        setTimeout(() => {
+            notification('notification-welcome');
+        }, 2000);
+    </script> -->
 
 
     <!-- ============== Js Files ==============  -->

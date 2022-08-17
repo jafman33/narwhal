@@ -1,3 +1,4 @@
+from xml.dom.pulldom import END_ELEMENT
 from app import app
 from config import socketio, client, s3, os
 
@@ -25,6 +26,7 @@ from faunadb.objects import Ref
 import re
 import uuid
 
+import myLib
 
 
 # Login decorator to ensure user is logged in before accessing certain routes
@@ -72,16 +74,33 @@ def register():
             else:
         
             # Todo - add check for terms and conditions
+            
+            # make this USER TYPE specific!
                 user = client.query(
                     q.create(
                         q.collection("users"),
                         {
                             "data": {
-                                "usertype": type,
-                                "firstname": firstname,
-                                "lastname": lastname,
-                                "email": email,
-                                "password": hashlib.sha512(password.encode()).hexdigest(),
+                                "account": {
+                                    "usertype": type,
+                                    "firstname": firstname,
+                                    "lastname": lastname,
+                                    "email": email,
+                                    "password": hashlib.sha512(password.encode()).hexdigest(),
+                                    },
+                                "profile": {
+                                    "photo": "https://bidztr.s3.amazonaws.com/65463811-61ff-49d0-a714-c93369649d94-docs-avatar.png",
+                                    "phone": "",
+                                    "calendly": "",
+                                    "headline": "",
+                                    "industry": "",
+                                    "zipcode": "",
+                                    "city": "",
+                                    },
+                                "experience": {
+                                    },
+                                "education": {
+                                    },
                                 "date": datetime.now(pytz.UTC),
                             }
                         },
@@ -104,14 +123,14 @@ def register():
                 # Create new session for newly logged in user
                 session["user"] = {
                     "id": user["ref"].id(),
-                    "firstname": user["data"]["firstname"],
-                    "lastname": user["data"]["lastname"],
-                    "email": user["data"]["email"],
-                    "usertype": user["data"]["usertype"],
+                    "firstname": user["data"]["account"]["firstname"],
+                    "lastname": user["data"]["account"]["lastname"],
+                    "email": user["data"]["account"]["email"],
+                    "usertype": user["data"]["account"]["usertype"],
                     "loggedin": True,
                 }
                             
-                return redirect(url_for("about"))
+                return redirect(url_for("intro"))
             
     return render_template("common/register.html")
 
@@ -126,16 +145,19 @@ def login():
         try:
             # Query the data base for the inputed email address
             user = client.query(q.get(q.match(q.index("userEmail_index"), email)))
-
-            if (hashlib.sha512(password.encode()).hexdigest() == user["data"]["password"]):
+            
+            print('trying password!...')
+            print(user["data"]["account"]["password"])
+            if (hashlib.sha512(password.encode()).hexdigest() == user["data"]["account"]["password"]):
+                print('made it!')
                 
                 # Create new session for newly logged in user
                 session["user"] = {
                     "id": user["ref"].id(),
-                    "firstname": user["data"]["firstname"],
-                    "lastname": user["data"]["lastname"],
-                    "email": user["data"]["email"],
-                    "usertype": user["data"]["usertype"],
+                    "firstname": user["data"]["account"]["firstname"],
+                    "lastname": user["data"]["account"]["lastname"],
+                    "email": user["data"]["account"]["email"],
+                    "usertype": user["data"]["account"]["usertype"],
                     "loggedin": True,
                 }
                             
@@ -155,9 +177,9 @@ def login():
 @login_required
 def intro():
     if session["user"]['usertype'] == 'Project Manager':
-        return render_template("pm/intro.html", user_data=session["user"])
+        return render_template("pm/intro.html", user=session["user"])
     elif session["user"]['usertype'] == 'Engineering Talent':
-        return render_template("talent/intro.html", user_data=session["user"])
+        return render_template("talent/intro.html", user=session["user"])
     else:
         return None
     
@@ -165,7 +187,7 @@ def intro():
 @app.route("/projects", methods=["GET", "POST"])
 @login_required
 def projects():
-    return render_template("common/projects.html", user_data=session["user"])
+    return render_template("common/projects.html", user=session["user"])
  
 
 
@@ -173,7 +195,7 @@ def projects():
 @login_required
 def home():
     if session["user"]['usertype'] == 'Project Manager':
-        return render_template("pm/home.html", user_data=session["user"])
+        return render_template("pm/home.html", user=session["user"])
     elif session["user"]['usertype'] == 'Engineering Talent':
         user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
         return render_template("talent/home.html", user=user_data)
@@ -192,66 +214,141 @@ def profile():
     else:
         return None
 
-ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
-def allowed_file(filename):
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-@app.route("/personal", methods=["GET","POST"])
+
+@app.route("/profile-edit", methods=["GET","POST"])
 @login_required
-def personal():
+def profile_edit():
     if session["user"]['usertype'] == 'Project Manager':
         # to-do...
-        return render_template("pm/personal.html", user_data=session["user"])
+        #
+        #
+        return render_template("pm/profile_edit.html", user_data=session["user"])
     
     elif session["user"]['usertype'] == 'Engineering Talent':
         
         # get values from fauna using id... pass them to render the form pre-populated
         user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
-
-        if request.method == 'POST':
-            print('entered post')
+        
+        if request.method == 'POST':            
+            
+            photo = request.files['file']
+            # here logic to make sure you actually received a photo submission
+            #
+            #
+            if photo.filename != '' and myLib.allowed_file(photo.filename):
+                photoUrl = myLib.uploadPhotoS3(photo)
+                myLib.updateProfilePhoto(photoUrl)
+            
+            firstname = request.form['firstname']
+            lastname = request.form['lastname']  
+            if firstname and lastname:                
+                myLib.updateAccountName(firstname, lastname)
             
             phone = request.form['phone']
-            city = request.form['city']
-            selfie = request.files['file']
-            uuid_ = uuid.uuid4()
+            calendly = request.form['calendly']
+            if phone:              
+                myLib.updateProfileContact(phone, calendly)
             
-            if selfie and allowed_file(selfie.filename):
-                filename = secure_filename('profile_photo-' + session["user"]["id"] + '-' + str(uuid_))
-                photoUrl = 'https://bidztr.s3.amazonaws.com/{}'.format(filename)
-                selfie.save("static/tmp/"+filename)
-                s3.upload_file(
-                    Bucket=app.config['S3_BUCKET'],
-                    Filename="static/tmp/"+filename,
-                    Key=filename)
-                os.remove("static/tmp/"+filename)
+            headline = request.form['headline']   
+            if headline:
+                myLib.updateProfileHeadline(headline)
                 
-            if phone and city and selfie:                
-                update = client.query(
-                    q.update(
-                        q.ref(q.collection("users"), session["user"]["id"]),
-                        {
-                            "data": {
-                                "selfie": photoUrl,
-                                "phone": phone,
-                                "city": city,
-                            }
-                        }
-                    )
-                )
-            else:
-                flash("You must upload a photo, and include your phone number and your city.")
-                return redirect(url_for('personal'))
+            industry = request.form['industry']
+            if industry:
+                myLib.updateProfileIndustry(industry)
+                
+            zipcode = request.form['zipcode']
+            city = request.form['city']
+            if zipcode and city:
+                myLib.updateProfileLocation(zipcode, city)
+     
             
-            if request.form['btn'] == 'Next':
-                return 'where should it go next!?'
-            else:
-                return redirect(url_for('personal'))
+            if request.form['btn'] == 'Save':
+                return redirect(url_for('profile_edit'))
 
-        return render_template("talent/personal.html", user = user_data)
+        return render_template("talent/profile-edit.html", user = user_data)
     else:
         return None
+
+@app.route("/experience-edit", methods=["GET","POST"])
+@app.route("/experience-edit/<id>", methods=["GET","POST"])
+@login_required
+def experience_edit(id=None):
+    
+    user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
+
+    if request.method == 'POST':
+        
+        if request.form['btn'] == 'Delete Entry':
+            client.query(
+                q.update(
+                    q.ref(q.collection("users"), session["user"]["id"]),
+                    {
+                        "data": {
+                            "experience": {
+                                id: None,
+                                },
+                            }
+                        },
+                    )
+                )
+            return redirect(url_for('profile_edit'))
+            
+        title = request.form['title']
+        type = request.form['type']  
+        company = request.form['company']  
+        location = request.form['location']  
+        status = request.form['status']  
+        start = request.form['start']  
+        end = request.form['end']  
+        industry = request.form['industry']  
+        
+        if start:
+            date_time_obj = datetime.strptime(start, '%Y-%m-%d')
+            start = date_time_obj.strftime("%m/%d/%Y")
+        if end and end != 'Present':
+            date_time_obj = datetime.strptime(end, '%Y-%m-%d')
+            end = date_time_obj.strftime("%m/%d/%Y")
+            
+        experienceID = str(uuid.uuid4())
+        if id:
+            experienceID = id
+
+        if title and type and company and location and status and start and end and industry:
+            client.query(
+                q.update(
+                    q.ref(q.collection("users"), session["user"]["id"]),
+                    {
+                        "data": {
+                            "experience": {
+                                experienceID: {
+                                    "title": title,
+                                    "type": type,
+                                    "company": company,
+                                    "location": location,
+                                    "status": status,
+                                    "start": start,
+                                    "end": end,
+                                    "industry": industry,
+                                    },
+                                },
+                            }
+                        },
+                    )
+                )
+        else:
+            flash("You need to fill out every field")
+            return redirect(url_for('experience_edit'))
+        
+        if request.form['btn'] == 'Save and Back':
+            return redirect(url_for('profile_edit'))
+        if request.form['btn'] == 'Save and Add':
+            return redirect(url_for('experience_edit'))
+
+    return render_template("talent/experience-edit.html", user = user_data, id = id)
+
+
 
 @app.route("/contacts", methods=["GET","POST"])
 @login_required
@@ -469,6 +566,11 @@ def terms():
 def logout():
     session.pop('user', None)
     return redirect(url_for('login'))
+
+@app.route('/under-construction')
+@login_required
+def under_construction():
+    return render_template("common/construction.html")
 
 @app.route('/service-worker.js')
 def sw():

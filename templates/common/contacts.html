@@ -1,5 +1,15 @@
-<!doctype html> {% extends 'layout.html' %}
+<!doctype html>
 
+<!--  -->
+{% if user.data.account.usertype == 'Engineering Talent' %}
+<!--  -->
+{% extends 'talent/layout.html' %}
+<!--  -->
+{% else %}
+<!--  -->
+{% extends 'pm/layout.html' %}
+<!--  -->
+{% endif %}
 <!--  -->
 {% block content %}
 
@@ -11,7 +21,7 @@
             <ion-icon name="chevron-back-outline"></ion-icon>
         </a>
     </div>
-    <div class="pageTitle">Chats</div>
+    <div class="pageTitle">Contacts</div>
     <div class="right">
         <!-- <a href="#" class="headerButton toggle-searchbox">
             <ion-icon name="search-outline"></ion-icon>
@@ -57,7 +67,7 @@
             <a href="{{ url_for('text', rid=my_contacts.room_id) }}" class="item">
                 <img src="../static/assets/img/sample/avatar/avatar.png" alt="image" class="image">
                 <div class="in">
-                    <div>{{ my_contacts["username"] }}</div>
+                    <div>{{ my_contacts.firstname }}</div>
                 </div>
             </a>
         </li>

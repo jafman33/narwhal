@@ -76,39 +76,70 @@ def register():
             # Todo - add check for terms and conditions
             
             # make this USER TYPE specific!
-                user = client.query(
-                    q.create(
-                        q.collection("users"),
-                        {
-                            "data": {
-                                "account": {
-                                    "usertype": type,
-                                    "firstname": firstname,
-                                    "lastname": lastname,
-                                    "email": email,
-                                    "password": hashlib.sha512(password.encode()).hexdigest(),
-                                    },
-                                "profile": {
-                                    "photo": "https://bidztr.s3.amazonaws.com/65463811-61ff-49d0-a714-c93369649d94-docs-avatar.png",
-                                    "phone": "",
-                                    "calendly": "",
-                                    "headline": "",
-                                    "summary": "",
-                                    "industry": "",
-                                    "zipcode": "",
-                                    "city": "",
-                                    },
-                                "experience": {
-                                    },
-                                "education": {
-                                    },
-                                "date": datetime.now(pytz.UTC),
-                            }
-                        },
+                if type == 'Engineering Talent':
+                    user = client.query(
+                        q.create(
+                            q.collection("users"),
+                            {
+                                "data": {
+                                    "account": {
+                                        "usertype": type,
+                                        "firstname": firstname,
+                                        "lastname": lastname,
+                                        "email": email,
+                                        "password": hashlib.sha512(password.encode()).hexdigest(),
+                                        },
+                                    "profile": {
+                                        "photo": "https://bidztr.s3.amazonaws.com/65463811-61ff-49d0-a714-c93369649d94-docs-avatar.png",
+                                        "phone": "",
+                                        "calendly": "",
+                                        "headline": "",
+                                        "summary": "",
+                                        "industry": "",
+                                        "zipcode": "",
+                                        "city": "",
+                                        },
+                                    "experience": {
+                                        },
+                                    "education": {
+                                        },
+                                    "date": datetime.now(pytz.UTC),
+                                }
+                            },
+                        )
                     )
-                )
+                else:
+                    user = client.query(
+                        q.create(
+                            q.collection("users"),
+                            {
+                                "data": {
+                                    "account": {
+                                        "usertype": type,
+                                        "firstname": firstname,
+                                        "lastname": lastname,
+                                        "email": email,
+                                        "password": hashlib.sha512(password.encode()).hexdigest(),
+                                        },
+                                    "profile": {
+                                        "photo": "https://bidztr.s3.amazonaws.com/65463811-61ff-49d0-a714-c93369649d94-docs-avatar.png",
+                                        "phone": "",
+                                        "calendly": "",
+                                        "headline": "",
+                                        "summary": "",
+                                        "division": "",
+                                        "zipcode": "",
+                                        "city": "",
+                                        },
+                                    "projects": {
+                                        },
+                                    "date": datetime.now(pytz.UTC),
+                                }
+                            },
+                        )
+                    )
                 
-                # Create a new chat list for newly registered userß
+                # Create a new chat list for newly registered user
                 chat = client.query(
                     q.create(
                         q.collection("chats"),
@@ -185,19 +216,15 @@ def intro():
         return None
     
     
-@app.route("/projects", methods=["GET", "POST"])
-@login_required
-def projects():
-    user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
-    return render_template("common/projects.html", user=user_data)
- 
 
+  
 
 @app.route("/home", methods=["GET","POST"])
 @login_required
 def home():
     if session["user"]['usertype'] == 'Project Manager':
-        return render_template("pm/home.html", user=session["user"])
+        user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
+        return render_template("pm/home.html", user=user_data)
     elif session["user"]['usertype'] == 'Engineering Talent':
         user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
         return render_template("talent/home.html", user=user_data)
@@ -205,12 +232,12 @@ def home():
       return None
   
 
-
 @app.route("/profile", methods=["GET","POST"])
 @login_required
 def profile():
     if session["user"]['usertype'] == 'Project Manager':
-        return render_template("pm/profile.html", user_data=session["user"])
+        user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
+        return render_template("pm/profile.html", user=user_data)
     elif session["user"]['usertype'] == 'Engineering Talent':
         user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
         return render_template("talent/profile.html", user=user_data)
@@ -223,10 +250,46 @@ def profile():
 @login_required
 def profile_edit():
     if session["user"]['usertype'] == 'Project Manager':
-        # to-do...
-        #
-        #
-        return render_template("pm/profile_edit.html", user_data=session["user"])
+        # get values from fauna using id... pass them to render the form pre-populated
+        user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
+        
+        if request.method == 'POST':   
+             
+            photo = request.files['file']
+            if photo.filename != '' and myLib.allowed_file(photo.filename):
+                photoUrl = myLib.uploadPhotoS3(photo)
+                myLib.updateProfilePhoto(photoUrl)
+            
+            firstname = request.form['firstname']
+            lastname = request.form['lastname']  
+            if firstname and lastname:                
+                myLib.updateAccountName(firstname, lastname)
+            
+            phone = request.form['phone']
+            calendly = request.form['calendly']
+            if phone:              
+                myLib.updateProfileContact(phone, calendly)
+            
+            headline = request.form['headline']
+            if headline:
+                myLib.updateProfileHeadline(headline)
+                
+            summary = request.form['summary']
+            if summary:
+                myLib.updateProfileSummary(summary)
+                
+            division = request.form['division']
+            if division:
+                myLib.updateProfileDivision(division)
+                
+            zipcode = request.form['zipcode']
+            city = request.form['city']
+            if zipcode and city:
+                myLib.updateProfileLocation(zipcode, city)
+            
+            if request.form['btn'] == 'Save':
+                return redirect(url_for('profile_edit'))
+        return render_template("pm/profile-edit.html", user=user_data)
     
     elif session["user"]['usertype'] == 'Engineering Talent':
         
@@ -428,11 +491,88 @@ def education_edit(id=None):
 
     return render_template("talent/education-edit.html", user = user_data, id = id)
 
+@app.route("/projects", methods=["GET", "POST"])
+@login_required
+def projects():
+    user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
+    return render_template("common/project-list.html", user=user_data)
+
+@app.route("/project-edit", methods=["GET","POST"])
+@app.route("/project-edit/<id>", methods=["GET","POST"])
+@login_required
+def project_edit(id=None):
+    
+    user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
+
+    # if request.method == 'POST':
+        
+        
+    return render_template("pm/project-edit.html", user = user_data, id = id)
+
+
+# 
+# 
+
+@app.route("/talent", methods=["GET", "POST"])
+@login_required
+def talent():
+    user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
+    
+    # talent_ids = client.query(q.paginate(q.match(q.index("userType_index"), "Engineering Talent")))["data"]
+    # for n in range(len(talent_ids)):
+    #     id = talent_ids[n]
+    #     print(id)
+    
+    # Get Talents
+    talents = client.query(
+        q.map_(
+            q.lambda_("talent", q.get(q.var("talent"))),
+            q.paginate(q.match(q.index("userType_index"), "Engineering Talent"))
+        )      
+    )["data"]
+
+    talent_data = client.query(q.get(q.match(q.index("userType_index"), "Engineering Talent")))
+    
+    return render_template("common/talent-list.html", user=user_data, talents=talents, talent=talent_data)
+
+
+
+# 
+# 
+
+
+
+
+
+@app.route("/project-details", methods=["GET", "POST"])
+@app.route("/project-details/<id>", methods=["GET", "POST"])
+@login_required
+def project_details(id=None):
+    user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
+    return render_template("talent/project-details.html", user=user_data)
+
+@app.route("/profile-details", methods=["GET", "POST"])
+@app.route("/profile-details/<email>", methods=["GET", "POST"])
+@login_required
+def profile_details(email=None):
+    print('entered')
+    if email:
+        print('entered email')
+
+        talent_data = client.query(q.get(q.match(q.index("userEmail_index"), email)))
+        return render_template("talent/profile.html", user=talent_data, viewing = email)
+    else:
+        print('entered else')
+
+        user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
+        return render_template("talent/profile.html", user=user_data)
 
 
 @app.route("/contacts", methods=["GET","POST"])
 @login_required
 def contacts():
+
+    user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
 
     # Initialize context that contains information about the chat room
     data = []
@@ -444,18 +584,18 @@ def contacts():
 
     for contacts in chat_list:
         # Query the database to get the user name of users in a user's chat list
-        contact = client.query(q.get(q.ref(q.collection("users"), contacts["user_id"])))["data"]["username"]
+        contact = client.query(q.get(q.ref(q.collection("users"), contacts["user_id"])))["data"]["account"]["firstname"]
 
         data.append(
             {
-                "username": contact,
+                "firstname": contact,
                 "room_id": contacts["room_id"],
             }
         )
         
     return render_template(
-        "contacts.html", 
-        user_data=session["user"],
+        "common/contacts.html", 
+        user=user_data,
         data=data,
     )
 
@@ -466,17 +606,22 @@ def new_contact():
     
     user_id = session["user"]["id"]
     new_contact = request.form["email"].strip().lower()
+    
+    print(new_contact)
 
     # If user is trying to add their self, do nothing
     if new_contact == session["user"]["email"]:
+        print('cant contact yourself!')
         return redirect(url_for("contacts"))
 
     # If user tries to add an email which has not been registerd...
     try:
-        new_contact_id = client.query(q.get(q.match(q.index("user_index"), new_contact)))
+        new_contact_id = client.query(q.get(q.match(q.index("userEmail_index"), new_contact)))
+        print('contact added')
     except:
-        # need to alert here that nothing was found
+        # need to alert here that contact was not found!
         # currenlty just refreshes
+        print('contact not found')
         return redirect(url_for("contacts"))
     
     # Get the chats | related to both users
@@ -537,6 +682,11 @@ def new_contact():
 
     return redirect(url_for("contacts"))
 
+@app.route("/save-project", methods=["POST"])
+@login_required
+def save_project():
+# 
+    return redirect(url_for("contacts"))
 
 @app.route("/text", methods=["GET","POST"])
 @login_required
@@ -558,7 +708,8 @@ def text():
             # Get all the message history 
             messages = client.query(q.get(q.match(q.index("message_index"), room_id)))["data"]["conversation"]
             # Get our contact's name
-            contact = client.query(q.get(q.ref(q.collection("users"), chats["user_id"])))["data"]["username"]
+            contactFirstName = client.query(q.get(q.ref(q.collection("users"), chats["user_id"])))["data"]["account"]["firstname"]
+            contactLastName = client.query(q.get(q.ref(q.collection("users"), chats["user_id"])))["data"]["account"]["lastname"]
             # Try to get the last message for the room
             try:
                 last_message = client.query(q.get(q.match(q.index("message_index"), chats["room_id"])))["data"]["conversation"][-1]["message"]
@@ -567,7 +718,7 @@ def text():
             
             data.append(
                 {
-                    "username": contact,
+                    "name": contactFirstName,
                     "room_id": room_id,
                     "is_active": True,
                     "last_message": last_message,
@@ -576,7 +727,7 @@ def text():
              
 
     return render_template(
-        "chat.html",
+        "common/chat.html",
         user_data=session["user"],
         room_id=room_id,
         data=data,
@@ -608,14 +759,14 @@ def chatting_event(json, methods=["GET", "POST"]):
     timestamp = json["timestamp"]
     message = json["message"]
     sender_id = json["sender_id"]
-    sender_username = json["sender_username"]
+    sender_name = json["sender_name"]
 
     messages = client.query(q.get(q.match(q.index("message_index"), room_id)))
     conversation = messages["data"]["conversation"]
     conversation.append(
         {
             "timestamp": timestamp,
-            "sender_username": sender_username,
+            "sender_name": sender_name,
             "sender_id": sender_id,
             "message": message,
         }

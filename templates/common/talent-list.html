@@ -1,8 +1,16 @@
+<!doctype html>
+<!--  -->
+{% if user.data.account.usertype == 'Engineering Talent' %}
+<!--  -->
 {% extends 'talent/layout.html' %}
-
+<!--  -->
+{% else %}
+<!--  -->
+{% extends 'pm/layout.html' %}
+<!--  -->
+{% endif %}
 <!--  -->
 {% block content %}
-
 
 <!-- App Header -->
 <div class="appHeader bg-primary text-light">
@@ -11,7 +19,7 @@
             <ion-icon name="chevron-back-outline"></ion-icon>
         </a>
     </div>
-    <div class="pageTitle">Projects</div>
+    <div class="pageTitle">Talent Pool</div>
     <div class="right">
         <a href="#" class="headerButton toggle-searchbox">
             <ion-icon name="search-outline"></ion-icon>
@@ -40,13 +48,16 @@
 <div class="extraHeader p-0">
     <ul class="nav nav-tabs lined" id="myTab" role="tablist">
         <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="active-tab" data-bs-toggle="tab" data-bs-target="#active" type="button" role="tab" aria-controls="intro" aria-selected="true">All</button>
+            <button class="nav-link active" id="all-tab" data-bs-toggle="tab" data-bs-target="#all" type="button" role="tab" aria-controls="intro" aria-selected="true">All</button>
         </li>
         <li class="nav-item" role="presentation">
-            <button class="nav-link" id="applied-tab" data-bs-toggle="tab" data-bs-target="#applied" type="button" role="tab" aria-controls="applied" aria-selected="false">Applied</button>
+            <button class="nav-link" id="active-tab" data-bs-toggle="tab" data-bs-target="#active" type="button" role="tab" aria-controls="intro" aria-selected="false">Matched</button>
         </li>
         <li class="nav-item" role="presentation">
-            <button class="nav-link" id="engaged-tab" data-bs-toggle="tab" data-bs-target="#engaged" type="button" role="tab" aria-controls="engaged" aria-selected="false">Engaged</button>
+            <button class="nav-link" id="saved-tab" data-bs-toggle="tab" data-bs-target="#saved" type="button" role="tab" aria-controls="saved" aria-selected="false">Bookmarked</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="applied-tab" data-bs-toggle="tab" data-bs-target="#applied" type="button" role="tab" aria-controls="applied" aria-selected="false">Contacted</button>
         </li>
     </ul>
 </div>
@@ -56,24 +67,61 @@
 
 <div id="appCapsule" class="extra-header-active">
     <div class="tab-content">
-        <div class="tab-pane active" id="active" role="tabpanel" aria-labelledby="active-tab">
+        <div class="tab-pane active" id="all" role="tabpanel" aria-labelledby="all-tab">
+
+
+
+            <ul class="listview image-listview media mb-2">
+
+                {% for talent in talents %}
+                <!--  -->
+                <li>
+                    <a href="{{ url_for('profile_details', email = talent.data.account.email) }}" class="item">
+                        <div class="imageWrapper">
+                            <img src="{{talent.data.profile.photo}}" alt="image" class="imaged w64">
+                        </div>
+                        <div class="in">
+                            <div>
+                                {{talent.data.account.firstname}} {{talent.data.account.lastname}}
+                                <div class="text-muted">{{talent.data.profile.headline}}</div>
+                                <div class="text-muted">{{talent.data.profile.city}}</div>
+                            </div>
+                        </div>
+                    </a>
+                </li>
+                <!--  -->
+                {% endfor %}
+
+            </ul>
+
+        </div>
+
+        <div class="tab-pane" id="active" role="tabpanel" aria-labelledby="active-tab">
 
             <ul class="listview image-listview media mb-2">
 
                 <li>
-                    <a href="#" class="item">
+                    <a href="{ url_for('profile_details', id = {1}) }" class="item">
                         <div class="imageWrapper">
                             <img src="../static/assets/img/sample/photo/3.jpg" alt="image" class="imaged w64">
                         </div>
                         <div class="in">
                             <div>
-                                Project Title
-                                <div class="text-muted">Division Name</div>
-                                <div class="text-muted">Project Manager Name</div>
+                                {Talent Name}
+                                <div class="text-muted">{Talent Headline}</div>
+                                <div class="text-muted">{Talent Location}</div>
                             </div>
                         </div>
                     </a>
                 </li>
+
+            </ul>
+
+        </div>
+
+        <div class="tab-pane" id="saved" role="tabpanel" aria-labelledby="saved-tab">
+
+            <ul class="listview image-listview media mb-2">
 
                 <li>
                     <a href="#" class="item">
@@ -110,44 +158,6 @@
         </div>
 
         <div class="tab-pane" id="applied" role="tabpanel" aria-labelledby="applied-tab">
-
-            <ul class="listview image-listview media mb-2">
-
-                <li>
-                    <a href="#" class="item">
-                        <div class="imageWrapper">
-                            <img src="../static/assets/img/sample/photo/3.jpg" alt="image" class="imaged w64">
-                        </div>
-                        <div class="in">
-                            <div>
-                                Project Title
-                                <div class="text-muted">Division Name</div>
-                                <div class="text-muted">Project Manager Name</div>
-                            </div>
-                        </div>
-                    </a>
-                </li>
-
-                <li>
-                    <a href="#" class="item">
-                        <div class="imageWrapper">
-                            <img src="../static/assets/img/sample/photo/3.jpg" alt="image" class="imaged w64">
-                        </div>
-                        <div class="in">
-                            <div>
-                                Project Title
-                                <div class="text-muted">Division Name</div>
-                                <div class="text-muted">Project Manager Name</div>
-                            </div>
-                        </div>
-                    </a>
-                </li>
-
-            </ul>
-
-        </div>
-
-        <div class="tab-pane" id="engaged" role="tabpanel" aria-labelledby="engaged-tab">
 
             <ul class="listview image-listview media mb-2">
 

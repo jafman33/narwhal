@@ -35,20 +35,15 @@
             var start = '{{user["data"]["education"][id]["start"]}}'
             const startdate = new Date(start).toISOString().slice(0, 10);
             document.getElementById("start").value = startdate;
-            '{% endif %}'
 
-            '{% if id and user["data"]["education"][id]["end"] != "Present" %}'
             var end = '{{user["data"]["education"][id]["end"]}}'
             const enddate = new Date(end).toISOString().slice(0, 10);
             document.getElementById("end").value = enddate;
             '{% endif %}'
 
-            '{% if user["data"]["education"][id]["status"] == "Present" %}'
+            '{% if id and user["data"]["projects"][id]["location"] == "Remote" %}'
             document.getElementById("mystatus").click();
             '{% endif %}'
-
-            '{% endif %}'
-
 
 
         });
@@ -113,7 +108,7 @@
                 <ion-icon name="chevron-back-outline"></ion-icon>
             </a>
         </div>
-        <div class="pageTitle">Edit Education</div>
+        <div class="pageTitle">New Project</div>
         <div class="right">
         </div>
     </div>
@@ -125,8 +120,35 @@
 
             <div class="section full mt-2 mb-2">
 
-                <div class="section-title mt-2">Education</div>
-                <div class="wide-block pb-1 pt-2">
+                <div class="section-title">Project Banner</div>
+                <div class="wide-block pb-2 pt-2">
+
+                    <!-- <div class="row"> -->
+                    <!-- <div class="image-wrapper"> -->
+                    <!--  -->
+                    {% if id %}
+                    <img src='{{user["data"]["projects"][id]["banner"]}}' alt="image" class="imaged" style="width: 100%; height: 150px;">
+                    <!--  -->
+                    {% else %}
+                    <div class="custom-file-upload" id="fileUpload">
+                        <img src='../static/assets/img/sample/photo/wide0.jpg' alt="image" class="imaged" style="width: 100% !important; height: 150px;">
+                    </div>
+                    <!--  -->
+                    {% endif %}
+
+                    <div class="custom-file-upload" id="fileUpload" style="margin-top:-150px">
+                        <input type="file" id="fileuploadInput" name="file" accept="image/*,.pdf" multiple="false">
+                        <label for="fileuploadInput">
+                                <span>
+                                    <strong><ion-icon name="cloud-upload-outline"></ion-icon><i>Upload New</i></strong>
+                                </span>
+                            </label>
+                    </div>
+
+                </div>
+
+                <div class="section-title mt-2">Project Details</div>
+                <div class="wide-block pb-1 pt-0">
 
                     <div class="row">
 
@@ -142,13 +164,13 @@
 
                         <div class="form-group boxed">
                             <div class="input-wrapper">
-                                <label class="form-label" for="school">School</label>
+                                <label class="form-label" for="sponsor">Sponsor</label>
                                 <!--  -->
                                 {% if id %}
-                                <input type="text" class="form-control" id="school" name="school" value='{{ user["data"]["education"][id]["school"] }}' autocomplete="off">
+                                <input type="text" class="form-control" id="sponsor" name="sponsor" value='{{ user["data"]["projects"][id]["sponsor"] }}' autocomplete="off">
                                 <!--  -->
                                 {% else %}
-                                <input type="text" class="form-control" id="school" name="school" placeholder="Ex: Georgia Tech" autocomplete="off">
+                                <input type="text" class="form-control" id="sponsor" name="sponsor" placeholder="Ex: US NAVY" autocomplete="off">
                                 <!--  -->
                                 {% endif %}
                                 <i class="clear-input"><ion-icon name="close-circle"></ion-icon></i>
@@ -157,40 +179,13 @@
 
                         <div class="form-group boxed">
                             <div class="input-wrapper">
-                                <label class="form-label" for="degree">Degree</label>
+                                <label class="form-label" for="title">Title</label>
                                 <!--  -->
                                 {% if id %}
-                                <select class="form-control form-select" id="degree" name="degree">
-                                    <option value='{{ user["data"]["education"][id]["degree"] }}'>{{ user["data"]["education"][id]["degree"] }}</option>
-                                    <option value="Associates">Associates</option>
-                                    <option value="Bachelors">Bachelors</option>
-                                    <option value="Masters">Masters</option>
-                                    <option value="Doctorate">Doctorate</option>
-                                </select>
+                                <input type="text" class="form-control" id="title" name="title" value='{{ user["data"]["projects"][id]["title"] }}' autocomplete="off">
                                 <!--  -->
                                 {% else %}
-                                <select class="form-control form-select" id="degree" name="degree">
-                                    <option value="0">Select Degree</option>
-                                    <option value="Associates">Associates</option>
-                                    <option value="Bachelors">Bachelors</option>
-                                    <option value="Masters">Masters</option>
-                                    <option value="Doctorate">Doctorate</option>
-                                </select>
-                                <!--  -->
-                                {% endif %}
-
-                            </div>
-                        </div>
-
-                        <div class="form-group boxed">
-                            <div class="input-wrapper">
-                                <label class="form-label" for="field">Field of Study</label>
-                                <!--  -->
-                                {% if id %}
-                                <input type="text" class="form-control" id="field" name="field" value='{{ user["data"]["education"][id]["field"] }}' autocomplete="off">
-                                <!--  -->
-                                {% else %}
-                                <input type="text" class="form-control" id="field" name="field" placeholder="Ex: Aerospace Engineering" autocomplete="off">
+                                <input type="text" class="form-control" id="title" name="title" placeholder="Ex. Project Narwhal" autocomplete="off">
                                 <!--  -->
                                 {% endif %}
                                 <i class="clear-input"><ion-icon name="close-circle"></ion-icon></i>
@@ -199,34 +194,68 @@
 
                         <div class="form-group boxed">
                             <div class="input-wrapper">
-                                <label class="form-label" for="none">Status</label>
-                                <div class="form-check mb-1">
-                                    <input type="checkbox" class="form-check-input" id="mystatus" onclick="typeChanger()">
-                                    <label class="form-check-label" for="mystatus">I am currently pursuing this degree</label>
+                                <label class="form-label" for="headline">Headline</label>
+                                <!--  -->
+                                {% if id %}
+                                <input type="text" class="form-control" id="headline" name="headline" value='{{ user["data"]["projects"][id]["headline"] }}' autocomplete="off">
+                                <!--  -->
+                                {% else %}
+                                <input type="text" class="form-control" id="headline" name="headline" placeholder="Ex. Creating the NAVY's Gig-Economy App" autocomplete="off">
+                                <!--  -->
+                                {% endif %}
+                                <i class="clear-input"><ion-icon name="close-circle"></ion-icon></i>
+                            </div>
+                        </div>
+
+                        <div class="form-group boxed">
+                            <div class="input-wrapper">
+                                <label class="form-label" for="location">Location</label>
+                                <div class="row">
+                                    <div class="col-8">
+                                        <!--  -->
+                                        {% if id %}
+                                        <input type="text" class="form-control" id="location" name="location" value='{{ user["data"]["projects"][id]["location"] }}' autocomplete="off">
+                                        <!--  -->
+                                        {% else %}
+                                        <input type="text" class="form-control" id="location" name="location" placeholder="Ex: Atlanta" autocomplete="off">
+                                        <!--  -->
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-4 mt-1">
+                                        <div class="form-check mb-0">
+                                            <input type="checkbox" class="form-check-input" id="mystatus" onclick="typeChanger()">
+                                            <label class="form-check-label" for="mystatus">Remote</label>
+                                        </div>
+                                    </div>
                                 </div>
+                                <i class="clear-input"><ion-icon name="close-circle"></ion-icon></i>
                             </div>
                         </div>
 
-
-                        <!--  -->
-                        {% if id and user["data"]["education"][id]["status"] == 'Present' %}
-                        <input hidden type="text" class="form-control" id="status" name="status" value="Present">
-                        <!--  -->
-                        {% else %}
-                        <input hidden type="text" class="form-control" id="status" name="status" value="Past">
-                        <!--  -->
-                        {% endif %}
-
+                        <div class="form-group boxed">
+                            <div class="input-wrapper">
+                                <label class="form-label" for="summary">Summary</label>
+                                <!--  -->
+                                {% if id %}
+                                <textarea id="summary" name="summary" rows="3" class="form-control">{{ user["data"]["projects"][id]["summary"] }}</textarea>
+                                <!--  -->
+                                {% else %}
+                                <textarea placeholder="Write a summary of your project" id="summary" name="summary" rows="3" class="form-control"></textarea>
+                                <!--  -->
+                                {% endif %}
+                                <i class="clear-input"><ion-icon name="close-circle"></ion-icon></i>
+                            </div>
+                        </div>
 
                         <div class="form-group boxed">
                             <div class="input-wrapper">
                                 <div class="row">
                                     <div class="col-6">
-                                        <label class="form-label" for="start">Start Date</label>
+                                        <label class="form-label" for="start">Project Start Date</label>
                                         <input type="date" class="form-control" id="start" name="start" autocomplete="off">
                                     </div>
                                     <div class="col-6">
-                                        <label class="form-label" for="end">End date</label>
+                                        <label class="form-label" for="end">Project End Date</label>
                                         <input type="date" class="form-control" id="end" name="end" autocomplete="off">
                                     </div>
                                 </div>
@@ -236,6 +265,28 @@
                     </div>
 
                 </div>
+
+                <div class="section-title mt-2">Talent Request Details</div>
+                <div class="wide-block pb-1 pt-0">
+                    <div class="row">
+
+                        <div class="form-group boxed mt-2">
+                            <div class="input-wrapper">
+                                <label class="form-label" for="keys">Key words</label>
+                                <!--  -->
+                                {% if id %}
+                                <input type="text" class="form-control" id="keys" name="keys" value='{{ user["data"]["projects"][id]["keys"] }}' autocomplete="off">
+                                <!--  -->
+                                {% else %}
+                                <input type="text" class="form-control" id="keys" name="keys" placeholder="Ex: Software, Algorithms, Analytics" autocomplete="off">
+                                <!--  -->
+                                {% endif %}
+                                <i class="clear-input"><ion-icon name="close-circle"></ion-icon></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
 
             </div>
 
@@ -271,13 +322,12 @@
     <script>
         function typeChanger() {
             var checkBox = document.getElementById("mystatus");
+            var location = document.getElementById("location");
             if (checkBox.checked == true) {
-                document.getElementById("end").type = "text";
-                document.getElementById("end").value = "Present";
-                document.getElementById("status").value = "Present";
+                location.value = "Remote";
             } else {
-                document.getElementById("end").type = "date";
-                document.getElementById("status").value = "Past";
+                location.value = "";
+                location.placeholder = "Ex: Atlanta";
             }
         }
     </script>

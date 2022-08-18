@@ -89,7 +89,7 @@
     <!-- App Header -->
     <div class="appHeader bg-primary text-light">
         <div class="left">
-            <a href="#" class="headerButton goBack">
+            <a href="{{url_for('home')}}" class="headerButton">
                 <ion-icon name="chevron-back-outline"></ion-icon>
             </a>
         </div>
@@ -148,6 +148,30 @@
                             <div class="input-wrapper">
                                 <label class="form-label" for="lastname">Last Name</label>
                                 <input type="text" class="form-control" id="lastname" name="lastname" placeholder="Enter your last name" value="{{user.data.account.lastname}}" autocomplete="off">
+                                <i class="clear-input"><ion-icon name="close-circle"></ion-icon></i>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="section-title mt-2">Division</div>
+                <div class="wide-block pb-1 pt-2">
+
+                    <div class="row">
+
+                        <div class="form-group boxed">
+                            <div class="input-wrapper">
+                                <label class="form-label" for="division">Division</label>
+                                <!--  -->
+                                {% if user.data.profile.division == '' %}
+                                <input type="text" class="form-control" id="division" name="division" placeholder="Enter your division" autocomplete="off">
+                                <!--  -->
+                                {% else %}
+                                <input type="text" class="form-control" id="division" name="division" value="{{ user.data.profile.division }}" autocomplete="off">
+                                <!--  -->
+                                {% endif %}
                                 <i class="clear-input"><ion-icon name="close-circle"></ion-icon></i>
                             </div>
                         </div>
@@ -241,29 +265,7 @@
 
                 </div>
 
-                <div class="section-title mt-2">Industry</div>
-                <div class="wide-block pb-1 pt-2">
 
-                    <div class="row">
-
-                        <div class="form-group boxed">
-                            <div class="input-wrapper">
-                                <label class="form-label" for="industry">Industry</label>
-                                <!--  -->
-                                {% if user.data.profile.industry == '' %}
-                                <input type="text" class="form-control" id="industry" name="industry" placeholder="Enter your Industry" autocomplete="off">
-                                <!--  -->
-                                {% else %}
-                                <input type="text" class="form-control" id="industry" name="industry" value="{{ user.data.profile.industry }}" autocomplete="off">
-                                <!--  -->
-                                {% endif %}
-                                <i class="clear-input"><ion-icon name="close-circle"></ion-icon></i>
-                            </div>
-                        </div>
-
-                    </div>
-
-                </div>
 
                 <div class="section-title mt-2">Location</div>
                 <div class="wide-block pb-1 pt-2">
@@ -304,27 +306,29 @@
 
                 </div>
 
-                <div class="section-title mt-2">Experience</div>
+                <div class="section-title mt-2">Projects</div>
                 <div class="wide-block pb-1 pt-2">
 
                     <!--  -->
                     <!-- populate list if exists! -->
                     <!--  -->
                     <ul class="listview image-listview media">
-                        {% for exp in user["data"]["experience"] %}
+                        {% for proj in user["data"]["projects"] %}
                         <li>
-                            <a href="{{ url_for('experience_edit', id = exp ) }}" class="item">
+                            <a href="{{ url_for('project_edit', id = proj ) }}" class="item">
                                 <div class="imageWrapper">
                                     <img src="../static/assets/img/sample/photo/1.jpg" alt="image" class="imaged w64">
                                 </div>
                                 <div class="in">
-                                    <div>
-                                        {{user["data"]["experience"][exp]["company"]}}
-                                        <div class="text-muted">{{user["data"]["experience"][exp]["title"]}}</div>
-                                        <div class="text-muted">
-                                            {{user["data"]["experience"][exp]["start"]}} - {{user["data"]["experience"][exp]["end"]}}
-                                        </div>
-                                    </div>
+
+                                    {#
+                                    <!-- <div>
+                                        {{user["data"]["projects"][proj]["title"]}}
+                                        <div class="text-muted">{{user["data"]["projects"][proj]["division"]}}</div>
+                                        <div class="text-muted">{{user["data"]["projects"][proj]["start"]}}</div>
+                                    </div> -->
+                                    #}
+
                                 </div>
                             </a>
                         </li>
@@ -335,56 +339,14 @@
                     <div class="row">
                         <div class="form-group boxed">
                             <div class="input-wrapper">
-                                <a href="{{ url_for('experience_edit') }}" class="btn btn-success btn-block">
-                                    <ion-icon name="add-circle-outline"></ion-icon> Add Experience
+                                <a href="{{ url_for('project_edit') }}" class="btn btn-success btn-block">
+                                    <ion-icon name="add-circle-outline"></ion-icon> Add Projects
                                 </a>
                             </div>
                         </div>
                     </div>
 
                 </div>
-
-
-                <div class="section-title mt-2">Education</div>
-                <div class="wide-block pb-1 pt-2">
-
-                    <!--  -->
-                    <!-- populate list if exists! -->
-                    <!--  -->
-                    <ul class="listview image-listview media">
-                        {% for edu in user["data"]["education"] %}
-                        <li>
-                            <a href="{{ url_for('education_edit', id = edu ) }}" class="item">
-                                <div class="imageWrapper">
-                                    <img src="../static/assets/img/sample/photo/1.jpg" alt="image" class="imaged w64">
-                                </div>
-                                <div class="in">
-                                    <div>
-                                        {{user["data"]["education"][edu]["school"]}}
-                                        <div class="text-muted">{{user["data"]["education"][edu]["degree"]}}</div>
-                                        <div class="text-muted">
-                                            {{user["data"]["education"][edu]["start"]}} - {{user["data"]["education"][edu]["end"]}}
-                                        </div>
-                                    </div>
-                                </div>
-                            </a>
-                        </li>
-                        <!--  -->
-                        {% endfor %}
-                    </ul>
-
-                    <div class="row">
-                        <div class="form-group boxed">
-                            <div class="input-wrapper">
-                                <a href="{{ url_for('education_edit') }}" class="btn btn-success btn-block">
-                                    <ion-icon name="add-circle-outline"></ion-icon> Add Education
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-
 
             </div>
 

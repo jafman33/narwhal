@@ -1,5 +1,15 @@
-<!doctype html> {% extends 'talent/layout.html' %}
+<!doctype html>
 
+<!--  -->
+{% if user.data.account.usertype == 'Engineering Talent' %}
+<!--  -->
+{% extends 'talent/layout.html' %}
+<!--  -->
+{% else %}
+<!--  -->
+{% extends 'pm/layout.html' %}
+<!--  -->
+{% endif %}
 <!--  -->
 {% block content %}
 
@@ -13,12 +23,19 @@
     </div>
     <div class="pageTitle">Profile</div>
     <div class="right">
+        {% if viewing %}
         <a href="#" class="headerButton">
-            <ion-icon name="mail-outline"></ion-icon>
+            <ion-icon name="bookmark-outline"></ion-icon>
         </a>
-        <a href="#" class="headerButton">
-            <ion-icon name="person-add-outline"></ion-icon>
-        </a>
+        <form action="{{ url_for('new_contact') }}" method="POST">
+            <input hidden type="email" class="form-control" name="email" id="email" value="{{viewing}}">
+            <button type="input" class="headerButton" style="background: transparent !important; border-width: 0px !important;">
+                <ion-icon name="chatbubble-ellipses-outline"></ion-icon>
+            </button>
+        </form>
+        <!--  -->
+        {% endif %}
+
     </div>
 </div>
 <!-- * App Header -->
@@ -83,7 +100,7 @@
                 <ul class="listview image-listview media" style="margin-left: 0px;">
                     {% for exp in user["data"]["experience"] %}
                     <li>
-                        <a href="{{ url_for('experience_edit', id = exp ) }}" class="item">
+                        <div class="item">
                             <div class="imageWrapper" style="margin-left:-17px;">
                                 <img src="../static/assets/img/sample/photo/1.jpg" alt="image" class="imaged w64">
                             </div>
@@ -96,7 +113,7 @@
                                     </div>
                                 </div>
                             </div>
-                        </a>
+                        </div>
                     </li>
                     <!--  -->
                     {% endfor %}
@@ -115,7 +132,7 @@
                 <ul class="listview image-listview media">
                     {% for edu in user["data"]["education"] %}
                     <li>
-                        <a href="{{ url_for('education_edit', id = edu ) }}" class="item">
+                        <div class="item">
                             <div class="imageWrapper" style="margin-left:-17px;">
                                 <img src="../static/assets/img/sample/photo/1.jpg" alt="image" class="imaged w64">
                             </div>
@@ -128,7 +145,7 @@
                                     </div>
                                 </div>
                             </div>
-                        </a>
+                        </div>
                     </li>
                     <!--  -->
                     {% endfor %}

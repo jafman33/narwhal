@@ -112,6 +112,20 @@ def updateProfileIndustry(industry):
             )
         )
     
+def updateProfileDivision(division):
+    client.query(
+        q.update(
+            q.ref(q.collection("users"), session["user"]["id"]),
+            {
+                "data": {
+                    "profile": {
+                        "division": division,
+                        },
+                    }
+                },
+            )
+        )
+    
 def updateProfileLocation(zipcode,city):
     client.query(
         q.update(

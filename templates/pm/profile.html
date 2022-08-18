@@ -1,5 +1,15 @@
-<!doctype html> {% extends 'layout.html' %}
+<!doctype html>
 
+<!--  -->
+{% if user.data.account.usertype == 'Engineering Talent' %}
+<!--  -->
+{% extends 'talent/layout.html' %}
+<!--  -->
+{% else %}
+<!--  -->
+{% extends 'pm/layout.html' %}
+<!--  -->
+{% endif %}
 <!--  -->
 {% block content %}
 
@@ -29,11 +39,22 @@
     <div class="section mt-2">
         <div class="profile-head">
             <div class="avatar">
-                <img src="../static/assets/img/sample/avatar/avatar.png" alt="avatar" class="imaged w64 rounded">
+                <img src="{{user.data.profile.photo}}" alt="avatar" class="imaged w64 rounded">
             </div>
             <div class="in">
-                <h3 class="name">{{ user_data["username"] }}</h3>
-                <!-- <h5 class="subtext">Ranking: 34</h5> -->
+                <h3 class="name" style="margin-bottom:0px">{{user.data.account.firstname}} {{user.data.account.lastname}}</h3>
+                <div class="profile-info" style="margin-top:0px">
+                    <div class="link" style="margin-top:0px">{{user.data.profile.headline}}</div>
+                </div>
+                <h5 class="subtext">{{user.data.profile.city}}</h5>
+            </div>
+        </div>
+    </div>
+
+    <div class="section mt-1">
+        <div class="profile-info">
+            <div class=" bio">
+                {{user.data.profile.summary}}
             </div>
         </div>
     </div>

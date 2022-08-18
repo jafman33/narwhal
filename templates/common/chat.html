@@ -7,8 +7,8 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#000000">
-    <title>Cyber-Chat</title>
-    <meta name="description" content="Cyber Chat">
+    <title>Narwhal</title>
+    <meta name="description" content="Narwhal">
     <meta name="keywords" content="bootstrap 5, mobile template, cordova, phonegap, mobile, html" />
     <link rel="icon" type="image/png" href="../static/assets/img/favicon.png" sizes="32x32">
     <link rel="apple-touch-icon" sizes="180x180" href="../static/assets/img/icon/192x192.png">
@@ -39,17 +39,24 @@
         </div>
         <div class="pageTitle">
             <div class="message-item">
-                <img src="../static/assets/img/sample/avatar/avatar.png" alt="avatar" class="avatar"> {{data[0]["username"]}}
+                <div class="row">
+                    <div class="col-4 mt-1">
+                        <img src="../static/assets/img/sample/avatar/avatar.png" alt="avatar" class="avatar">
+                    </div>
+                    <div class="col-8 mt-2">
+                        <!--  -->
+                        {{data[0].name}}
+                    </div>
+                </div>
             </div>
+
         </div>
         <div class="right">
-            <a href="{{ url_for('stake') }}" class="headerButton">
-                <ion-icon name="logo-usd"></ion-icon>
+
+            <a href="#" class="headerButton">
+                <ion-icon name="calendar-outline"></ion-icon>
+                <!-- <span class="badge badge-danger">1</span> -->
             </a>
-            <!-- <a href="#" class="headerButton">
-                <ion-icon name="call-outline"></ion-icon>
-                <span class="badge badge-danger">1</span>
-            </a>  -->
         </div>
     </div>
     <!-- * App Header -->
@@ -64,7 +71,7 @@
         <div class="msg_history">
             {% for msg in messages %}
             <!--  -->
-            {% if msg["sender_username"]==user_data["username"] %}
+            {% if msg["sender_name"]==user_data["firstname"] %}
 
             <div class="message-item user" id="{{ msg.timestamp }}">
                 <div class="content">
@@ -196,7 +203,7 @@
 
                 socket.emit('outgoing', {
                     timestamp: Date.now() / 1000,
-                    sender_username: "{{ user_data['username'] }}",
+                    sender_name: "{{ user_data['firstname'] }}",
                     sender_id: "{{ user_data['id'] }}",
                     message: user_input,
                     rid: "{{ room_id }}"

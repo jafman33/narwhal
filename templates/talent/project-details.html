@@ -1,0 +1,146 @@
+<!doctype html>
+<!--  -->
+{% if user.data.account.usertype == 'Engineering Talent' %}
+<!--  -->
+{% extends 'talent/layout.html' %}
+<!--  -->
+{% else %}
+<!--  -->
+{% extends 'pm/layout.html' %}
+<!--  -->
+{% endif %}
+<!--  -->
+{% block content %}
+
+<!-- App Header -->
+<div class="appHeader bg-primary text-light">
+    <div class="left">
+        <a href="#" class="headerButton goBack">
+            <ion-icon name="chevron-back-outline"></ion-icon>
+        </a>
+    </div>
+    <div class="pageTitle">Project Details</div>
+    <div class="right">
+        <a href="#" class="headerButton">
+            <ion-icon name="bookmark-outline"></ion-icon>
+        </a>
+        <a href="#" class="headerButton" data-bs-toggle="offcanvas" data-bs-target="#actionSheetShare">
+            <ion-icon name="share-outline"></ion-icon>
+        </a>
+    </div>
+</div>
+<!-- * App Header -->
+
+<!-- App Capsule -->
+<div id="appCapsule">
+
+    <div class="blog-post">
+        <div class="mb-2">
+            <img src="../static/assets/img/sample/photo/wide1.jpg" alt="image" class="imaged square w-100">
+        </div>
+
+        <div class="in">
+            <h2 class="name ms-2">{Project Title}</h2>
+
+            <h5 class="text-muted ms-2">{Project Headline}</h5>
+            <div class="profile-info ms-2">
+                <div class="link">{Project Sponsor}</div>
+            </div>
+        </div>
+
+        <div class="post-header">
+            <div>
+                <a href="#">
+                    <img src="../static/assets/img/sample/avatar/avatar1.jpg" alt="avatar" class="imaged w24 rounded me-05"> {PM Name}
+                </a>
+            </div>
+            {Post Date}
+        </div>
+        <div class="post-body">
+            <h4>{post.Subtitle}</h4>
+            <p>
+                {post.text}
+            </p>
+        </div>
+    </div>
+
+
+    <div class="section mt-4 mb-5">
+        <div class="row">
+
+            <div class="col-6">
+                <form action="{{ url_for('new_contact') }}" method="POST">
+
+                    <!-- this needs an update! -->
+                    <!-- 
+                        must attach the email of the point of contact
+                     -->
+                    <input type="email" class="form-control" name="email" id="email" value=jafman33@gmail.com>
+
+                    <button type="input" class="btn btn-outline-primary btn-block">
+                        <ion-icon name="chatbubble-ellipses-outline"></ion-icon>
+                        Contact
+                    </button>
+
+
+                </form>
+            </div>
+
+            <div class="col-6">
+                <button type="button" class="btn btn-outline-primary btn-block">
+                    <ion-icon name="git-pull-request-outline"></ion-icon>Apply
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+<!-- * App Capsule -->
+
+<!-- Share Action Sheet -->
+<div class="offcanvas offcanvas-bottom action-sheet inset" tabindex="-1" id="actionSheetShare">
+    <div class="offcanvas-header">
+        <h5 class="offcanvas-title">Share with</h5>
+    </div>
+    <div class="offcanvas-body">
+        <ul class="action-button-list">
+            <li>
+                <a href="#" class="btn btn-list" data-bs-dismiss="offcanvas">
+                    <span>
+                            <ion-icon name="logo-facebook"></ion-icon>
+                            Facebook
+                        </span>
+                </a>
+            </li>
+            <li>
+                <a href="#" class="btn btn-list" data-bs-dismiss="offcanvas">
+                    <span>
+                            <ion-icon name="logo-twitter"></ion-icon>
+                            Twitter
+                        </span>
+                </a>
+            </li>
+            <li>
+                <a href="#" class="btn btn-list" data-bs-dismiss="offcanvas">
+                    <span>
+                            <ion-icon name="logo-instagram"></ion-icon>
+                            Instagram
+                        </span>
+                </a>
+            </li>
+            <li>
+                <a href="#" class="btn btn-list" data-bs-dismiss="offcanvas">
+                    <span>
+                            <ion-icon name="logo-linkedin"></ion-icon>
+                            Linkedin
+                        </span>
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>
+<!-- * Share Action Sheet -->
+
+
+{% endblock %}

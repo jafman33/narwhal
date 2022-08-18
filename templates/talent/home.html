@@ -1,7 +1,17 @@
+<!doctype html>
+<!--  -->
+{% if user.data.account.usertype == 'Engineering Talent' %}
+<!--  -->
 {% extends 'talent/layout.html' %}
-
+<!--  -->
+{% else %}
+<!--  -->
+{% extends 'pm/layout.html' %}
+<!--  -->
+{% endif %}
 <!--  -->
 {% block content %}
+
 
 <!-- App Header -->
 <div class="appHeader bg-primary scrolled">
@@ -143,11 +153,11 @@
                 <img src="../static/assets/img/sample/photo/wide_narwhal.png" class="card-img-top" alt="image">
                 <div class="card-body">
                     <h2 class="card-subtitle m-0">Project Narwal</h2>
-                    <p class="card-text m-0" style="font-size: 14px;">
-                        Department of Defense - Navy
-                    </p>
                     <p class="text-muted m-0" style="font-size: 14px;">
                         Creating the Navy's Gig Economy App
+                    </p>
+                    <p class="card-text m-0" style="font-size: 14px;">
+                        Department of Defense - Navy
                     </p>
                 </div>
             </div>
@@ -160,11 +170,11 @@
                 <img src="../static/assets/img/sample/photo/wide_code.png" class="card-img-top" alt="image">
                 <div class="card-body">
                     <h2 class="card-subtitle m-0">Code Challenge</h2>
-                    <p class="card-text m-0" style="font-size: 14px;">
-                        Department of Health and Human Services
-                    </p>
                     <p class="text-muted m-0" style="font-size: 14px;">
                         Improve public health response to the opioid epidemic
+                    </p>
+                    <p class="card-text m-0" style="font-size: 14px;">
+                        Department of Health and Human Services
                     </p>
                 </div>
             </div>

@@ -4634,7 +4634,7 @@ textarea,
     cursor: pointer;
     position: relative;
     display: flex;
-    width: 150px;
+    width: flex;
     height: 150px;
 }
 
@@ -4660,14 +4660,14 @@ textarea,
     background-color: rgba(225, 225, 225, 0.2);
     background-size: 45px 58px;
     border: 1px solid #E1E1E1;
-    border-radius: 50%;
+    border-radius: 6px;
     margin: 0;
 }
 
 .custom-file-upload label span {
     display: block;
     font-size: 15px;
-    color: #A1A1A2;
+    color: #ffffff;
     height: auto;
     position: absolute;
     top: 50%;
@@ -4688,7 +4688,7 @@ textarea,
 .custom-file-upload label span ion-icon {
     --ionicon-stroke-width: 32px;
     font-size: 48px;
-    color: #A1A1A2;
+    color: #ffffff;
 }
 
 .custom-file-upload label span strong {

@@ -93,6 +93,7 @@ def register():
                                     "phone": "",
                                     "calendly": "",
                                     "headline": "",
+                                    "summary": "",
                                     "industry": "",
                                     "zipcode": "",
                                     "city": "",
@@ -187,7 +188,8 @@ def intro():
 @app.route("/projects", methods=["GET", "POST"])
 @login_required
 def projects():
-    return render_template("common/projects.html", user=session["user"])
+    user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
+    return render_template("common/projects.html", user=user_data)
  
 
 
@@ -210,7 +212,8 @@ def profile():
     if session["user"]['usertype'] == 'Project Manager':
         return render_template("pm/profile.html", user_data=session["user"])
     elif session["user"]['usertype'] == 'Engineering Talent':
-        return render_template("talent/profile.html", user_data=session["user"])
+        user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
+        return render_template("talent/profile.html", user=user_data)
     else:
         return None
 
@@ -250,9 +253,13 @@ def profile_edit():
             if phone:              
                 myLib.updateProfileContact(phone, calendly)
             
-            headline = request.form['headline']   
+            headline = request.form['headline']
             if headline:
                 myLib.updateProfileHeadline(headline)
+                
+            summary = request.form['summary']
+            if summary:
+                myLib.updateProfileSummary(summary)
                 
             industry = request.form['industry']
             if industry:
@@ -347,6 +354,79 @@ def experience_edit(id=None):
             return redirect(url_for('experience_edit'))
 
     return render_template("talent/experience-edit.html", user = user_data, id = id)
+
+@app.route("/education-edit", methods=["GET","POST"])
+@app.route("/education-edit/<id>", methods=["GET","POST"])
+@login_required
+def education_edit(id=None):
+    
+    user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
+
+    if request.method == 'POST':
+        
+        if request.form['btn'] == 'Delete Entry':
+            client.query(
+                q.update(
+                    q.ref(q.collection("users"), session["user"]["id"]),
+                    {
+                        "data": {
+                            "education": {
+                                id: None,
+                                },
+                            }
+                        },
+                    )
+                )
+            return redirect(url_for('profile_edit'))
+            
+        school = request.form['school']
+        degree = request.form['degree']  
+        field = request.form['field']  
+        status = request.form['status']  
+        start = request.form['start']  
+        end = request.form['end']  
+        
+        if start:
+            date_time_obj = datetime.strptime(start, '%Y-%m-%d')
+            start = date_time_obj.strftime("%m/%d/%Y")
+        if end and end != 'Present':
+            date_time_obj = datetime.strptime(end, '%Y-%m-%d')
+            end = date_time_obj.strftime("%m/%d/%Y")
+            
+        educationID = str(uuid.uuid4())
+        if id:
+            educationID = id
+
+        if school and degree and field and status and start and end:
+            client.query(
+                q.update(
+                    q.ref(q.collection("users"), session["user"]["id"]),
+                    {
+                        "data": {
+                            "education": {
+                                educationID: {
+                                    "school": school,
+                                    "degree": degree,
+                                    "field": field,
+                                    "status": status,
+                                    "start": start,
+                                    "end": end,
+                                    },
+                                },
+                            }
+                        },
+                    )
+                )
+        else:
+            flash("You need to fill out every field")
+            return redirect(url_for('education_edit'))
+        
+        if request.form['btn'] == 'Save and Back':
+            return redirect(url_for('profile_edit'))
+        if request.form['btn'] == 'Save and Add':
+            return redirect(url_for('education_edit'))
+
+    return render_template("talent/education-edit.html", user = user_data, id = id)
 
 
 

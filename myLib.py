@@ -83,6 +83,20 @@ def updateProfileHeadline(headline):
                 },
             )
         )
+    
+def updateProfileSummary(summary):
+    client.query(
+        q.update(
+            q.ref(q.collection("users"), session["user"]["id"]),
+            {
+                "data": {
+                    "profile": {
+                        "summary": summary,
+                        },
+                    }
+                },
+            )
+        )
 
 def updateProfileIndustry(industry):
     client.query(

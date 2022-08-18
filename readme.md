@@ -1,4 +1,4 @@
-# A simple chat application using flask and fauna
+# A submission to the Project Narwhal request by the U.S. NAVY
 
 ## Setup a virtual environment
 In VS Code, open a terminal and navigate to the current directory if not already there.

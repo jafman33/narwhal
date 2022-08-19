@@ -1,7 +1,7 @@
 <!doctype html>
 
 <!--  -->
-{% if user.data.account.usertype == 'Engineering Talent' %}
+{% if user.data.account.usertype == 'Engineering Talent' and self %}
 <!--  -->
 {% extends 'talent/layout.html' %}
 <!--  -->
@@ -23,12 +23,18 @@
     </div>
     <div class="pageTitle">Profile</div>
     <div class="right">
-        <!-- <a href="#" class="headerButton">
-            <ion-icon name="mail-outline"></ion-icon>
-        </a>
+        {% if self == False %}
         <a href="#" class="headerButton">
-            <ion-icon name="person-add-outline"></ion-icon>
-        </a> -->
+            <ion-icon name="bookmark-outline"></ion-icon>
+        </a>
+        <form action="{{ url_for('new_contact') }}" method="POST">
+            <input hidden type="email" class="form-control" name="email" id="email" value="{{user.data.account.email}}">
+            <button type="input" class="headerButton" style="background: transparent !important; border-width: 0px !important;">
+                <ion-icon name="chatbubble-ellipses-outline"></ion-icon>
+            </button>
+        </form>
+        <!--  -->
+        {% endif %}
     </div>
 </div>
 <!-- * App Header -->

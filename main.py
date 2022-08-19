@@ -214,8 +214,6 @@ def intro():
     
     
 
-  
-
 @app.route("/home", methods=["GET","POST"])
 @login_required
 def home():
@@ -468,7 +466,6 @@ def education_edit(id=None):
 def projects():
     user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
     
-    # Get pms
     managers = client.query(
         q.map_(
             q.lambda_("project", q.get(q.var("project"))),
@@ -555,18 +552,11 @@ def project_edit(id=None):
     return render_template("pm/project-edit.html", user = user_data, id = id)
 
 
-
 @app.route("/talent", methods=["GET", "POST"])
 @login_required
 def talent():
     user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
-    
-    # talent_ids = client.query(q.paginate(q.match(q.index("userType_index"), "Engineering Talent")))["data"]
-    # for n in range(len(talent_ids)):
-    #     id = talent_ids[n]
-    #     print(id)
-    
-    # Get Talents
+
     talents = client.query(
         q.map_(
             q.lambda_("talent", q.get(q.var("talent"))),
@@ -577,33 +567,56 @@ def talent():
     return render_template("common/talent-list.html", user=user_data, talents=talents)
 
 
-
-
-
-
 @app.route("/project-details", methods=["GET", "POST"])
-@app.route("/project-details/<id>", methods=["GET", "POST"])
 @login_required
-def project_details(id=None):
-    if id:
-        return redirect(url_for('under_construction'))
-        # project_data = client.query(q.get(q.match(q.index("userEmail_index"), id)))
-        # return render_template("talent/project-details.html", user=user_data)
-    else:
-        return redirect(url_for('under_construction'))
-        # user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
-        # return render_template("talent/project-details.html", user=user_data)
+def project_details():
+    project_id  = request.args.get('project_id', None)
+    project_email  = request.args.get('project_email', None)
+        
+    project_data = client.query(q.get(q.match(q.index("userEmail_index"), project_email)))
+
+    user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
+    
+    return render_template("common/project-details.html", user = user_data, project=project_data, id = project_id)
 
 @app.route("/profile-details", methods=["GET", "POST"])
 @app.route("/profile-details/<email>", methods=["GET", "POST"])
 @login_required
 def profile_details(email=None):
+    
+    self_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
+
     if email:
-        talent_data = client.query(q.get(q.match(q.index("userEmail_index"), email)))
-        return render_template("talent/profile.html", user=talent_data, viewing = email)
+        user_data = client.query(q.get(q.match(q.index("userEmail_index"), email)))
+        user_type = user_data["data"]["account"]["usertype"]
+    
+    # Check if user is viewing own profile page details
+    self = False
+    if session["user"]['email'] == email:
+        self = True
+    
+    # Check if user is a Project Manager
+    if session["user"]['usertype'] == 'Project Manager':
+        if self:
+            return render_template("pm/profile.html", user=self_data, view = self_data)
+        elif user_type == 'Engineering Talent':
+            return render_template("talent/profile.html", user=self_data, view = user_data)
+        # one day... so pms can talk amongst each other and see each others profiles
+        else:
+            return render_template("pm/profile.html", user=self_data, view=user_data)
+    
+    elif session["user"]['usertype'] == 'Engineering Talent':
+        if self:
+            return render_template("talent/profile.html", user=self_data, view=user_data)
+        elif user_type == 'Project Manager':
+            return render_template("pm/profile.html", user=self_data, view=user_data)
+        # one day... so talent can talk amongst each other and see each others profiles
+        else:
+            return render_template("talent/profile.html", user=self_data, view=user_data)
+        
     else:
-        user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
-        return render_template("talent/profile.html", user=user_data)
+      return None
+    
 
 
 @app.route("/contacts", methods=["GET","POST"])

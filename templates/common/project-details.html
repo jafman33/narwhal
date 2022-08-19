@@ -9,6 +9,7 @@
 {% extends 'pm/layout.html' %}
 <!--  -->
 {% endif %}
+
 <!--  -->
 {% block content %}
 
@@ -36,30 +37,44 @@
 
     <div class="blog-post">
         <div class="mb-2">
-            <img src="../static/assets/img/sample/photo/wide1.jpg" alt="image" class="imaged square w-100">
+            <img src='{{project["data"]["projects"][id]["banner"]}}' alt="image" class="imaged square w-100">
         </div>
 
         <div class="in">
-            <h2 class="name ms-2">{Project Title}</h2>
-
-            <h5 class="text-muted ms-2">{Project Headline}</h5>
+            <h2 class="name ms-2">{{project["data"]["projects"][id]["title"]}}</h2>
+            <h5 class="text-muted ms-2">{{project["data"]["projects"][id]["headline"]}}</h5>
             <div class="profile-info ms-2">
-                <div class="link">{Project Sponsor}</div>
+                <div class="link">{{project["data"]["projects"][id]["sponsor"]}}</div>
             </div>
         </div>
 
         <div class="post-header">
             <div>
-                <a href="#">
-                    <img src="../static/assets/img/sample/avatar/avatar1.jpg" alt="avatar" class="imaged w24 rounded me-05"> {PM Name}
+                <a href="{{ url_for('profile_details', email = talent.data.account.email) }}">
+                    <img src='{{project["data"]["profile"]["photo"]}}' alt="avatar" class="imaged w24 rounded me-05">
+                    <!--  -->
+                    {{project["data"]["account"]["firstname"]}} {{project["data"]["account"]["lastname"]}}
                 </a>
             </div>
-            {Post Date}
+            {postdate!}
         </div>
         <div class="post-body">
-            <h4>{post.Subtitle}</h4>
-            <p>
-                {post.text}
+            <h4>Project Summary</h4>
+            <p style="text-align: justify">
+                {{project["data"]["projects"][id]["summary"]}}
+            </p>
+            <h4>Talent Details</h4>
+            <p style="text-align: justify">
+                {todo here}
+            </p>
+            <h4>Key Words</h4>
+            <p style="text-align: justify">
+                <!-- for loop the key words here into bubbles! -->
+                {{project["data"]["projects"][id]["keys"]}}
+            </p>
+            <h4>External Links</h4>
+            <p style="text-align: justify">
+                <a href="#">{{project["data"]["projects"][id]["title"]}}</a>
             </p>
         </div>
     </div>
@@ -71,11 +86,7 @@
             <div class="col-6">
                 <form action="{{ url_for('new_contact') }}" method="POST">
 
-                    <!-- this needs an update! -->
-                    <!-- 
-                        must attach the email of the point of contact
-                     -->
-                    <input type="email" class="form-control" name="email" id="email" value=jafman33@gmail.com>
+                    <input hidden type="email" class="form-control" name="email" id="email" value='{{project["data"]["account"]["email"]}}'>
 
                     <button type="input" class="btn btn-outline-primary btn-block">
                         <ion-icon name="chatbubble-ellipses-outline"></ion-icon>

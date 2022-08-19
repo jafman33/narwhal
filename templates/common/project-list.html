@@ -97,9 +97,9 @@
                 <!--  -->
                 {% for projectID in manager.data.projects %}
                 <!--  -->
-                {% if manager["data"]["projects"][projectID]["banner"] != '' %}
+                {% if manager["data"]["projects"][projectID]["title"] != '' %}
                 <li>
-                    <a href="#" class="item">
+                    <a href="{{ url_for('project_details', project_email = manager.data.account.email, project_id = projectID) }}" class="item">
                         <div class="imageWrapper">
                             {% if manager["data"]["projects"][projectID]["banner"] != ''%}
                             <img src='{{manager["data"]["projects"][projectID]["banner"]}}' alt="image" class="imaged w64">

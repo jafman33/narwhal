@@ -50,7 +50,7 @@
 
         <div class="post-header">
             <div>
-                <a href="{{ url_for('profile_details', email = talent.data.account.email) }}">
+                <a href="{{ url_for('profile_details', email = project.data.account.email) }}">
                     <img src='{{project["data"]["profile"]["photo"]}}' alt="avatar" class="imaged w24 rounded me-05">
                     <!--  -->
                     {{project["data"]["account"]["firstname"]}} {{project["data"]["account"]["lastname"]}}
@@ -89,8 +89,7 @@
                     <input hidden type="email" class="form-control" name="email" id="email" value='{{project["data"]["account"]["email"]}}'>
 
                     <button type="input" class="btn btn-outline-primary btn-block">
-                        <ion-icon name="chatbubble-ellipses-outline"></ion-icon>
-                        Contact
+                        <ion-icon name="person-add-outline"></ion-icon>Contact
                     </button>
 
 

@@ -230,12 +230,16 @@ def home():
 @app.route("/profile", methods=["GET","POST"])
 @login_required
 def profile():
-    if session["user"]['usertype'] == 'Project Manager':
+    user_type = session["user"]['usertype']
+    
+    if user_type == 'Project Manager':
         user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
-        return render_template("pm/profile.html", user=user_data)
-    elif session["user"]['usertype'] == 'Engineering Talent':
+        return render_template("pm/profile.html", type=user_type, user=user_data)
+    
+    elif user_type == 'Engineering Talent':
         user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
-        return render_template("talent/profile.html", user=user_data)
+        return render_template("talent/profile.html", type=user_type, user=user_data)
+    
     else:
         return None
 
@@ -585,6 +589,7 @@ def project_details():
 def profile_details(email=None):
     
     self_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
+    self_type = session["user"]['usertype']
 
     if email:
         user_data = client.query(q.get(q.match(q.index("userEmail_index"), email)))
@@ -598,21 +603,21 @@ def profile_details(email=None):
     # Check if user is a Project Manager
     if session["user"]['usertype'] == 'Project Manager':
         if self:
-            return render_template("pm/profile.html", user=self_data, view = self_data)
+            return render_template("pm/profile.html", type=self_type, user=self_data)
         elif user_type == 'Engineering Talent':
-            return render_template("talent/profile.html", user=self_data, view = user_data)
+            return render_template("talent/profile.html", type=self_type, user=user_data)
         # one day... so pms can talk amongst each other and see each others profiles
         else:
-            return render_template("pm/profile.html", user=self_data, view=user_data)
+            return render_template("pm/profile.html", type=self_type, user=user_data)
     
     elif session["user"]['usertype'] == 'Engineering Talent':
         if self:
-            return render_template("talent/profile.html", user=self_data, view=user_data)
+            return render_template("talent/profile.html", type=self_type, user=user_data)
         elif user_type == 'Project Manager':
-            return render_template("pm/profile.html", user=self_data, view=user_data)
+            return render_template("pm/profile.html", type=self_type, user=user_data)
         # one day... so talent can talk amongst each other and see each others profiles
         else:
-            return render_template("talent/profile.html", user=self_data, view=user_data)
+            return render_template("talent/profile.html", type=self_type, user=user_data)
         
     else:
       return None

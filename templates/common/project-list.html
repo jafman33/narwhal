@@ -11,6 +11,27 @@
 <!--  -->
 {% block content %}
 
+<style>
+    .overflow {
+        display: block;
+        width: 220px;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+    
+    .mytext-muted {
+        font-size: 12px;
+        color: gray;
+        margin-bottom: 0px
+    }
+    
+    .mytext-link {
+        font-size: 12px;
+        color: #1E74FD;
+    }
+</style>
+
 
 <!-- App Header -->
 <div class="appHeader bg-primary text-light">
@@ -72,21 +93,36 @@
 
             <ul class="listview image-listview media mb-2">
 
-                <!-- loop here -->
+                {% for manager in managers %}
+                <!--  -->
+                {% for projectID in manager.data.projects %}
+                <!--  -->
+                {% if manager["data"]["projects"][projectID]["banner"] != '' %}
                 <li>
-                    <a href="{ url_for('project_details', id = {1}) }" class="item">
+                    <a href="#" class="item">
                         <div class="imageWrapper">
-                            <img src="../static/assets/img/sample/photo/3.jpg" alt="image" class="imaged w64">
+                            {% if manager["data"]["projects"][projectID]["banner"] != ''%}
+                            <img src='{{manager["data"]["projects"][projectID]["banner"]}}' alt="image" class="imaged w64">
+                            <!--  -->
+                            {% else %}
+                            <img src="../static/assets/img/sample/photo/wide0.jpg" alt="image" class="imaged w64">
+                            <!--  -->
+                            {% endif %}
                         </div>
                         <div class="in">
                             <div>
-                                {Project Title}
-                                <div class="text-muted">{Project Sponsor}</div>
-                                <div class="text-muted">{Project Manager}</div>
+                                <div class="overflow">{{manager["data"]["projects"][projectID]["title"]}}</div>
+                                <div class="overflow mytext-muted">{{manager["data"]["projects"][projectID]["headline"]}}</div>
+                                <div class="overflow mytext-link">{{manager["data"]["projects"][projectID]["sponsor"]}}</div>
                             </div>
                         </div>
                     </a>
                 </li>
+                {% endif %}
+                <!--  -->
+                {% endfor %}
+                <!--  -->
+                {% endfor %}
 
             </ul>
 
@@ -96,29 +132,7 @@
 
             <ul class="listview image-listview media mb-2">
 
-                <li>
-                    <a href="{ url_for('project_details', id = {1}) }" class="item">
-                        <div class="imageWrapper">
-                            <img src="../static/assets/img/sample/photo/3.jpg" alt="image" class="imaged w64">
-                        </div>
-                        <div class="in">
-                            <div>
-                                {Project Title}
-                                <div class="text-muted">{Project Sponsor}</div>
-                                <div class="text-muted">{Project Manager}</div>
-                            </div>
-                        </div>
-                    </a>
-                </li>
-
-            </ul>
-
-        </div>
-
-        <div class="tab-pane" id="saved" role="tabpanel" aria-labelledby="saved-tab">
-
-            <ul class="listview image-listview media mb-2">
-
+                <!-- loop here -->
                 <li>
                     <a href="#" class="item">
                         <div class="imageWrapper">
@@ -134,6 +148,15 @@
                     </a>
                 </li>
 
+            </ul>
+
+        </div>
+
+        <div class="tab-pane" id="saved" role="tabpanel" aria-labelledby="saved-tab">
+
+            <ul class="listview image-listview media mb-2">
+
+                <!-- loop here -->
                 <li>
                     <a href="#" class="item">
                         <div class="imageWrapper">

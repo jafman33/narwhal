@@ -39,6 +39,36 @@ def updateProfilePhoto(url):
             )
         )
     
+def updateProjectBanner(id, url):
+    client.query(
+        q.update(
+            q.ref(q.collection("users"), session["user"]["id"]),
+            {
+                "data": {
+                    "projects": {
+                        id: {
+                            "banner": url,
+                            },
+                        },
+                    }
+                },
+            )
+        )
+    
+def deleteItem(item,id):
+    client.query(
+        q.update(
+            q.ref(q.collection("users"), session["user"]["id"]),
+            {
+                "data": {
+                    item: {
+                        id: None,
+                        },
+                    }
+                },
+            )
+        )
+    
 def updateAccountName(firstname, lastname):
     client.query(
         q.update(

@@ -178,10 +178,7 @@ def login():
             # Query the data base for the inputed email address
             user = client.query(q.get(q.match(q.index("userEmail_index"), email)))
             
-            print('trying password!...')
-            print(user["data"]["account"]["password"])
             if (hashlib.sha512(password.encode()).hexdigest() == user["data"]["account"]["password"]):
-                print('made it!')
                 
                 # Create new session for newly logged in user
                 session["user"] = {
@@ -299,9 +296,6 @@ def profile_edit():
         if request.method == 'POST':            
             
             photo = request.files['file']
-            # here logic to make sure you actually received a photo submission
-            #
-            #
             if photo.filename != '' and myLib.allowed_file(photo.filename):
                 photoUrl = myLib.uploadPhotoS3(photo)
                 myLib.updateProfilePhoto(photoUrl)
@@ -351,18 +345,7 @@ def experience_edit(id=None):
     if request.method == 'POST':
         
         if request.form['btn'] == 'Delete Entry':
-            client.query(
-                q.update(
-                    q.ref(q.collection("users"), session["user"]["id"]),
-                    {
-                        "data": {
-                            "experience": {
-                                id: None,
-                                },
-                            }
-                        },
-                    )
-                )
+            myLib.deleteItem("experience",id)
             return redirect(url_for('profile_edit'))
             
         title = request.form['title']
@@ -428,18 +411,7 @@ def education_edit(id=None):
     if request.method == 'POST':
         
         if request.form['btn'] == 'Delete Entry':
-            client.query(
-                q.update(
-                    q.ref(q.collection("users"), session["user"]["id"]),
-                    {
-                        "data": {
-                            "education": {
-                                id: None,
-                                },
-                            }
-                        },
-                    )
-                )
+            myLib.deleteItem("education",id)
             return redirect(url_for('profile_edit'))
             
         school = request.form['school']
@@ -495,7 +467,16 @@ def education_edit(id=None):
 @login_required
 def projects():
     user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
-    return render_template("common/project-list.html", user=user_data)
+    
+    # Get pms
+    managers = client.query(
+        q.map_(
+            q.lambda_("project", q.get(q.var("project"))),
+            q.paginate(q.match(q.index("userType_index"), "Project Manager"),size=100)
+        )      
+    )["data"]
+    
+    return render_template("common/project-list.html", user=user_data, managers=managers)
 
 @app.route("/project-edit", methods=["GET","POST"])
 @app.route("/project-edit/<id>", methods=["GET","POST"])
@@ -504,14 +485,76 @@ def project_edit(id=None):
     
     user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
 
-    # if request.method == 'POST':
+    if request.method == 'POST':
+        
+        if request.form['btn'] == 'Delete Entry':
+            myLib.deleteItem("projects",id)
+            return redirect(url_for('profile_edit'))
+        
+        projectID = str(uuid.uuid4())
+        if id:
+            projectID = id
+        
+        banner = request.files['file']
+        if banner.filename != '':
+            if myLib.allowed_file(banner.filename):
+                bannerUrl = myLib.uploadPhotoS3(banner)
+                myLib.updateProjectBanner(projectID,bannerUrl)
+            else:
+                flash("Invalid File Name")
+         
+        start = request.form['start']  
+        if start:
+            date_time_obj = datetime.strptime(start, '%Y-%m-%d')
+            start = date_time_obj.strftime("%m/%d/%Y")
+        
+        end = request.form['end']  
+        if end and end != 'Present':
+            date_time_obj = datetime.strptime(end, '%Y-%m-%d')
+            end = date_time_obj.strftime("%m/%d/%Y")
+            
+        sponsor = request.form['sponsor']
+        title = request.form['title']  
+        headline = request.form['headline']  
+        location = request.form['location']  
+        summary = request.form['summary']
+        keys = request.form['keys']
+            
+        if sponsor and title and headline and location and summary and keys and start and end:
+            client.query(
+                q.update(
+                    q.ref(q.collection("users"), session["user"]["id"]),
+                    {
+                        "data": {
+                            "projects": {
+                                projectID: {
+                                    "sponsor": sponsor,
+                                    "title": title,
+                                    "headline": headline,
+                                    "location": location,
+                                    "summary": summary,
+                                    "start": start,
+                                    "end": end,
+                                    "keys": keys,
+                                    },
+                                },
+                            }
+                        },
+                    )
+                )
+        else:
+            flash("You need to fill out every field")
+            return redirect(url_for('project_edit'))
+        
+        if request.form['btn'] == 'Save and Back':
+            return redirect(url_for('profile_edit'))
+        if request.form['btn'] == 'Save and Add':
+            return redirect(url_for('project_edit'))
         
         
     return render_template("pm/project-edit.html", user = user_data, id = id)
 
 
-# 
-# 
 
 @app.route("/talent", methods=["GET", "POST"])
 @login_required
@@ -527,18 +570,12 @@ def talent():
     talents = client.query(
         q.map_(
             q.lambda_("talent", q.get(q.var("talent"))),
-            q.paginate(q.match(q.index("userType_index"), "Engineering Talent"))
+            q.paginate(q.match(q.index("userType_index"), "Engineering Talent"),size=100)
         )      
     )["data"]
-
-    talent_data = client.query(q.get(q.match(q.index("userType_index"), "Engineering Talent")))
     
-    return render_template("common/talent-list.html", user=user_data, talents=talents, talent=talent_data)
+    return render_template("common/talent-list.html", user=user_data, talents=talents)
 
-
-
-# 
-# 
 
 
 
@@ -548,22 +585,23 @@ def talent():
 @app.route("/project-details/<id>", methods=["GET", "POST"])
 @login_required
 def project_details(id=None):
-    user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
-    return render_template("talent/project-details.html", user=user_data)
+    if id:
+        return redirect(url_for('under_construction'))
+        # project_data = client.query(q.get(q.match(q.index("userEmail_index"), id)))
+        # return render_template("talent/project-details.html", user=user_data)
+    else:
+        return redirect(url_for('under_construction'))
+        # user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
+        # return render_template("talent/project-details.html", user=user_data)
 
 @app.route("/profile-details", methods=["GET", "POST"])
 @app.route("/profile-details/<email>", methods=["GET", "POST"])
 @login_required
 def profile_details(email=None):
-    print('entered')
     if email:
-        print('entered email')
-
         talent_data = client.query(q.get(q.match(q.index("userEmail_index"), email)))
         return render_template("talent/profile.html", user=talent_data, viewing = email)
     else:
-        print('entered else')
-
         user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
         return render_template("talent/profile.html", user=user_data)
 
@@ -607,21 +645,19 @@ def new_contact():
     user_id = session["user"]["id"]
     new_contact = request.form["email"].strip().lower()
     
-    print(new_contact)
-
     # If user is trying to add their self, do nothing
     if new_contact == session["user"]["email"]:
-        print('cant contact yourself!')
+        # print('cant contact yourself!')
         return redirect(url_for("contacts"))
 
     # If user tries to add an email which has not been registerd...
     try:
         new_contact_id = client.query(q.get(q.match(q.index("userEmail_index"), new_contact)))
-        print('contact added')
+        # print('contact added')
     except:
         # need to alert here that contact was not found!
         # currenlty just refreshes
-        print('contact not found')
+        # print('contact not found')
         return redirect(url_for("contacts"))
     
     # Get the chats | related to both users

@@ -59,19 +59,27 @@
             {postdate!}
         </div>
         <div class="post-body">
+
             <h4>Project Summary</h4>
             <p style="text-align: justify">
                 {{project["data"]["projects"][id]["summary"]}}
             </p>
+
             <h4>Talent Details</h4>
             <p style="text-align: justify">
                 {todo here}
             </p>
+
             <h4>Key Words</h4>
-            <p style="text-align: justify">
-                <!-- for loop the key words here into bubbles! -->
-                {{project["data"]["projects"][id]["keys"]}}
+            <p>
+                <!-- for loop the key words -->
+                {% for key in project["data"]["projects"][id]["keys"]%}
+                <div class="chip chip-primary ms-05 mb-05">
+                    <span class="chip-label">{{project["data"]["projects"][id]["keys"][loop.index0|string]}}</span>
+                </div>
+                {% endfor %}
             </p>
+
             <h4>External Links</h4>
             <p style="text-align: justify">
                 <a href="#">{{project["data"]["projects"][id]["title"]}}</a>

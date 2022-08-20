@@ -1,4 +1,3 @@
-from xml.dom.pulldom import END_ELEMENT
 from app import app
 from config import socketio, client, s3, os
 
@@ -519,9 +518,8 @@ def project_edit(id=None):
         headline = request.form['headline']  
         location = request.form['location']  
         summary = request.form['summary']
-        keys = request.form['keys']
             
-        if sponsor and title and headline and location and summary and keys and start and end:
+        if sponsor and title and headline and location and summary and start and end:
             client.query(
                 q.update(
                     q.ref(q.collection("users"), session["user"]["id"]),
@@ -536,13 +534,20 @@ def project_edit(id=None):
                                     "summary": summary,
                                     "start": start,
                                     "end": end,
-                                    "keys": keys,
                                     },
                                 },
                             }
                         },
                     )
                 )
+        
+        keys = request.form['keys']
+        if keys:
+            myLib.deleteProjectKeys(projectID)
+            keyList = keys.split(",")
+            for n in range(len(keyList)):
+                myLib.updateProjectKeys(projectID, n, keyList[n])
+        
         else:
             flash("You need to fill out every field")
             return redirect(url_for('project_edit'))
@@ -578,7 +583,6 @@ def project_details():
     project_email  = request.args.get('project_email', None)
         
     project_data = client.query(q.get(q.match(q.index("userEmail_index"), project_email)))
-
     user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
     
     return render_template("common/project-details.html", user = user_data, project=project_data, id = project_id)

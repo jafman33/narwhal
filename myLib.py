@@ -99,6 +99,39 @@ def updateProfileContact(phone, calendly = ""):
             )
         )
     
+def updateProjectKeys(id, num,key):
+    client.query(
+            q.update(
+                q.ref(q.collection("users"), session["user"]["id"]),
+                {
+                    "data": {
+                        "projects": {
+                            id: {
+                                "keys": {
+                                    num: key,
+                                    },
+                                },
+                            },
+                        }
+                    },
+                )
+                )   
+    
+def deleteProjectKeys(id):
+    client.query(
+                q.update(
+                    q.ref(q.collection("users"), session["user"]["id"]),
+                    {
+                        "data": {
+                            "projects": {
+                                id: {
+                                    "keys": None,
+                                    },
+                                },
+                            }
+                        },
+                    )
+                )
 
 def updateProfileHeadline(headline):
     client.query(

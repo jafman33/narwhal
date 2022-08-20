@@ -33,6 +33,9 @@
                 <ion-icon name="person-add-outline"></ion-icon>            
             </button>
         </form>
+        <a href="{{url_for('schedule', user_email = user.data.account.email)}}" class="headerButton">
+            <ion-icon name="calendar-outline"></ion-icon>
+        </a>
         <!--  -->
         {% endif %}
 

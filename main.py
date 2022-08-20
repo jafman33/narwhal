@@ -628,6 +628,8 @@ def profile_details(email=None):
     
 
 
+    
+    
 @app.route("/contacts", methods=["GET","POST"])
 @login_required
 def contacts():
@@ -659,6 +661,17 @@ def contacts():
         data=data,
     )
 
+
+@app.route("/calendly/<user_email>", methods=["GET","POST"])
+@login_required
+def schedule(user_email):
+    
+    try:
+        user_data = client.query(q.get(q.match(q.index("userEmail_index"), user_email)))
+    except:
+        return 'user does not have calendly setup'
+
+    return render_template("common/calendly.html", user=user_data)
 
 @app.route("/new-contact", methods=["POST"])
 @login_required

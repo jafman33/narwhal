@@ -14,6 +14,7 @@
     <link rel="apple-touch-icon" sizes="180x180" href="../static/assets/img/icon/192x192.png">
     <link rel="stylesheet" href="../static/assets/css/style.css">
     <link rel="manifest" href="../static/manifest/manifest.json">
+    <!-- tokenfield -->
 
     <script>
         document.addEventListener("DOMContentLoaded", function(event) {
@@ -41,10 +42,10 @@
             document.getElementById("end").value = enddate;
             '{% endif %}'
 
+
             '{% if id and user["data"]["projects"][id]["location"] == "Remote" %}'
             document.getElementById("mystatus").click();
             '{% endif %}'
-
 
         });
 
@@ -290,6 +291,13 @@
                 </div>
 
 
+
+
+
+
+
+
+
             </div>
 
             <div class="carousel-button-footer bg-white">
@@ -321,6 +329,8 @@
     <!-- Base Js File -->
     <script src="../static/assets/js/base.js"></script>
 
+
+    <!--  -->
     <script>
         function typeChanger() {
             var checkBox = document.getElementById("mystatus");
@@ -333,6 +343,9 @@
             }
         }
     </script>
+
+
+
 
 </body>
 

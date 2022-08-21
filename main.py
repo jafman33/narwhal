@@ -25,6 +25,9 @@ from faunadb.objects import Ref
 import re
 import uuid
 
+import json
+import jsonify
+
 import myLib
 
 
@@ -547,9 +550,8 @@ def project_edit(id=None):
             keyList = keys.split(",")
             for n in range(len(keyList)):
                 myLib.updateProjectKeys(projectID, n, keyList[n])
-        
         else:
-            flash("You need to fill out every field")
+            flash(keys)
             return redirect(url_for('project_edit'))
         
         if request.form['btn'] == 'Save and Back':
@@ -671,7 +673,7 @@ def schedule(user_email):
     except:
         return 'user does not have calendly setup'
 
-    return render_template("common/calendly.html", user=user_data)
+    return render_template("common/calendly.html", user=user_data, self = session)
 
 @app.route("/new-contact", methods=["POST"])
 @login_required

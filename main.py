@@ -1,3 +1,4 @@
+from pickle import TRUE
 from app import app
 from config import socketio, client, s3, os
 
@@ -7,7 +8,7 @@ from datetime import datetime
 import pytz
 
 from flask import (
-    Flask,
+    Flask, 
     render_template,
     request,
     flash,
@@ -22,11 +23,7 @@ from werkzeug.utils import secure_filename
 from flask_socketio import join_room
 from faunadb import query as q
 from faunadb.objects import Ref
-import re
 import uuid
-
-import json
-import jsonify
 
 import myLib
 
@@ -889,6 +886,6 @@ def sw():
     return response
 
 
-
 if __name__ == "__main__":
-    socketio.run(app,debug=True)
+    socketio.run(app, debug=True)
+

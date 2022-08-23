@@ -15,6 +15,7 @@
     <link rel="stylesheet" href="../static/assets/css/style.css">
     <link rel="manifest" href="../static/manifest/manifest.json">
 
+
     <style>
         lottie-player {
             margin: 0 auto;
@@ -138,6 +139,26 @@
                         </div>
                     </a>
                 </li>
+
+                <li>
+                    <div class="item">
+                        <div class="icon-box bg-primary">
+                            <ion-icon name="notifications-outline"></ion-icon>
+                        </div>
+                        <div class="in">
+                            <div>Notifications</div>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input notifications-mode-switch" type="checkbox" id="notifications_sidebar">
+                                <label class="form-check-label" for="notifications_sidebar"></label>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+
+                <section hidden class="js-subscription-details">
+                    <pre><code class="js-subscription-json"></code></pre>
+                </section>
+
                 <li>
                     <div class="item">
                         <div class="icon-box bg-primary">
@@ -152,20 +173,8 @@
                         </div>
                     </div>
                 </li>
-                <li>
-                    <div class="item">
-                        <div class="icon-box bg-primary">
-                            <ion-icon name="alarm-outline"></ion-icon>
-                        </div>
-                        <div class="in">
-                            <div>Notifications</div>
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" id="notifications_sidebar">
-                                <label class="form-check-label" for="notifications_sidebar"></label>
-                            </div>
-                        </div>
-                    </div>
-                </li>
+
+
             </ul>
 
         </div>
@@ -244,12 +253,12 @@
     <!-- * App Sidebar -->
 
     <!-- welcome notification  -->
-    <!-- <div id="notification-welcome" class="notification-box">
+    <div id="notification-welcome" class="notification-box">
         <div class="notification-dialog android-style">
             <div class="notification-header">
                 <div class="in">
                     <img src="../static/assets/img/icon/72x72.png" alt="image" class="imaged w24">
-                    <strong>Cyber-Text</strong>
+                    <strong>Narwhal</strong>
                     <span>just now</span>
                 </div>
                 <a href="#" class="close-button">
@@ -258,9 +267,9 @@
             </div>
             <div class="notification-content">
                 <div class="in">
-                    <h3 class="subtitle">Welcome to CyberText!</h3>
+                    <h3 class="subtitle">Welcome to Narwhal!</h3>
                     <div class="text">
-                        Receive notifications when someone messages you!
+                        Receive Notifications when new projects that match your skills are posted.
                     </div>
                 </div>
             </div>
@@ -275,20 +284,23 @@
                 </a>
             </div>
         </div>
-    </div> -->
+    </div>
     <!-- * welcome notification -->
 
-    <!-- <script>
+    <script>
         // Trigger welcome notification after 5 seconds
         setTimeout(() => {
             notification('notification-welcome');
-        }, 2000);
-    </script> -->
+        }, 10000);
+    </script>
 
 
     <!-- ============== Js Files ==============  -->
     <!-- Bootstrap -->
     <script src="../static/assets/js/lib/bootstrap.min.js"></script>
+    <!-- jquery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
     <!-- Ionicons -->
     <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
     <!-- Splide -->

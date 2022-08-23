@@ -1,6 +1,12 @@
 from pickle import TRUE
 from app import app
-from config import socketio, client, s3, os
+from config import (
+    socketio, 
+    client, 
+    VAPID_PRIVATE_KEY,
+    VAPID_PUBLIC_KEY,
+    VAPID_CLAIM_EMAIL
+)
 
 import hashlib
 from functools import wraps
@@ -16,16 +22,18 @@ from flask import (
     url_for,
     session,
     make_response, 
-    send_from_directory
+    send_from_directory,
+    jsonify
 )
 
-from werkzeug.utils import secure_filename
+from pywebpush import webpush, WebPushException
 from flask_socketio import join_room
 from faunadb import query as q
 from faunadb.objects import Ref
 import uuid
 
 import myLib
+import json
 
 
 # Login decorator to ensure user is logged in before accessing certain routes
@@ -101,6 +109,12 @@ def register():
                                     "experience": {
                                         },
                                     "education": {
+                                        },
+                                    "sub": {
+                                        "endpoint": "null",
+                                        "keys": {
+                                            "auth": "null",
+                                            },
                                         },
                                     "date": datetime.now(pytz.UTC),
                                 }
@@ -875,16 +889,114 @@ def under_construction():
 
 @app.route('/service-worker.js')
 def sw():
-    response = make_response(
-        send_from_directory(
-            'templates',
-            path='service-worker.js'
-        )
-    )
-    response.headers['Content-Type'] = 'application/javascript'
-    # response.headers['Cache-Control'] = 'no-cache'
-    return response
+    return app.send_static_file('service-worker.js')
 
+
+#  SUBSCRIPTIONS
+# save the subscription
+@app.route('/api/subscribe', methods=["POST"])
+def subscribe():
+
+    json_data = request.get_json('subscription_info')
+    subscription_json = json.loads(json_data['subscription_json'])
+    auth = subscription_json["keys"]["auth"]
+
+    try:
+        subQ = client.query(q.get(q.match(q.index("sub_auth_index"), auth)))
+        print("Found Authorization on database")
+    except:
+        print("Creating NEW Authorization on database")
+        subQ = client.query(
+                q.update(
+                    q.ref(q.collection("users"), session["user"]["id"]),
+                    {
+                        "data": {
+                            "sub": subscription_json,
+                            }
+                        },
+                    )
+                )
+
+    return jsonify({
+        "status": "success",
+        "result": {
+            "id": subQ["ref"].id(),
+            "subscription_json": subQ["data"]["sub"],
+        }
+    })
+
+# save the subscription in the database if it doesn’t exist already.
+@app.route('/api/unsubscribe', methods=["POST"])
+def unsubscribe():
+
+    json_data = request.get_json('subscription_info')
+    subscription_json = json.loads(json_data['subscription_json'])
+
+    try:
+        subQ = client.query(
+                    q.update(
+                        q.ref(q.collection("users"), session["user"]["id"]),
+                        {
+                            "data": {
+                                "sub": {
+                                    "endpoint": "null",
+                                    "keys": {
+                                        "auth": "null",
+                                        },
+                                    },
+                                }
+                            },
+                        )
+                    )
+        print("Subscription Removed")
+    except:
+        print("Fauna could not remove subscription")
+
+    return jsonify({
+        "status": "success",
+        "result": {
+            "id": subQ["ref"].id(),
+            "subscription_json": subQ["data"]["sub"],
+        }
+    })
+    
+def trigger_push_notification(sub, title, body):
+    
+    try:
+        response = webpush(
+            # subscription_info=json.loads(sub),
+            subscription_info=sub,
+            data=json.dumps({"title": title, "body": body}),
+            vapid_private_key=VAPID_PRIVATE_KEY,
+            vapid_claims={
+                "sub": "mailto:{}".format(VAPID_CLAIM_EMAIL)
+            }
+        )
+        return response.ok
+    except WebPushException as ex:
+        if ex.response and ex.response.json():
+            extra = ex.response.json()
+            print("Remote service replied with a {}:{}, {}",
+                extra.code,
+                extra.errno,
+                extra.message
+            )
+        print(ex)
+        return False
+
+# loop through all subscirptions and send all the clients a push notification
+def trigger_push_notifications_for_subscriptions(subscriptions, title, body):
+    return [trigger_push_notification(subscription["data"]["sub"], title, body)
+            for subscription in subscriptions]
+    
+@app.route("/publicVapidKey")
+def get_public_key():
+    publicVapidKey = {"publicVapidKey": VAPID_PUBLIC_KEY}
+    return jsonify(publicVapidKey)
+
+# @app.route('/manifest.json')
+# def manifest():
+#     return app.send_from_directory('static', 'manifest.json')
 
 if __name__ == "__main__":
     socketio.run(app, debug=True)

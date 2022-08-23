@@ -50,3 +50,39 @@ self.addEventListener('activate', function(event) {
     // Calling claim() to force a "controllerchange" event on navigator.serviceWorker
     event.waitUntil(self.clients.claim());
 });
+
+// On notification Push, Create Notification using event data
+self.addEventListener("push", function(event) {
+    console.log("[Service Worker] Push Received.");
+
+    let data = {};
+    if (event.data) {
+        data = event.data.json();
+        console.log("[Service Worker] Push had this title:", data.title)
+        console.log("[Service Worker] Push had this body:", data.body)
+    }
+
+    var title = data.title
+    var body = data.body;
+    var icon = "{{url_for('static', filename='assets/img/sample/alerts/icon.png')}}";
+    var badge = "{{url_for('static', filename='assets/img/sample/alerts/badge.png')}}";
+    var tag = 'simple-push-demo-notification-tag';
+
+    event.waitUntil(
+        self.registration.showNotification(title, {
+            body: body,
+            icon: icon,
+            vibrate: [200, 100, 200, 100, 200, 100, 200],
+            badge: badge,
+            tag: tag
+        })
+    );
+
+});
+
+// On Notification Click, Go to URL
+self.addEventListener("notificationclick", function(event) {
+    console.log("[Service Worker] Notification click Received.");
+    event.notification.close();
+    event.waitUntil(clients.openWindow("{{url_for('home')}}"));
+});

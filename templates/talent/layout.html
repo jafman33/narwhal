@@ -261,7 +261,7 @@
                     <strong>Narwhal</strong>
                     <span>just now</span>
                 </div>
-                <a href="#" class="close-button">
+                <a href="#" class="close-button" id="close-notification-banner">
                     <ion-icon name="close"></ion-icon>
                 </a>
             </div>
@@ -274,11 +274,11 @@
                 </div>
             </div>
             <div class="notification-footer">
-                <a href="#" class="notification-button" id="rejected">
+                <a href="#" class="notification-button" id="rejected" onclick="reject()">
                     <ion-icon name="close-circle"></ion-icon>
                     Reject
                 </a>
-                <a href="#" class="notification-button" id="granted">
+                <a href="#" class="notification-button" id="granted" onclick="accept()">
                     <ion-icon name="checkmark-circle"></ion-icon>
                     Accept
                 </a>
@@ -287,12 +287,6 @@
     </div>
     <!-- * welcome notification -->
 
-    <script>
-        // Trigger welcome notification after 5 seconds
-        setTimeout(() => {
-            notification('notification-welcome');
-        }, 10000);
-    </script>
 
 
     <!-- ============== Js Files ==============  -->
@@ -312,13 +306,26 @@
     <!-- lootie -->
     <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
 
-    <!-- <script>
+
+    <script>
         // Trigger welcome notification after 5 seconds
         setTimeout(() => {
             notification('notification-welcome');
-        }, 2000);
-    </script> -->
+        }, 5000);
+    </script>
 
+    <script>
+        function accept() {
+            subscribeUser();
+            document.getElementById("close-notification-banner").click();
+        }
+
+        function reject() {
+            unsubscribeUser();
+            document.getElementById("close-notification-banner").click();
+
+        }
+    </script>
 
 
 </body>

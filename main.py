@@ -951,14 +951,14 @@ def unsubscribe():
         print("Subscription Removed")
     except:
         print("Fauna could not remove subscription")
-
-    return jsonify({
-        "status": "success",
-        "result": {
-            "id": subQ["ref"].id(),
-            "subscription_json": subQ["data"]["sub"],
-        }
-    })
+    return '', 204
+    # return jsonify({
+    #     "status": "success",
+    #     "result": {
+    #         "id": subQ["ref"].id(),
+    #         "subscription_json": subQ["data"]["sub"],
+    #     }
+    # })
     
 def trigger_push_notification(sub, title, body):
     

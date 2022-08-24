@@ -110,12 +110,6 @@ def register():
                                         },
                                     "education": {
                                         },
-                                    "sub": {
-                                        "endpoint": "null",
-                                        "keys": {
-                                            "auth": "null",
-                                            },
-                                        },
                                     "date": datetime.now(pytz.UTC),
                                 }
                             },
@@ -893,7 +887,6 @@ def sw():
 
 
 #  SUBSCRIPTIONS
-# save the subscription
 @app.route('/api/subscribe', methods=["POST"])
 def subscribe():
 
@@ -902,11 +895,11 @@ def subscribe():
     auth = subscription_json["keys"]["auth"]
 
     try:
-        subQ = client.query(q.get(q.match(q.index("sub_auth_index"), auth)))
+        client.query(q.get(q.match(q.index("sub_auth_index"), auth)))
         print("Found Authorization on database")
     except:
         print("Creating NEW Authorization on database")
-        subQ = client.query(
+        client.query(
                 q.update(
                     q.ref(q.collection("users"), session["user"]["id"]),
                     {
@@ -917,54 +910,59 @@ def subscribe():
                     )
                 )
 
-    return jsonify({
-        "status": "success",
-        "result": {
-            "id": subQ["ref"].id(),
-            "subscription_json": subQ["data"]["sub"],
-        }
-    })
+    return '', 204
 
-# save the subscription in the database if it doesn’t exist already.
+# remove the sub key if unsubscribed
 @app.route('/api/unsubscribe', methods=["POST"])
 def unsubscribe():
 
-    json_data = request.get_json('subscription_info')
-    subscription_json = json.loads(json_data['subscription_json'])
-
     try:
-        subQ = client.query(
-                    q.update(
-                        q.ref(q.collection("users"), session["user"]["id"]),
-                        {
-                            "data": {
-                                "sub": {
-                                    "endpoint": "null",
-                                    "keys": {
-                                        "auth": "null",
-                                        },
-                                    },
-                                }
-                            },
-                        )
-                    )
+        client.query(
+            q.update(
+                q.ref(q.collection("users"), session["user"]["id"]),
+                {
+                    "data": {
+                        "sub": None,
+                        }
+                    },
+                )
+            )
         print("Subscription Removed")
     except:
-        print("Fauna could not remove subscription")
+        print("Fauna could not find push subscription for this user")
     return '', 204
-    # return jsonify({
-    #     "status": "success",
-    #     "result": {
-    #         "id": subQ["ref"].id(),
-    #         "subscription_json": subQ["data"]["sub"],
-    #     }
-    # })
+
+
+@app.route('/api/notify', methods=["POST"])
+def notify():
+    # mass notification to all subscriptoins
+
+    subscriptions = client.query(
+        q.map_(
+            q.lambda_("x", q.get(q.var("x"))),
+            q.paginate(q.match(q.index("sub_auth_index"), "sub"),size=999)
+        )      
+    )["data"]
     
+    
+    myTitle = "My Title"
+    myBody = "My Body"
+ 
+    results = trigger_push_notifications_for_subscriptions(
+        subscriptions,
+        myTitle,
+        myBody,
+    )
+
+    return jsonify({
+        "status": "success",
+        "result": results
+    })
+
 def trigger_push_notification(sub, title, body):
     
     try:
         response = webpush(
-            # subscription_info=json.loads(sub),
             subscription_info=sub,
             data=json.dumps({"title": title, "body": body}),
             vapid_private_key=VAPID_PRIVATE_KEY,

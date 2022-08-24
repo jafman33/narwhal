@@ -988,9 +988,9 @@ if (Mobilekit.PWA.enable) {
 
 
         function updateSubscriptionOnServer(subscription) {
-            const subscriptionJson = document.querySelector(".js-subscription-json");
+            // const subscriptionJson = document.querySelector(".js-subscription-json");
             if (subscription) {
-                subscriptionJson.textContent = JSON.stringify(subscription);
+                // subscriptionJson.textContent = JSON.stringify(subscription);
                 fetch("/api/subscribe", {
                     method: "POST",
                     headers: { "Content-Type": "application/json", },
@@ -1029,14 +1029,10 @@ if (Mobilekit.PWA.enable) {
             swRegistration.pushManager.getSubscription()
                 .then(function(subscription) {
                     if (subscription) {
-                        // new
-                        subscriptionJson.textContent = JSON.stringify(subscription);
                         fetch("/api/unsubscribe", {
-                                method: "POST",
-                                headers: { "Content-Type": "application/json", },
-                                body: JSON.stringify({ subscription_json: JSON.stringify(subscription), }),
-                            })
-                            // end new
+                            method: "POST",
+                            body: {},
+                        })
                         return subscription.unsubscribe();
                     }
                 })

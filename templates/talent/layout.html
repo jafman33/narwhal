@@ -142,7 +142,7 @@
 
                 <li>
                     <div class="item">
-                        <div class="icon-box bg-primary">
+                        <div class="icon-box bg-primary push-test">
                             <ion-icon name="notifications-outline"></ion-icon>
                         </div>
                         <div class="in">
@@ -173,8 +173,6 @@
                         </div>
                     </div>
                 </li>
-
-
             </ul>
 
         </div>
@@ -306,13 +304,15 @@
     <!-- lootie -->
     <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
 
-
+    <!-- and user.data.account. -->
+    {% if flag %}
     <script>
         // Trigger welcome notification after 5 seconds
         setTimeout(() => {
             notification('notification-welcome');
-        }, 5000);
+        }, 3000);
     </script>
+    {% endif %}
 
     <script>
         function accept() {

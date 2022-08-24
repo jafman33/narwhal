@@ -1,4 +1,3 @@
-from pickle import TRUE
 from app import app
 from config import (
     socketio, 
@@ -21,8 +20,6 @@ from flask import (
     redirect,
     url_for,
     session,
-    make_response, 
-    send_from_directory,
     jsonify
 )
 
@@ -223,13 +220,15 @@ def intro():
 
 @app.route("/home", methods=["GET","POST"])
 @login_required
-def home():
+def home(flag=None):
+    flag = request.args.get('flag')
+    print(flag)
     if session["user"]['usertype'] == 'Project Manager':
         user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
         return render_template("pm/home.html", user=user_data)
     elif session["user"]['usertype'] == 'Engineering Talent':
         user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
-        return render_template("talent/home.html", user=user_data)
+        return render_template("talent/home.html", user=user_data, flag = flag)
     else:
       return None
   
@@ -917,33 +916,79 @@ def subscribe():
 def unsubscribe():
 
     try:
+        # client.query(
+        #     q.update(
+        #         q.ref(q.collection("users"), session["user"]["id"]),
+        #         {
+        #             "data": {
+        #                 "sub": None,
+        #                 }
+        #             },
+        #         )
+        #     )
+        
         client.query(
             q.update(
                 q.ref(q.collection("users"), session["user"]["id"]),
                 {
                     "data": {
-                        "sub": None,
+                        "sub": {
+                            "keys": {
+                                "auth": "null"
+                                },
+                            },
                         }
                     },
                 )
             )
+        
         print("Subscription Removed")
     except:
         print("Fauna could not find push subscription for this user")
     return '', 204
 
-
+@app.route('/api/test', methods=["POST"])
+def api_test():
+    
+    json_data = request.get_json('subscription_info')
+    subscription_json = json.loads(json_data['subscription_json'])
+    auth = subscription_json["keys"]["auth"]
+    
+    try:
+        subQ = client.query(q.get(q.match(q.index("sub_auth_index"), auth)))
+        subscription = subQ["data"]["sub"]
+        print("Found Authorization on database. Sending push!")
+    except:
+        print("----------------------------------")
+        print("NOTE: did NOT find authorization for this user. PLEASE AUTHORIZE NOTIFICATIONS")
+        print("----------------------------------")
+        return '', 204
+        
+    myTitle = "Congratulations!"
+    myBody = "You are now subscribed to notifications from Narwhal"
+        
+    results = trigger_push_notification(
+        subscription,
+        myTitle,
+        myBody
+        )
+    return jsonify({
+        "status": "success",
+        "result": results
+    })
+    
 @app.route('/api/notify', methods=["POST"])
 def notify():
     # mass notification to all subscriptoins
-
-    subscriptions = client.query(
-        q.map_(
-            q.lambda_("x", q.get(q.var("x"))),
-            q.paginate(q.match(q.index("sub_auth_index"), "sub"),size=999)
-        )      
-    )["data"]
-    
+    try:
+        subscriptions = client.query(
+            q.map_(
+                q.lambda_("x", q.get(q.var("x"))),
+                q.paginate(q.not_(q.match(q.index("sub_auth_index"), "null"),size=999))
+            )      
+        )["data"]
+    except:
+        print("Fauna returned some errors")
     
     myTitle = "My Title"
     myBody = "My Body"

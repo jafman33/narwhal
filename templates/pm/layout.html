@@ -138,6 +138,22 @@
                         </div>
                     </a>
                 </li>
+
+                <li>
+                    <div class="item">
+                        <div class="icon-box bg-primary push-test">
+                            <ion-icon name="notifications-outline"></ion-icon>
+                        </div>
+                        <div class="in">
+                            <div>Notifications</div>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input notifications-mode-switch" type="checkbox" id="notifications_sidebar">
+                                <label class="form-check-label" for="notifications_sidebar"></label>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+
                 <li>
                     <div class="item">
                         <div class="icon-box bg-primary">
@@ -152,20 +168,7 @@
                         </div>
                     </div>
                 </li>
-                <li>
-                    <div class="item">
-                        <div class="icon-box bg-primary">
-                            <ion-icon name="alarm-outline"></ion-icon>
-                        </div>
-                        <div class="in">
-                            <div>Notifications</div>
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" id="notifications_sidebar">
-                                <label class="form-check-label" for="notifications_sidebar"></label>
-                            </div>
-                        </div>
-                    </div>
-                </li>
+
             </ul>
 
         </div>
@@ -244,46 +247,41 @@
     <!-- * App Sidebar -->
 
     <!-- welcome notification  -->
-    <!-- <div id="notification-welcome" class="notification-box">
+    <div id="notification-welcome" class="notification-box">
         <div class="notification-dialog android-style">
             <div class="notification-header">
                 <div class="in">
                     <img src="../static/assets/img/icon/72x72.png" alt="image" class="imaged w24">
-                    <strong>Cyber-Text</strong>
+                    <strong>Narwhal</strong>
                     <span>just now</span>
                 </div>
-                <a href="#" class="close-button">
+                <a href="#" class="close-button" id="close-notification-banner">
                     <ion-icon name="close"></ion-icon>
                 </a>
             </div>
             <div class="notification-content">
                 <div class="in">
-                    <h3 class="subtitle">Welcome to CyberText!</h3>
+                    <h3 class="subtitle">Welcome to Narwhal!</h3>
                     <div class="text">
-                        Receive notifications when someone messages you!
+                        Receive Notifications when new projects that match your skills are posted.
                     </div>
                 </div>
             </div>
             <div class="notification-footer">
-                <a href="#" class="notification-button" id="rejected">
+                <a href="#" class="notification-button" id="rejected" onclick="reject()">
                     <ion-icon name="close-circle"></ion-icon>
                     Reject
                 </a>
-                <a href="#" class="notification-button" id="granted">
+                <a href="#" class="notification-button" id="granted" onclick="accept()">
                     <ion-icon name="checkmark-circle"></ion-icon>
                     Accept
                 </a>
             </div>
         </div>
-    </div> -->
+    </div>
     <!-- * welcome notification -->
 
-    <!-- <script>
-        // Trigger welcome notification after 5 seconds
-        setTimeout(() => {
-            notification('notification-welcome');
-        }, 2000);
-    </script> -->
+
 
 
     <!-- ============== Js Files ==============  -->
@@ -300,12 +298,28 @@
     <!-- lootie -->
     <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
 
-    <!-- <script>
+    <!-- and user.data.account. -->
+    {% if flag %}
+    <script>
         // Trigger welcome notification after 5 seconds
         setTimeout(() => {
             notification('notification-welcome');
-        }, 2000);
-    </script> -->
+        }, 3000);
+    </script>
+    {% endif %}
+
+    <script>
+        function accept() {
+            subscribeUser();
+            document.getElementById("close-notification-banner").click();
+        }
+
+        function reject() {
+            unsubscribeUser();
+            document.getElementById("close-notification-banner").click();
+
+        }
+    </script>
 
 
 

@@ -31,7 +31,7 @@
             "{% endif %}"
             "{% endwith %}"
 
-            '{% if id %}'
+            '{% if id != None %}'
             var start = '{{user["data"]["experience"][id]["start"]}}'
             const startdate = new Date(start).toISOString().slice(0, 10);
             document.getElementById("start").value = startdate;

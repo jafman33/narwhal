@@ -31,24 +31,23 @@
             "{% endif %}"
             "{% endwith %}"
 
-            '{% if id %}'
+            '{% if id != None %}'
             var start = '{{user["data"]["education"][id]["start"]}}'
             const startdate = new Date(start).toISOString().slice(0, 10);
             document.getElementById("start").value = startdate;
-            '{% endif %}'
 
-            '{% if id and user["data"]["education"][id]["end"] != "Present" %}'
+            '{% if user["data"]["education"][id]["end"] != "Present" %}'
             var end = '{{user["data"]["education"][id]["end"]}}'
             const enddate = new Date(end).toISOString().slice(0, 10);
             document.getElementById("end").value = enddate;
             '{% endif %}'
+
 
             '{% if user["data"]["education"][id]["status"] == "Present" %}'
             document.getElementById("mystatus").click();
             '{% endif %}'
 
             '{% endif %}'
-
 
 
         });

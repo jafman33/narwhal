@@ -107,6 +107,11 @@ def register():
                                         },
                                     "education": {
                                         },
+                                    "sub": {
+                                        "keys": {
+                                            "auth": "null"
+                                            },
+                                        },
                                     "date": datetime.now(pytz.UTC),
                                 }
                             },

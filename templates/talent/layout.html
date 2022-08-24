@@ -155,9 +155,9 @@
                     </div>
                 </li>
 
-                <section hidden class="js-subscription-details">
+                <!-- <section hidden class="js-subscription-details">
                     <pre><code class="js-subscription-json"></code></pre>
-                </section>
+                </section> -->
 
                 <li>
                     <div class="item">
@@ -304,8 +304,8 @@
     <!-- lootie -->
     <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
 
-    <!-- and user.data.account. -->
-    {% if flag %}
+    <!-- and  -->
+    {% if flag and user.data.account.sub.keys.auth == "null" %}
     <script>
         // Trigger welcome notification after 5 seconds
         setTimeout(() => {

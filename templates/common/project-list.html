@@ -157,20 +157,29 @@
             <ul class="listview image-listview media mb-2">
 
                 <!-- loop here -->
+                {% for manager in managers %} {% for proj_id in bookmarks %} {% if manager["data"]["projects"][proj_id] %}
                 <li>
-                    <a href="#" class="item">
+                    <a href="{{ url_for('project_details', project_email = manager.data.account.email, project_id = proj_id) }}" class="item">
                         <div class="imageWrapper">
-                            <img src="../static/assets/img/sample/photo/3.jpg" alt="image" class="imaged w64">
+                            {% if manager["data"]["projects"][proj_id]["banner"] != ''%}
+                            <img src='{{manager["data"]["projects"][proj_id]["banner"]}}' alt="image" class="imaged w64">
+                            <!--  -->
+                            {% else %}
+                            <img src="../static/assets/img/sample/photo/wide0.jpg" alt="image" class="imaged w64">
+                            <!--  -->
+                            {% endif %}
                         </div>
                         <div class="in">
                             <div>
-                                Project Title
-                                <div class="text-muted">Division Name</div>
-                                <div class="text-muted">Project Manager Name</div>
+                                <div class="overflow">{{manager["data"]["projects"][proj_id]["title"]}}</div>
+                                <div class="overflow mytext-muted">{{manager["data"]["projects"][proj_id]["headline"]}}</div>
+                                <div class="overflow mytext-link">{{manager["data"]["projects"][proj_id]["sponsor"]}}</div>
                             </div>
                         </div>
                     </a>
                 </li>
+                <!--  -->
+                {% endif %} {% endfor %} {% endfor %}
 
             </ul>
 
@@ -180,20 +189,31 @@
 
             <ul class="listview image-listview media mb-2">
 
+                <!-- loop here -->
+                {% for manager in managers %} {% for proj_id in applications %} {% if manager["data"]["projects"][proj_id] %}
                 <li>
-                    <a href="#" class="item">
+                    <a href="{{ url_for('project_details', project_email = manager.data.account.email, project_id = proj_id) }}" class="item">
                         <div class="imageWrapper">
-                            <img src="../static/assets/img/sample/photo/3.jpg" alt="image" class="imaged w64">
+                            {% if manager["data"]["projects"][proj_id]["banner"] != ''%}
+                            <img src='{{manager["data"]["projects"][proj_id]["banner"]}}' alt="image" class="imaged w64">
+                            <!--  -->
+                            {% else %}
+                            <img src="../static/assets/img/sample/photo/wide0.jpg" alt="image" class="imaged w64">
+                            <!--  -->
+                            {% endif %}
                         </div>
                         <div class="in">
                             <div>
-                                Project Title
-                                <div class="text-muted">Division Name</div>
-                                <div class="text-muted">Project Manager Name</div>
+                                <div class="overflow">{{manager["data"]["projects"][proj_id]["title"]}}</div>
+                                <div class="overflow mytext-muted">{{manager["data"]["projects"][proj_id]["headline"]}}</div>
+                                <div class="overflow mytext-link">{{manager["data"]["projects"][proj_id]["sponsor"]}}</div>
                             </div>
                         </div>
                     </a>
                 </li>
+                <!--  -->
+                {% endif %} {% endfor %} {% endfor %}
+
 
             </ul>
 

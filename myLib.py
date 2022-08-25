@@ -99,7 +99,7 @@ def updateProfileContact(phone, calendly = ""):
             )
         )
     
-def updateProjectKeys(id, num,key):
+def updateProjectKeys(id,keys):
     client.query(
             q.update(
                 q.ref(q.collection("users"), session["user"]["id"]),
@@ -107,31 +107,44 @@ def updateProjectKeys(id, num,key):
                     "data": {
                         "projects": {
                             id: {
-                                "keys": {
-                                    num: key,
-                                    },
+                                "keys": keys,
                                 },
                             },
                         }
                     },
                 )
-                )   
+            )   
     
-def deleteProjectKeys(id):
+    
+
+    
+def updateTalentBookmarks(bookmark):
     client.query(
-                q.update(
-                    q.ref(q.collection("users"), session["user"]["id"]),
-                    {
-                        "data": {
-                            "projects": {
-                                id: {
-                                    "keys": None,
-                                    },
-                                },
-                            }
-                        },
-                    )
-                )
+            q.update(
+                q.ref(q.collection("users"), session["user"]["id"]),
+                {
+                    "data": {
+                        "bookmarks": bookmark,
+                    }
+                },
+            )
+        )  
+    
+# def deleteProjectKeys(id):
+#     client.query(
+#                 q.update(
+#                     q.ref(q.collection("users"), session["user"]["id"]),
+#                     {
+#                         "data": {
+#                             "projects": {
+#                                 id: {
+#                                     "keys": None,
+#                                     },
+#                                 },
+#                             }
+#                         },
+#                     )
+#                 )
 
 def updateProfileHeadline(headline):
     client.query(

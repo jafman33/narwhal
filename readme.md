@@ -111,9 +111,15 @@ messenger
 
 Push Notifications let your Progressive Web App go far beyond the browser and are an incredibly useful way to (re)engage with your website visitors. You're in control of exactly when you want to show your visitors something that's intended for them, such as a confirmation, update, or discount at your chosen time. This makes visitors personally feel more engaged with your company and the information you would like to share with them. The chance of returning visitors is enormous and as a result, your brand awareness will increase enormously. Therefore, we see Web Push Notifications as a great value extension for higher user engagement. it feels very native and particularly on Android, where web notifications work and there is better support in general for theming and browser apis.
 
+for pms, ability to edit projects easily.
+for 
+
 ### 2.4 Future Integrations
 
-LinkedIn API
+LinkedIn API - Noticed a lot of work on the side of the engineer. 
+Sharing Projects 
+Sharing Engineer Profiles
+
 
 it feels very native and particularly on Android, where web notifications work and there is better support in general for theming and browser apis.
 

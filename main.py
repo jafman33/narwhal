@@ -149,13 +149,38 @@ def register():
                     )
                 
                 # Create a new chat list for newly registered user
-                chat = client.query(
+                client.query(
                     q.create(
                         q.collection("chats"),
                         {
                             "data": {
                                 "user_id": user["ref"].id(),
                                 "chat_list": [],
+                            }
+                        },
+                    )
+                )
+                
+                # Create a new chat list for newly registered user
+                client.query(
+                    q.create(
+                        q.collection("bookmarks"),
+                        {
+                            "data": {
+                                "user_id": user["ref"].id(),
+                                "bookmarks": [],
+                            }
+                        },
+                    )
+                )
+                
+                client.query(
+                    q.create(
+                        q.collection("applications"),
+                        {
+                            "data": {
+                                "user_id": user["ref"].id(),
+                                "applications": [],
                             }
                         },
                     )
@@ -227,7 +252,6 @@ def intro():
 @login_required
 def home(flag=None):
     flag = request.args.get('flag')
-    print(flag)
     if session["user"]['usertype'] == 'Project Manager':
         user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
         return render_template("pm/home.html", user=user_data)
@@ -238,6 +262,7 @@ def home(flag=None):
       return None
   
 
+  
 @app.route("/profile", methods=["GET","POST"])
 @login_required
 def profile():
@@ -348,6 +373,222 @@ def profile_edit():
     else:
         return None
 
+@app.route("/add-bookmark", methods=["GET","POST"])
+@login_required
+def add_bookmark():
+    # json_data = request.get_json('data')
+    # print(json_data)
+    
+    project_id  = request.args.get('project_id', None)
+    # project_email = request.args.get('project_email', None)
+    # talent_id  = request.args.get('talent_id', None)
+    user_id = session["user"]["id"]
+    
+    if session["user"]['usertype'] == 'Project Manager':
+        # Todo: bookmark talent!
+        return '', 204
+    
+    elif session["user"]['usertype'] == 'Engineering Talent':
+        
+        # Get user bookmarks document
+        user_bookmarks = client.query(q.get(q.match(q.index("bookmark_index"), user_id)))
+        # Create current bookmark list...
+        try:
+            bookmark_list = [list(i.values())[0] for i in user_bookmarks["data"]["bookmarks"]]
+        except:
+            bookmark_list = []
+        # ...and make sure new bookmark is not already on the list
+        if project_id not in bookmark_list:     
+            # append the project bookmark
+            user_bookmarks["data"]["bookmarks"].append({"project_id": project_id})
+            # Update the user's bookmark document
+            client.query(
+                q.update(
+                    q.ref(q.collection("bookmarks"), user_bookmarks["ref"].id()),
+                    {
+                        "data": {
+                            "bookmarks": user_bookmarks["data"]["bookmarks"]
+                        }
+                    },
+                )
+            )
+            return jsonify({
+            "status": "success",
+            "name": "bookmark"
+            })
+        else:
+            user_bookmarks["data"]["bookmarks"].remove({"project_id": project_id})
+            client.query(
+                q.update(
+                    q.ref(q.collection("bookmarks"), user_bookmarks["ref"].id()),
+                    {
+                        "data": {
+                            "bookmarks": user_bookmarks["data"]["bookmarks"]
+                        }
+                    },
+                )
+            )
+            return jsonify({
+            "status": "success",
+            "name": "bookmark-outline"
+            })
+            
+@app.route("/add-application", methods=["GET","POST"])
+@login_required
+def add_application():
+
+    project_id  = request.args.get('project_id', None)
+    # talent_id  = request.args.get('talent_id', None)
+    user_id = session["user"]["id"]
+    
+    if session["user"]['usertype'] == 'Project Manager':
+        # Todo: bookmark talent!
+        return '', 204
+    
+    elif session["user"]['usertype'] == 'Engineering Talent':
+        
+        # Get user applications document
+        user_applications = client.query(q.get(q.match(q.index("application_index"), user_id)))
+        # Create current application list...
+        try:
+            application_list = [list(i.values())[0] for i in user_applications["data"]["applications"]]
+        except:
+            application_list = []
+        # ...and make sure new bookmark is not already on the list
+        if project_id not in application_list:     
+            # append the project bookmark
+            user_applications["data"]["applications"].append({"project_id": project_id})
+            # Update the user's application document
+            client.query(
+                q.update(
+                    q.ref(q.collection("applications"), user_applications["ref"].id()),
+                    {
+                        "data": {
+                            "applications": user_applications["data"]["applications"]
+                        }
+                    },
+                )
+            )
+            # get authorization key from PM
+            try:
+                user_applications = client.query(q.get(q.match(q.index("application_index"), user_id)))
+                auth = ''
+            except:
+                auth = ''
+
+            
+            return jsonify({
+            "status": "success",
+            "name": "git-branch-outline",
+            "text": "Un-Apply",
+            "auth": auth,
+            "title": "New Applicant",
+            "body": project_title,
+            })
+        else:
+            user_applications["data"]["applications"].remove({"project_id": project_id})
+            client.query(
+                q.update(
+                    q.ref(q.collection("applications"), user_applications["ref"].id()),
+                    {
+                        "data": {
+                            "applications": user_applications["data"]["applications"]
+                        }
+                    },
+                )
+            )
+            return jsonify({
+            "status": "success",
+            "name": "git-pull-request-outline",
+            "text": "Apply"            
+            })
+            
+@app.route('/new-applicant-notification', methods=["POST"])
+def new_applicant_notification():
+    
+    json_data = request.get_json('notification_info')
+    auth = json.loads(json_data['auth'])
+    title = json.loads(json_data['title'])
+    body = json.loads(json_data['body'])
+
+    try:
+        subscription = client.query(q.get(q.match(q.index("sub_auth_index"), auth)))["data"]["sub"]
+        print("Found Authorization on database. Sending push!")
+    except:
+        print("----------------------------------")
+        print("NOTE: did NOT find authorization for this user.")
+        print("----------------------------------")
+        return '', 204
+    results = trigger_push_notification(
+        subscription,
+        title,
+        body
+        )
+    return jsonify({
+        "status": "success",
+        "result": results
+    })
+
+@app.route("/check-bookmark", methods=["GET","POST"])
+@login_required
+def check_bookmark():
+
+    user_id = session["user"]["id"]
+    project_id  = request.args.get('project_id', None)
+    # talent_id  = request.args.get('talent_id', None)
+    
+    if session["user"]['usertype'] == 'Project Manager':
+        # Todo: bookmark talent!
+        return '', 204
+    
+    elif session["user"]['usertype'] == 'Engineering Talent':
+        user_bookmarks = client.query(q.get(q.match(q.index("bookmark_index"), user_id)))
+        try:
+            bookmark_list = [list(i.values())[0] for i in user_bookmarks["data"]["bookmarks"]]
+        except:
+            bookmark_list = []
+        if project_id not in bookmark_list:     
+            return jsonify({
+            "status": "success",
+            "name": "bookmark-outline"
+            })
+        else:
+            return jsonify({
+            "status": "success",
+            "name": "bookmark"
+            })
+            
+@app.route("/check-application", methods=["GET","POST"])
+@login_required
+def check_application():
+
+    user_id = session["user"]["id"]
+    project_id  = request.args.get('project_id', None)
+    # talent_id  = request.args.get('talent_id', None)
+    
+    if session["user"]['usertype'] == 'Project Manager':
+        # Todo: bookmark talent!
+        return '', 204
+    
+    elif session["user"]['usertype'] == 'Engineering Talent':
+        user_applications = client.query(q.get(q.match(q.index("application_index"), user_id)))
+        try:
+            application_list = [list(i.values())[0] for i in user_applications["data"]["applications"]]
+        except:
+            application_list = []
+        if project_id not in application_list:     
+            return jsonify({
+            "status": "success",
+            "name": "git-pull-request-outline",
+            "text": "Apply"
+            })
+        else:
+            return jsonify({
+            "status": "success",
+            "name": "git-branch-outline",
+            "text": "Un-Apply"
+            })
+  
 @app.route("/experience-edit", methods=["GET","POST"])
 @app.route("/experience-edit/<id>", methods=["GET","POST"])
 @login_required
@@ -480,7 +721,9 @@ def education_edit(id=None):
 @login_required
 def projects():
     user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
+    user_id = session["user"]['id']
     
+    # ultimately, we dont want to pull up 200k managers here... Need to be more specific
     managers = client.query(
         q.map_(
             q.lambda_("project", q.get(q.var("project"))),
@@ -488,7 +731,20 @@ def projects():
         )      
     )["data"]
     
-    return render_template("common/project-list.html", user=user_data, managers=managers)
+    
+    bookmarks = client.query(q.get(q.match(q.index("bookmark_index"), user_id)))["data"]["bookmarks"]
+    bookmark_list = [list(i.values())[0] for i in bookmarks]
+    
+    applications = client.query(q.get(q.match(q.index("application_index"), user_id)))["data"]["applications"]
+    application_list = [list(i.values())[0] for i in applications]
+
+    return render_template(
+        "common/project-list.html", 
+        user=user_data, 
+        managers=managers, 
+        bookmarks=bookmark_list, 
+        applications=application_list
+        )
 
 @app.route("/project-edit", methods=["GET","POST"])
 @app.route("/project-edit/<id>", methods=["GET","POST"])
@@ -528,10 +784,12 @@ def project_edit(id=None):
         sponsor = request.form['sponsor']
         title = request.form['title']  
         headline = request.form['headline']  
+        link = request.form['link']
         location = request.form['location']  
         summary = request.form['summary']
+        
             
-        if sponsor and title and headline and location and summary and start and end:
+        if sponsor and title and headline and link and location and summary and start and end:
             client.query(
                 q.update(
                     q.ref(q.collection("users"), session["user"]["id"]),
@@ -542,10 +800,12 @@ def project_edit(id=None):
                                     "sponsor": sponsor,
                                     "title": title,
                                     "headline": headline,
+                                    "link": link,
                                     "location": location,
                                     "summary": summary,
                                     "start": start,
                                     "end": end,
+                                    "postdate": datetime.today().strftime("%m/%d/%y"),
                                     },
                                 },
                             }
@@ -555,10 +815,12 @@ def project_edit(id=None):
         
         keys = request.form['keys']
         if keys:
-            myLib.deleteProjectKeys(projectID)
-            keyList = keys.split(",")
-            for n in range(len(keyList)):
-                myLib.updateProjectKeys(projectID, n, keyList[n])
+            # myLib.deleteProjectKeys(projectID)
+            keyList = keys.replace(" ", "").split(",")
+            myLib.updateProjectKeys(projectID, keyList)
+            
+            # for n in range(len(keyList)):
+            #     myLib.updateProjectKeys(projectID, n, keyList[n])
         else:
             flash(keys)
             return redirect(url_for('project_edit'))
@@ -571,6 +833,10 @@ def project_edit(id=None):
         
     return render_template("pm/project-edit.html", user = user_data, id = id)
 
+
+
+    
+    
 
 @app.route("/talent", methods=["GET", "POST"])
 @login_required
@@ -586,17 +852,17 @@ def talent():
     
     return render_template("common/talent-list.html", user=user_data, talents=talents)
 
-
 @app.route("/project-details", methods=["GET", "POST"])
 @login_required
 def project_details():
     project_id  = request.args.get('project_id', None)
     project_email  = request.args.get('project_email', None)
+    messages  = request.args.get('messages', None)
         
     project_data = client.query(q.get(q.match(q.index("userEmail_index"), project_email)))
     user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
     
-    return render_template("common/project-details.html", user = user_data, project=project_data, id = project_id)
+    return render_template("common/project-details.html", user = user_data, project=project_data, id = project_id, messages=messages)
 
 @app.route("/profile-details", methods=["GET", "POST"])
 @app.route("/profile-details/<email>", methods=["GET", "POST"])
@@ -982,14 +1248,18 @@ def api_test():
         "result": results
     })
     
+
+    
 @app.route('/api/notify', methods=["POST"])
 def notify():
     # mass notification to all subscriptoins
+    
+    
     try:
         subscriptions = client.query(
             q.map_(
                 q.lambda_("x", q.get(q.var("x"))),
-                q.paginate(q.not_(q.match(q.index("sub_auth_index"), "null"),size=999))
+                q.paginate(q.match(q.index("sub_auth_index"), "null"),size=999)
             )      
         )["data"]
     except:

@@ -83,23 +83,17 @@
                 // update icons and button
                 el.querySelector('ion-icon').setAttribute('name', data.name);
                 el.querySelector('span').textContent = data.text
-                if (data.text == 'Un-Apply') {
-                    fetch('{{ url_for("new_applicant_notification", project_id = id) }}', {
-                        method: "POST",
-                        body: JSON.stringify({
-                            auth: data.auth,
-                            title: data.title,
-                            body: data.body
-                        }),
-                    })
-                }
+                    // if (data.text == 'Un-Apply') {
+                    //     fetch('{{ url_for("new_applicant_notification", project_email = email) }}', {
+                    //         method: "POST",
+                    //     })
+                    // }
             });
     }
 </script>
 
 <!-- App Capsule -->
 <div id="appCapsule">
-
     <div class="blog-post">
         <div class="mb-2">
             <img src='{{project["data"]["projects"][id]["banner"]}}' alt="image" class="imaged square w-100">

@@ -373,14 +373,12 @@ def profile_edit():
     else:
         return None
 
-@app.route("/add-bookmark", methods=["GET","POST"])
+@app.route("/add-bookmark", methods=["POST"])
 @login_required
 def add_bookmark():
-    # json_data = request.get_json('data')
-    # print(json_data)
     
     project_id  = request.args.get('project_id', None)
-    # project_email = request.args.get('project_email', None)
+    # project_email  = request.args.get('project_email', None)
     # talent_id  = request.args.get('talent_id', None)
     user_id = session["user"]["id"]
     
@@ -390,7 +388,6 @@ def add_bookmark():
     
     elif session["user"]['usertype'] == 'Engineering Talent':
         
-        # Get user bookmarks document
         user_bookmarks = client.query(q.get(q.match(q.index("bookmark_index"), user_id)))
         # Create current bookmark list...
         try:
@@ -433,11 +430,12 @@ def add_bookmark():
             "name": "bookmark-outline"
             })
             
-@app.route("/add-application", methods=["GET","POST"])
+@app.route("/add-application", methods=["POST"])
 @login_required
 def add_application():
 
     project_id  = request.args.get('project_id', None)
+    # project_email  = request.args.get('project_email', None)
     # talent_id  = request.args.get('talent_id', None)
     user_id = session["user"]["id"]
     
@@ -469,21 +467,11 @@ def add_application():
                     },
                 )
             )
-            # get authorization key from PM
-            try:
-                user_applications = client.query(q.get(q.match(q.index("application_index"), user_id)))
-                auth = ''
-            except:
-                auth = ''
 
-            
             return jsonify({
             "status": "success",
             "name": "git-branch-outline",
             "text": "Un-Apply",
-            "auth": auth,
-            "title": "New Applicant",
-            "body": project_title,
             })
         else:
             user_applications["data"]["applications"].remove({"project_id": project_id})
@@ -503,10 +491,11 @@ def add_application():
             "text": "Apply"            
             })
             
-@app.route('/new-applicant-notification', methods=["POST"])
+@app.route('/new-applicant-notification', methods=["GET","POST"])
 def new_applicant_notification():
     
     json_data = request.get_json('notification_info')
+    print(json_data)
     auth = json.loads(json_data['auth'])
     title = json.loads(json_data['title'])
     body = json.loads(json_data['body'])
@@ -529,12 +518,13 @@ def new_applicant_notification():
         "result": results
     })
 
-@app.route("/check-bookmark", methods=["GET","POST"])
+@app.route("/check-bookmark", methods=["POST"])
 @login_required
 def check_bookmark():
 
     user_id = session["user"]["id"]
     project_id  = request.args.get('project_id', None)
+    # project_email  = request.args.get('project_email', None)
     # talent_id  = request.args.get('talent_id', None)
     
     if session["user"]['usertype'] == 'Project Manager':
@@ -558,12 +548,14 @@ def check_bookmark():
             "name": "bookmark"
             })
             
-@app.route("/check-application", methods=["GET","POST"])
+@app.route("/check-application", methods=["POST"])
 @login_required
 def check_application():
 
     user_id = session["user"]["id"]
     project_id  = request.args.get('project_id', None)
+    print()
+    # project_email  = request.args.get('project_email', None)
     # talent_id  = request.args.get('talent_id', None)
     
     if session["user"]['usertype'] == 'Project Manager':
@@ -855,6 +847,8 @@ def talent():
 @app.route("/project-details", methods=["GET", "POST"])
 @login_required
 def project_details():
+    
+    
     project_id  = request.args.get('project_id', None)
     project_email  = request.args.get('project_email', None)
     messages  = request.args.get('messages', None)
@@ -862,7 +856,13 @@ def project_details():
     project_data = client.query(q.get(q.match(q.index("userEmail_index"), project_email)))
     user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
     
-    return render_template("common/project-details.html", user = user_data, project=project_data, id = project_id, messages=messages)
+    return render_template(
+        "common/project-details.html", 
+        user = user_data, 
+        project=project_data, 
+        id = project_id, 
+        email = project_email, 
+        messages=messages)
 
 @app.route("/profile-details", methods=["GET", "POST"])
 @app.route("/profile-details/<email>", methods=["GET", "POST"])

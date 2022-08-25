@@ -430,12 +430,12 @@ def add_bookmark():
             "name": "bookmark-outline"
             })
             
-@app.route("/add-application", methods=["POST"])
+@app.route("/add-application", methods=["GET","POST"])
 @login_required
 def add_application():
 
     project_id  = request.args.get('project_id', None)
-    # project_email  = request.args.get('project_email', None)
+    project_email  = request.args.get('project_email', None)
     # talent_id  = request.args.get('talent_id', None)
     user_id = session["user"]["id"]
     
@@ -468,10 +468,23 @@ def add_application():
                 )
             )
 
+            try:
+                pm_data = client.query(q.get(q.match(q.index("userEmail_index"), project_email)))["data"]
+                auth = pm_data["sub"]["keys"]["auth"]
+                project_title = pm_data["projects"][project_id]["title"]
+                print("MANAGED TO FIND PM_DATA")
+            except:
+                print("DID NOT MANAGE TO FIND PM_DATA")
+                auth = ''
+                project_title = ''
+
             return jsonify({
             "status": "success",
             "name": "git-branch-outline",
             "text": "Un-Apply",
+            "auth": auth,
+            "title": "New Applicant!",
+            "body": project_title,
             })
         else:
             user_applications["data"]["applications"].remove({"project_id": project_id})
@@ -495,11 +508,11 @@ def add_application():
 def new_applicant_notification():
     
     json_data = request.get_json('notification_info')
-    print(json_data)
-    auth = json.loads(json_data['auth'])
-    title = json.loads(json_data['title'])
-    body = json.loads(json_data['body'])
-
+    data = json_data["notification_info"]
+    auth = data['auth']
+    title = data['title']
+    body = data['body']
+   
     try:
         subscription = client.query(q.get(q.match(q.index("sub_auth_index"), auth)))["data"]["sub"]
         print("Found Authorization on database. Sending push!")
@@ -847,8 +860,7 @@ def talent():
 @app.route("/project-details", methods=["GET", "POST"])
 @login_required
 def project_details():
-    
-    
+
     project_id  = request.args.get('project_id', None)
     project_email  = request.args.get('project_email', None)
     messages  = request.args.get('messages', None)

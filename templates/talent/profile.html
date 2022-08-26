@@ -14,6 +14,7 @@
 {% block content %}
 
 
+
 <!-- App Header -->
 <div class="appHeader bg-primary text-light">
     <div class="left">
@@ -68,30 +69,72 @@
                 </div>
 
                 <div class="section mt-1">
-                    <div class="profile-info">
-                        <div class=" bio">
-                            {{user.data.profile.summary}}
+                    <div class="row">
+                        <div class="col-8">
+                            <div class="profile-info">
+                                <div class="bio" style="text-align: justify;">
+                                    {{user.data.profile.summary}}
+                                </div>
+                            </div>
                         </div>
+                        <div class="col-4">
+                            <div class="section">
+                                <div class="row" style="width: 100px;">
+                                    <div class="col">
+                                        <div class="circle-progress-container">
+                                            <div id="progress1">
+                                                <div class="inner">
+                                                    <p class="mt-2">20 hrs.</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- <p class="mt-2">Availability</p> -->
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
 
-                <div class="text-center mt-2">
+                <!-- <div class="text-center mt-2">
                     <div class="profile-stats ps-1 pe-1">
                         <a href="#" class="item">
-                            <strong>112</strong>matches
+                            <strong>7</strong>matches
                         </a>
                         <a href="#" class="item">
                             <strong>28</strong>views
                         </a>
                         <a href="#" class="item">
-                            <strong>12</strong>searches
+                            <strong>15</strong>searches
                         </a>
                     </div>
-                </div>
+                </div> -->
 
             </div>
         </div>
     </div>
+
+    <!-- <div class="section mt-2">
+        <div class="card">
+            <div class="card-body">
+                <div class="section mt-2">
+                    <div class="row" style="width: 100px; margin: 0 auto">
+                        <div class="col">
+                            <div class="circle-progress-container">
+                                <div id="progress1">
+                                    <div class="inner">
+                                        <p class="mt-2">20 hrs.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="mt-2">Availability</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div> -->
 
     <div class="section mt-2">
         <div class="card">
@@ -157,6 +200,20 @@
         </div>
     </div>
 
+    <script src="../static/assets/js/plugins/progressbar-js/progressbar.min.js"></script>
+    <script>
+        var circleProgress1 = new ProgressBar.Circle(progress1, {
+            strokeWidth: 8,
+            easing: 'easeInOut',
+            duration: 2400,
+            color: '#1E74FD',
+            trailColor: '#E5E5E5',
+            trailWidth: 8,
+            svgStyle: null
+        });
+
+        circleProgress1.animate(0.50); // percent
+    </script>
 
 
 </div>

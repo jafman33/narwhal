@@ -472,11 +472,10 @@ def add_application():
                 pm_data = client.query(q.get(q.match(q.index("userEmail_index"), project_email)))["data"]
                 auth = pm_data["sub"]["keys"]["auth"]
                 project_title = pm_data["projects"][project_id]["title"]
-                print("MANAGED TO FIND PM_DATA")
             except:
-                print("DID NOT MANAGE TO FIND PM_DATA")
                 auth = ''
                 project_title = ''
+                return '', 204
 
             return jsonify({
             "status": "success",
@@ -515,11 +514,7 @@ def new_applicant_notification():
    
     try:
         subscription = client.query(q.get(q.match(q.index("sub_auth_index"), auth)))["data"]["sub"]
-        print("Found Authorization on database. Sending push!")
     except:
-        print("----------------------------------")
-        print("NOTE: did NOT find authorization for this user.")
-        print("----------------------------------")
         return '', 204
     results = trigger_push_notification(
         subscription,

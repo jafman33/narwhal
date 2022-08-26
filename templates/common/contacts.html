@@ -61,13 +61,13 @@
 
 
     <ul class="listview image-listview">
-        {% for my_contacts in data %}
+        {% for contact in contacts %}
 
         <li>
-            <a href="{{ url_for('text', rid=my_contacts.room_id) }}" class="item">
-                <img src="../static/assets/img/sample/avatar/avatar.png" alt="image" class="image">
+            <a href="{{ url_for('text', rid=contact.room_id) }}" class="item">
+                <img src="{{ contact.photo }}" alt="image" class="image">
                 <div class="in">
-                    <div>{{ my_contacts.firstname }}</div>
+                    <div>{{ contact.firstname }} {{ contact.lastname }}</div>
                 </div>
             </a>
         </li>

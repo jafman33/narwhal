@@ -241,6 +241,61 @@
 
                 </div>
 
+                <div class="section-title mt-2">Availability</div>
+                <div class="wide-block pb-1 pt-2">
+
+                    <div class="row ms-1 me-1">
+
+                        <!-- <div class="form-group boxed">
+                            <div class="input-wrapper"> -->
+                        <!-- <label class="form-label" for="availability">Avaliability</label> -->
+
+                        <ul class="listview image-listview no-line no-space flush">
+                            <li>
+                                <div class="item">
+                                    <div class="icon-box">
+
+                                        <div class="section">
+                                            <div class="row" style="width: 60px;">
+                                                <div class="col">
+                                                    <div class="circle-progress-container">
+                                                        <div id="progress1">
+                                                            <div class="inner">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <div class="in">
+                                        <div class="form-group basic">
+                                            <div class="input-wrapper">
+                                                <!--  -->
+                                                {% if user.data.profile.availability %}
+                                                <input type="tel" class="form-control" id="availability" name="availability" value="{{ user.data.profile.availability }}" autocomplete="off">
+                                                <!--  -->
+                                                {% else %}
+                                                <input type="tel" class="form-control" id="availability" name="availability" placeholder="Ex. '20' hrs. per week" autocomplete="off">
+                                                <!--  -->
+                                                {% endif %}
+                                                <i class="clear-input"><ion-icon name="close-circle"></ion-icon></i>
+                                            </div>
+                                            <div class="input-info">Enter how many hours per week you're available</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+
+
+                    </div>
+
+                </div>
+
+
+
                 <div class="section-title mt-2">Industry</div>
                 <div class="wide-block pb-1 pt-2">
 
@@ -249,14 +304,7 @@
                         <div class="form-group boxed">
                             <div class="input-wrapper">
                                 <label class="form-label" for="industry">Industry</label>
-                                <!--  -->
-                                {% if user.data.profile.industry == '' %}
-                                <input type="text" class="form-control" id="industry" name="industry" placeholder="Enter your Industry" autocomplete="off">
-                                <!--  -->
-                                {% else %}
-                                <input type="text" class="form-control" id="industry" name="industry" value="{{ user.data.profile.industry }}" autocomplete="off">
-                                <!--  -->
-                                {% endif %}
+                                <input type="text" class="form-control" id="industry" name="industry" autocomplete="off">
                                 <i class="clear-input"><ion-icon name="close-circle"></ion-icon></i>
                             </div>
                         </div>
@@ -410,6 +458,48 @@
     <script src="../static/assets/js/plugins/progressbar-js/progressbar.min.js"></script>
     <!-- Base Js File -->
     <script src="../static/assets/js/base.js"></script>
+
+    <!-- <script src="../static/assets/js/plugins/progressbar-js/progressbar.min.js"></script> -->
+    <script>
+        // Availability
+        var percent = 0;
+        var hrs = 0;
+        var availabilityVal = '{{ user.data.profile.availability }}';
+
+        // Industry
+        var industryVal = '{{ user.data.profile.industry }}';
+
+
+
+        document.addEventListener("DOMContentLoaded", function(event) {
+
+            if (availabilityVal) {
+                document.getElementById("availability").value = availabilityVal;
+                hrs = availabilityVal;
+                percent = hrs / 40;
+            } else {
+                document.getElementById("availability").placeholder = "Ex. 20"
+            }
+
+            if (industryVal) {
+                document.getElementById("industry").value = industryVal;
+            } else {
+                document.getElementById("industry").placeholder = "Ex. Aerospace"
+            }
+
+
+            var circleProgress1 = new ProgressBar.Circle(progress1, {
+                strokeWidth: 8,
+                easing: 'easeInOut',
+                duration: 2400,
+                color: '#1E74FD',
+                trailColor: '#E5E5E5',
+                trailWidth: 8,
+                svgStyle: null
+            });
+            circleProgress1.animate(percent); // percent
+        });
+    </script>
 
 </body>
 

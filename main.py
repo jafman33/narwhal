@@ -255,30 +255,19 @@ def home(flag=None):
     if session["user"]['usertype'] == 'Project Manager':
         user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
         return render_template("pm/home.html", user=user_data)
+    
     elif session["user"]['usertype'] == 'Engineering Talent':
         user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
-        return render_template("talent/home.html", user=user_data, flag = flag)
+        managers = client.query(
+            q.map_(
+                q.lambda_("project", q.get(q.var("project"))),
+                q.paginate(q.match(q.index("userType_index"), "Project Manager"),size=100)
+            )      
+        )["data"]
+        return render_template("talent/home.html", user=user_data, flag = flag, managers = managers)
     else:
       return None
   
-
-  
-@app.route("/profile", methods=["GET","POST"])
-@login_required
-def profile():
-    user_type = session["user"]['usertype']
-    
-    if user_type == 'Project Manager':
-        user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
-        return render_template("pm/profile.html", type=user_type, user=user_data)
-    
-    elif user_type == 'Engineering Talent':
-        user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
-        return render_template("talent/profile.html", type=user_type, user=user_data)
-    
-    else:
-        return None
-
 
 
 @app.route("/profile-edit", methods=["GET","POST"])
@@ -355,6 +344,10 @@ def profile_edit():
             summary = request.form['summary']
             if summary:
                 myLib.updateProfileSummary(summary)
+                
+            availability = request.form['availability']
+            if availability:
+                myLib.updateProfileAvailability(availability)
                 
             industry = request.form['industry']
             if industry:
@@ -590,10 +583,11 @@ def check_application():
             })
   
 @app.route("/experience-edit", methods=["GET","POST"])
-@app.route("/experience-edit/<id>", methods=["GET","POST"])
 @login_required
-def experience_edit(id=None):
+def experience_edit():
     
+    id  = request.args.get('id', None)
+
     user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
 
     if request.method == 'POST':
@@ -656,9 +650,10 @@ def experience_edit(id=None):
     return render_template("talent/experience-edit.html", user = user_data, id = id)
 
 @app.route("/education-edit", methods=["GET","POST"])
-@app.route("/education-edit/<id>", methods=["GET","POST"])
 @login_required
-def education_edit(id=None):
+def education_edit():
+    
+    id  = request.args.get('id', None)
     
     user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
 
@@ -747,10 +742,11 @@ def projects():
         )
 
 @app.route("/project-edit", methods=["GET","POST"])
-@app.route("/project-edit/<id>", methods=["GET","POST"])
 @login_required
-def project_edit(id=None):
+def project_edit():
     
+    id  = request.args.get('id', None)
+
     user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
 
     if request.method == 'POST':
@@ -871,41 +867,67 @@ def project_details():
         email = project_email, 
         messages=messages)
 
+# @app.route("/profile", methods=["GET","POST"])
+# @login_required
+# def profile():
+#     user_type = session["user"]['usertype']
+    
+#     if user_type == 'Project Manager':
+#         user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
+#         return render_template("pm/profile-pm.html", type=user_type, user=user_data)
+    
+#     elif user_type == 'Engineering Talent':
+#         user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
+#         return render_template("talent/profile-talent.html", type=user_type, user=user_data)
+    
+#     else:
+#         return None
+    
 @app.route("/profile-details", methods=["GET", "POST"])
-@app.route("/profile-details/<email>", methods=["GET", "POST"])
 @login_required
-def profile_details(email=None):
+def profile_details():
     
-    self_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
-    self_type = session["user"]['usertype']
-
+    email  = request.args.get('email', None)    
     if email:
-        user_data = client.query(q.get(q.match(q.index("userEmail_index"), email)))
-        user_type = user_data["data"]["account"]["usertype"]
-    
-    # Check if user is viewing own profile page details
-    self = False
-    if session["user"]['email'] == email:
+        self = False
+        user_data = client.query(q.get(q.match(q.index("userEmail_index"), email))) 
+    else:
         self = True
+        user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
+    self_type = session["user"]['usertype']
+    
+    # get contacts
+    contacts_data = []
+    try:
+        # Get the chat list of all their contacts
+        chat_list = client.query(q.get(q.match(q.index("chat_index"), session["user"]["id"])))["data"]["chat_list"]
+    except:
+        chat_list = []
+    for contacts in chat_list:
+        # Query the database to get the user name of users in a user's chat list
+        contact_data = client.query(q.get(q.ref(q.collection("users"), contacts["user_id"])))["data"]
+        contacts_data.append(
+            {
+                "firstname": contact_data["account"]["firstname"],
+                "lastname": contact_data["account"]["lastname"],
+                "email": contact_data["account"]["email"],
+                "photo": contact_data["profile"]["photo"],
+                "room_id": contacts["room_id"],
+            }
+        )  
     
     # Check if user is a Project Manager
-    if session["user"]['usertype'] == 'Project Manager':
+    if self_type == 'Project Manager':
         if self:
-            return render_template("pm/profile.html", type=self_type, user=self_data)
-        elif user_type == 'Engineering Talent':
-            return render_template("talent/profile.html", type=self_type, user=user_data)
-        # one day... so pms can talk amongst each other and see each others profiles
+            return render_template("pm/profile-pm-self.html", type=self_type, user=user_data)
         else:
-            return render_template("pm/profile.html", type=self_type, user=user_data)
+            return render_template("talent/profile-talent.html", type=self_type, user=user_data)
     
-    elif session["user"]['usertype'] == 'Engineering Talent':
+    elif self_type == 'Engineering Talent':
         if self:
-            return render_template("talent/profile.html", type=self_type, user=user_data)
-        elif user_type == 'Project Manager':
-            return render_template("pm/profile.html", type=self_type, user=user_data)
-        # one day... so talent can talk amongst each other and see each others profiles
+            return render_template("talent/profile-talent-self.html", type=self_type, user=user_data, contacts = contacts_data)
         else:
-            return render_template("talent/profile.html", type=self_type, user=user_data)
+            return render_template("pm/profile-pm.html", type=self_type, user=user_data)
         
     else:
       return None
@@ -917,32 +939,29 @@ def profile_details(email=None):
 @app.route("/contacts", methods=["GET","POST"])
 @login_required
 def contacts():
-
     user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
-
-    # Initialize context that contains information about the chat room
-    data = []
+    contacts_data = []
     try:
         # Get the chat list of all their contacts
         chat_list = client.query(q.get(q.match(q.index("chat_index"), session["user"]["id"])))["data"]["chat_list"]
     except:
         chat_list = []
-
     for contacts in chat_list:
         # Query the database to get the user name of users in a user's chat list
-        contact = client.query(q.get(q.ref(q.collection("users"), contacts["user_id"])))["data"]["account"]["firstname"]
-
-        data.append(
+        contact_data = client.query(q.get(q.ref(q.collection("users"), contacts["user_id"])))["data"]
+        contacts_data.append(
             {
-                "firstname": contact,
+                "firstname": contact_data["account"]["firstname"],
+                "lastname": contact_data["account"]["lastname"],
+                "photo": contact_data["profile"]["photo"],
                 "room_id": contacts["room_id"],
             }
-        )
+        )  
         
     return render_template(
         "common/contacts.html", 
         user=user_data,
-        data=data,
+        contacts=contacts_data,
     )
 
 

@@ -84,7 +84,7 @@
                                         <div class="circle-progress-container">
                                             <div id="progress1">
                                                 <div class="inner">
-                                                    <p class="mt-2">20 hrs.</p>
+                                                    <p class="mt-2">{{user.data.profile.availability}} hrs.</p>
                                                 </div>
                                             </div>
                                         </div>
@@ -201,20 +201,32 @@
     </div>
 
     <script src="../static/assets/js/plugins/progressbar-js/progressbar.min.js"></script>
+
     <script>
-        var circleProgress1 = new ProgressBar.Circle(progress1, {
-            strokeWidth: 8,
-            easing: 'easeInOut',
-            duration: 2400,
-            color: '#1E74FD',
-            trailColor: '#E5E5E5',
-            trailWidth: 8,
-            svgStyle: null
+        // Availability
+        var percent = 0;
+        var hrs = 0;
+        var availabilityVal = '{{ user.data.profile.availability }}';
+
+        document.addEventListener("DOMContentLoaded", function(event) {
+
+            if (availabilityVal) {
+                hrs = availabilityVal;
+                percent = hrs / 40;
+            }
+
+            var circleProgress1 = new ProgressBar.Circle(progress1, {
+                strokeWidth: 8,
+                easing: 'easeInOut',
+                duration: 2400,
+                color: '#1E74FD',
+                trailColor: '#E5E5E5',
+                trailWidth: 8,
+                svgStyle: null
+            });
+            circleProgress1.animate(percent); // percent
         });
-
-        circleProgress1.animate(0.50); // percent
     </script>
-
 
 </div>
 <!-- * App Capsule -->

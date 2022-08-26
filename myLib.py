@@ -160,6 +160,20 @@ def updateProfileHeadline(headline):
             )
         )
     
+def updateProfileAvailability(availability):
+    client.query(
+        q.update(
+            q.ref(q.collection("users"), session["user"]["id"]),
+            {
+                "data": {
+                    "profile": {
+                        "availability": availability,
+                        },
+                    }
+                },
+            )
+        )
+    
 def updateProfileSummary(summary):
     client.query(
         q.update(

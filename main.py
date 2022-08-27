@@ -1,3 +1,4 @@
+from curses import erasechar
 from app import app
 from config import (
     socketio, 
@@ -360,7 +361,7 @@ def profile_edit():
      
             
             if request.form['btn'] == 'Save':
-                return redirect(url_for('profile_edit'))
+                return redirect(url_for('profile_details'))
 
         return render_template("talent/profile-edit.html", user = user_data)
     else:
@@ -586,15 +587,17 @@ def check_application():
 @login_required
 def experience_edit():
     
-    id  = request.args.get('id', None)
+    id  = request.args.get('experience_id', None)
+    erase  = request.args.get('erase', None)
+    
+    if request.method == 'POST' and erase:
+        myLib.deleteItem("experience",id)
+        return redirect(url_for('profile_details'))
+        # return jsonify({"status": "erased"})
 
     user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
 
-    if request.method == 'POST':
-        
-        if request.form['btn'] == 'Delete Entry':
-            myLib.deleteItem("experience",id)
-            return redirect(url_for('profile_edit'))
+    if request.method == 'POST' and not erase:
             
         title = request.form['title']
         type = request.form['type']  
@@ -643,7 +646,7 @@ def experience_edit():
             return redirect(url_for('experience_edit'))
         
         if request.form['btn'] == 'Save and Back':
-            return redirect(url_for('profile_edit'))
+            return redirect(url_for('profile_details'))
         if request.form['btn'] == 'Save and Add':
             return redirect(url_for('experience_edit'))
 
@@ -653,15 +656,18 @@ def experience_edit():
 @login_required
 def education_edit():
     
-    id  = request.args.get('id', None)
+    id  = request.args.get('education_id', None)
+    erase  = request.args.get('erase', None)
+    print(id)
+    print(erase)
+    
+    if request.method == 'POST' and erase:
+        myLib.deleteItem("education",id)
+        return redirect(url_for('profile_details'))
     
     user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
 
-    if request.method == 'POST':
-        
-        if request.form['btn'] == 'Delete Entry':
-            myLib.deleteItem("education",id)
-            return redirect(url_for('profile_edit'))
+    if request.method == 'POST' and not erase:
             
         school = request.form['school']
         degree = request.form['degree']  
@@ -706,7 +712,7 @@ def education_edit():
             return redirect(url_for('education_edit'))
         
         if request.form['btn'] == 'Save and Back':
-            return redirect(url_for('profile_edit'))
+            return redirect(url_for('profile_details'))
         if request.form['btn'] == 'Save and Add':
             return redirect(url_for('education_edit'))
 

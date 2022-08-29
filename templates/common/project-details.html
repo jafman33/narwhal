@@ -128,15 +128,15 @@
 
             <h4>Talent Details</h4>
             <p style="text-align: justify">
-                {todo here}
+                {{project["data"]["projects"][id]["talent"]}}
             </p>
 
             <h4>Key Words</h4>
             <p>
                 <!-- for loop the key words -->
-                {% for key in project["data"]["projects"][id]["keys"]%}
+                {% for key in project["data"]["projects"][id]["keywords"]%} {{key}}
                 <div class="chip chip-primary ms-05 mb-05">
-                    <span class="chip-label">{{project["data"]["projects"][id]["keys"][loop.index0]}}</span>
+                    <span class="chip-label">{{key["keyword"][loop.index0]}}</span>
                 </div>
                 {% endfor %}
             </p>

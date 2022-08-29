@@ -109,9 +109,17 @@
                 <ion-icon name="chevron-back-outline"></ion-icon>
             </a>
         </div>
-        <div class="pageTitle">New Project</div>
-        <div class="right">
 
+        <div class="pageTitle">Edit Project</div>
+        <div class="right">
+            <!--  -->{% if id %}
+            <form action="{{ url_for('project_edit', project_id = id, erase = 'True') }}" method="POST">
+                <input hidden type="text" name="trash" id="trash" value="trash">
+                <button type="input" class="headerButton" style="background: transparent !important; border-width: 0px !important;">
+                    <ion-icon name="trash-outline"></ion-icon>            
+                </button>
+            </form>
+            <!--  -->{% endif %}
         </div>
     </div>
     <!-- * App Header -->
@@ -122,15 +130,6 @@
 
             <div class="section full mt-2 mb-2">
 
-                <div class="mt-2 mb-0 ms-2 me-2">
-                    <div class="form-group boxed">
-                        <div class="input-wrapper">
-
-                            {% if id %}
-                            <input type="submit" class="btn btn-danger btn-block" name="btn" value="Delete Entry"> {% endif %}
-                        </div>
-                    </div>
-                </div>
 
                 <div class="section-title">Project Banner</div>
                 <div class="wide-block pb-2 pt-2">
@@ -257,7 +256,7 @@
                                 <textarea id="summary" name="summary" rows="3" class="form-control">{{ user["data"]["projects"][id]["summary"] }}</textarea>
                                 <!--  -->
                                 {% else %}
-                                <textarea placeholder="Write a summary of your project" id="summary" name="summary" rows="3" class="form-control"></textarea>
+                                <textarea id="summary" name="summary" rows="3" class="form-control" placeholder="Write a summary of your project"></textarea>
                                 <!--  -->
                                 {% endif %}
                                 <i class="clear-input"><ion-icon name="close-circle"></ion-icon></i>
@@ -283,53 +282,143 @@
 
                 </div>
 
-                <div class="section-title mt-2">Talent Request Details</div>
+                <div class="section-title mt-2">Talent Details</div>
                 <div class="wide-block pb-1 pt-0">
                     <div class="row">
 
-                        <div class="form-group boxed mt-2">
+                        <div class="form-group boxed">
                             <div class="input-wrapper">
-                                <label class="form-label" for="keys">Key words</label>
+                                <label class="form-label" for="talent">Talent Request Description</label>
                                 <!--  -->
                                 {% if id %}
-                                <input type="text" class="form-control" id="keys" name="keys" value='{{ user["data"]["projects"][id]["keys"][0] }},' autocomplete="off">
+                                <textarea id="talent" name="talent" rows="3" class="form-control">{{ user["data"]["projects"][id]["talent"] }}</textarea>
                                 <!--  -->
                                 {% else %}
-                                <input type="text" class="form-control" id="keys" name="keys" placeholder="Ex: Software, Algorithms, Analytics" autocomplete="off">
+                                <textarea id="talent" name="talent" rows="3" class="form-control" placeholder="Summary of talent requested"></textarea>
                                 <!--  -->
                                 {% endif %}
                                 <i class="clear-input"><ion-icon name="close-circle"></ion-icon></i>
                             </div>
                         </div>
+
+
+
+                        <div class="form-group boxed">
+                            <div class="input-wrapper">
+
+                                <div class="row" id="addKey">
+                                    <div class="col-10">
+                                        <div class="form-group searchbox">
+                                            <i class="input-icon">
+                                            <ion-icon name="star-outline"></ion-icon>
+                                        </i>
+                                            <input type="text" class="form-control" name="newKey" id="newKey" placeholder="Enter Key Word">
+                                        </div>
+                                    </div>
+
+                                    <div class="col-2" id="addBtn">
+                                        <a class="btn btn-outline-secondary btn-sm me-1 ms-1" style="height:36px;" onclick="appendKey()">Add</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group boxed">
+                            <div class="input-wrapper">
+                                <div id="keysContainer"></div>
+                            </div>
+                        </div>
+
                     </div>
+
                 </div>
-
-
-
-
-
-
-
-
-
             </div>
 
-            <div class="carousel-button-footer bg-white">
-                <div class="row">
-                    <div class="col-6">
-                        <input type="submit" class="btn btn-primary btn-block" name="btn" value="Save and Back">
-                    </div>
-                    <div class="col-6">
-                        <input type="submit" class="btn btn-success btn-block" name="btn" value="Save and Add">
-                    </div>
-                </div>
 
+
+
+
+
+
+
+
+    </div>
+
+    <div class="carousel-button-footer bg-white">
+        <div class="row">
+            <div class="col-6">
+                <input type="submit" class="btn btn-primary btn-block" name="btn" value="Save and Back" onclick='updateDatabase()'>
             </div>
+            <div class="col-6">
+                <input type="submit" class="btn btn-success btn-block" name="btn" value="Save and Add" onclick='updateDatabase()'>
+            </div>
+        </div>
 
-        </form>
+    </div>
+
+    </form>
     </div>
     <!-- * App Capsule -->
 
+    <script type="text/javascript">
+        var keysStr = ''
+        var keys = new Array()
+
+        document.addEventListener("DOMContentLoaded", function(event) {
+            keys = JSON.parse('{{keys|safe}}')
+            if (keys.length > 0) {
+                loadKeys(keys)
+            }
+        });
+
+        function loadKeys(keys) {
+            keysStr = ''
+            keys.forEach(function(key) {
+                keysStr += '<div class="chip chip-primary ms-05 mb-05"><span class="chip-label">' +
+                    key +
+                    '</span><a href="#" class="chip-delete" onclick="deleteKey(\'' + key + '\')"><ion-icon name="close-circle"></ion-icon></a></div>';
+            });
+            document.getElementById("keysContainer").innerHTML = keysStr;
+        }
+
+        function updateDatabase() {
+            console.log("made it to the update phase!")
+            fetch('{{ url_for("add_project_keyword", project_id=id) | safe }}', {
+                    method: "POST",
+                    body: JSON.stringify({
+                        keywords_info: keys,
+                    }),
+                })
+                .then((response) => response.json())
+                .then((data) => {
+                    console.log(data.status);
+                });
+        }
+
+        function appendKey() {
+            var newKey = document.getElementById("newKey").value;
+            if (newKey == '') {
+                return
+            }
+            // make sure it doesnt already exist -- TODO
+            keys.push(newKey)
+            loadKeys(keys);
+            document.getElementById("newKey").value = '';
+            // updateDatabase(keys)
+        }
+
+        function deleteKey(key_id) {
+            keys = keys.filter(function(item) {
+                return item !== key_id
+            })
+            loadKeys(keys);
+            // const element = document.getElementById("addBtn");
+            // element.scrollIntoView({
+            //     block: "end"
+            // });
+            // updateDatabase(keys)
+        }
+    </script>
 
     <!-- ============== Js Files ==============  -->
     <!-- Bootstrap -->

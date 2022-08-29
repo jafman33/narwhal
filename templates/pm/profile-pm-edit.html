@@ -126,19 +126,19 @@
 
             <div class="section full mt-2 mb-2">
 
-                <div class="section-title">Photo</div>
+                <div class="section-title">Profile name and photo</div>
                 <div class="wide-block pb-2 pt-2">
 
                     <div class="row">
 
                         <div class="col-6">
-                            <div class="image-wrapper">
+                            <div class="image-wrapper text-center">
                                 <img src="{{user.data.profile.photo}}" alt="image" class="imaged" style="width: 150px; height: 150px;">
                             </div>
-                        </div>
+                            <!-- </div> -->
 
-                        <div class="col-6">
-                            <div class="custom-file-upload" id="fileUpload">
+                            <!-- <div class="col-6"> -->
+                            <div class="custom-file-upload" id="fileUpload" style="width:150px; margin:-150px auto 0 auto;">
                                 <input type="file" id="fileuploadInput" name="file" accept="image/*,.pdf" multiple="false">
                                 <label for="fileuploadInput">
                                     <span>
@@ -148,29 +148,24 @@
                             </div>
                         </div>
 
-                    </div>
+                        <div class="col-6">
 
-                </div>
-
-                <div class="section-title mt-2">Name</div>
-                <div class="wide-block pb-1 pt-2">
-
-                    <div class="row">
-
-                        <div class="form-group boxed">
-                            <div class="input-wrapper">
-                                <label class="form-label" for="firstname">First Name</label>
-                                <input type="text" class="form-control" id="firstname" name="firstname" placeholder="Enter your name" value="{{user.data.account.firstname}}" autocomplete="off">
-                                <i class="clear-input"><ion-icon name="close-circle"></ion-icon></i>
+                            <div class="form-group boxed">
+                                <div class="input-wrapper">
+                                    <label class="form-label" for="firstname">First Name</label>
+                                    <input type="text" class="form-control" id="firstname" name="firstname" placeholder="Enter your name" value="{{user.data.account.firstname}}" autocomplete="off">
+                                    <i class="clear-input"><ion-icon name="close-circle"></ion-icon></i>
+                                </div>
                             </div>
-                        </div>
 
-                        <div class="form-group boxed">
-                            <div class="input-wrapper">
-                                <label class="form-label" for="lastname">Last Name</label>
-                                <input type="text" class="form-control" id="lastname" name="lastname" placeholder="Enter your last name" value="{{user.data.account.lastname}}" autocomplete="off">
-                                <i class="clear-input"><ion-icon name="close-circle"></ion-icon></i>
+                            <div class="form-group boxed">
+                                <div class="input-wrapper">
+                                    <label class="form-label" for="lastname">Last Name</label>
+                                    <input type="text" class="form-control" id="lastname" name="lastname" placeholder="Enter your last name" value="{{user.data.account.lastname}}" autocomplete="off">
+                                    <i class="clear-input"><ion-icon name="close-circle"></ion-icon></i>
+                                </div>
                             </div>
+
                         </div>
 
                     </div>
@@ -327,45 +322,7 @@
 
                 </div>
 
-                <div class="section-title mt-2">Projects</div>
-                <div class="wide-block pb-1 pt-2">
 
-                    <!--  -->
-                    <!-- populate list if exists! -->
-                    <!--  -->
-                    <ul class="listview image-listview media">
-                        {% for proj in user["data"]["projects"] %}
-                        <li>
-                            <a href="{{ url_for('project_edit', id = proj ) }}" class="item">
-                                <div class="imageWrapper" style="margin-left:-20px;">
-                                    <img src='{{user["data"]["projects"][proj]["banner"]}}' alt="image" class="imaged w64">
-                                </div>
-                                <div class="in">
-
-                                    <div>
-                                        <div class="overflow">{{user["data"]["projects"][proj]["title"]}}</div>
-                                        <div class="overflow mytext-muted">{{user["data"]["projects"][proj]["headline"]}}</div>
-                                        <div class="overflow mytext-link">{{user["data"]["projects"][proj]["sponsor"]}}</div>
-                                    </div>
-
-                                </div>
-                            </a>
-                        </li>
-                        <!--  -->
-                        {% endfor %}
-                    </ul>
-
-                    <div class="row">
-                        <div class="form-group boxed">
-                            <div class="input-wrapper">
-                                <a href="{{ url_for('project_edit') }}" class="btn btn-success btn-block">
-                                    <ion-icon name="add-circle-outline"></ion-icon> Add Projects
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
 
             </div>
 

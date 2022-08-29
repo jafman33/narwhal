@@ -1,7 +1,7 @@
 <!doctype html>
 
 <!--  -->
-{% if type == 'Engineering Talent' and self %}
+{% if type == 'Engineering Talent'%}
 <!--  -->
 {% extends 'talent/layout.html' %}
 <!--  -->
@@ -13,6 +13,35 @@
 <!--  -->
 {% block content %}
 
+<style>
+    .overflow {
+        display: block;
+        width: 220px;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+    
+    .mytext-muted {
+        font-size: 12px;
+        color: gray;
+        margin-bottom: 0px
+    }
+    
+    .mytext-link {
+        font-size: 12px;
+        color: #1E74FD;
+    }
+</style>
+
+<script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function(event) {
+        fetch('{{ url_for("contacts") }}', {
+            method: "POST",
+        })
+    });
+</script>
+
 
 <!-- App Header -->
 <div class="appHeader bg-primary text-light">
@@ -21,7 +50,7 @@
             <ion-icon name="chevron-back-outline"></ion-icon>
         </a>
     </div>
-    <div class="pageTitle">Profile</div>
+    <div class="pageTitle">My Profile</div>
     <div class="right">
         {% if type != user.data.account.usertype %}
         <a href="#" class="headerButton">
@@ -43,6 +72,11 @@
 <div id="appCapsule">
 
     <div class="section mt-2">
+        <h4>About
+            <a href="{{ url_for('profile_edit') }}">
+                <ion-icon name="add-circle-outline"></ion-icon>
+            </a>
+        </h4>
         <div class="profile-head">
             <div class="avatar">
                 <img src="{{user.data.profile.photo}}" alt="avatar" class="imaged w64 rounded">
@@ -52,45 +86,15 @@
                 <div class="profile-info" style="margin-top:0px">
                     <div class="link" style="margin-top:0px">{{user.data.profile.headline}}</div>
                 </div>
-                <h5 class="subtext">{{user.data.profile.city}}</h5>
+                <h5 class="subtext">{{user.data.profile.division}}</h5>
             </div>
-        </div>
-    </div>
-
-    <div class="section mt-1">
-        <div class="profile-info">
-            <div class=" bio">
-                {{user.data.profile.summary}}
-            </div>
-        </div>
-    </div>
-
-    <div class="section full mt-2">
-        <div class="profile-stats ps-2 pe-2">
-            <a href="#" class="item">
-                <strong>152</strong>photo
-            </a>
-            <a href="#" class="item">
-                <strong>52</strong>albums
-            </a>
-            <a href="#" class="item">
-                <strong>27k</strong>followers
-            </a>
-
-            <a href="#" class="item">
-                <strong>506</strong>following
-            </a>
         </div>
     </div>
 
     <div class="section mt-1 mb-2">
-        <div class="profile-info">
-            <div class=" bio">
-                This page is in progress! But this is the dashboard where users can see their badges, achievemets, progress, and compete for the #1 spot!
-            </div>
-            <div class="link">
-                <a href="#">Paris</a>,
-                <a href="#">France</a>
+        <div class="profile-info m-0">
+            <div class="bio m-0">
+                {{user.data.profile.summary}}
             </div>
         </div>
     </div>
@@ -99,23 +103,23 @@
         <div class="wide-block transparent p-0">
             <ul class="nav nav-tabs lined iconed" role="tablist">
                 <li class="nav-item">
-                    <a class="nav-link active" data-bs-toggle="tab" href="#feed" role="tab">
-                        <ion-icon name="grid-outline"></ion-icon>
+                    <a class="nav-link active" data-bs-toggle="tab" href="#projects" role="tab">
+                        <ion-icon name="folder-open-outline"></ion-icon>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" data-bs-toggle="tab" href="#friends" role="tab">
+                    <a class="nav-link " data-bs-toggle="tab" href="#experience" role="tab">
+                        <ion-icon name="id-card-outline"></ion-icon>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="tab" href="#education" role="tab">
+                        <ion-icon name="library-outline"></ion-icon>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="tab" href="#contacts" role="tab">
                         <ion-icon name="people-outline"></ion-icon>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" data-bs-toggle="tab" href="#bookmarks" role="tab">
-                        <ion-icon name="bookmark-outline"></ion-icon>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" data-bs-toggle="tab" href="#settings" role="tab">
-                        <ion-icon name="settings-outline"></ion-icon>
                     </a>
                 </li>
             </ul>
@@ -127,284 +131,194 @@
     <div class="section full mb-2">
         <div class="tab-content">
 
-            <!-- feed -->
-            <div class="tab-pane fade show active" id="feed" role="tabpanel">
-                <div class="mt-2 p-2 pt-0 pb-0">
+            <!-- projects -->
+            <div class="tab-pane fade show active" id="projects" role="tabpanel">
+
+                <div class="section m-2">
+                    <h4>Projects
+                        <a href="{{ url_for('project_edit') }}">
+                            <ion-icon name="add-circle-outline"></ion-icon>
+                        </a>
+                    </h4>
+                    <ul class="listview image-listview media flush transparent mt-1 mb-1">
+                        {% for projectID in user["data"]["projects"] %}
+                        <li>
+                            <a href="{{ url_for('project_edit', project_id = projectID) }}" class="item">
+                                <div class="imageWrapper" style="margin-left:-15px;">
+                                    {% if user["data"]["projects"][projectID]["banner"]%}
+                                    <img src='{{user["data"]["projects"][projectID]["banner"]}}' alt="image" class="imaged w64">
+                                    <!--  -->
+                                    {% else %}
+                                    <!-- <img src="../static/assets/img/sample/photo/wide0.jpg" alt="image" class="imaged w64"> -->
+                                    <ion-icon style="font-size:40px; --ionicon-stroke-width:15px; color:#1E74FD" name="library-outline"></ion-icon>
+                                    <!--  -->
+                                    {% endif %}
+                                </div>
+                                <div class="in">
+                                    <div>
+                                        <div class="overflow">{{user["data"]["projects"][projectID]["title"]}}</div>
+                                        <div class="overflow mytext-muted">{{user["data"]["projects"][projectID]["headline"]}}</div>
+                                        <div class="overflow mytext-link">{{user["data"]["projects"][projectID]["sponsor"]}}</div>
+                                    </div>
+                                </div>
+                            </a>
+                        </li>
+                        <!--  -->
+                        {% endfor %}
+                    </ul>
+                </div>
+
+
+            </div>
+            <!-- * projects -->
+
+            <!-- experience -->
+            <div class="tab-pane fade " id="experience" role="tabpanel">
+                <div class="section m-2">
+
+
+                    <h4>Experience
+                        <a href="{{ url_for('experience_edit') }}">
+                            <ion-icon name="add-circle-outline"></ion-icon>
+                        </a>
+                    </h4>
+
+
+                    <ul class="listview image-listview media flush transparent" style="margin-left: 0px;">
+                        {% for exp_id in user["data"]["experience"] %}
+                        <li>
+                            <a href="{{ url_for('experience_edit', experience_id = exp_id) }}" class="item">
+                                <div class="imageWrapper" style="margin-left:-15px;">
+                                    <!-- <img src="../static/assets/img/sample/photo/1.jpg" alt="image" class="imaged w64"> -->
+                                    <ion-icon style="font-size:40px; --ionicon-stroke-width:15px; color:#1E74FD" name="id-card-outline"></ion-icon>
+                                </div>
+                                <div class="in">
+                                    <div>
+                                        {{user["data"]["experience"][exp_id]["company"]}}
+                                        <div class="text-muted">{{user["data"]["experience"][exp_id]["title"]}}</div>
+                                        <div class="text-muted">
+                                            {{user["data"]["experience"][exp_id]["start"]}} - {{user["data"]["experience"][exp_id]["end"]}}
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </li>
+                        <!--  -->
+                        {% endfor %}
+                    </ul>
+
+                </div>
+
+
+
+            </div>
+            <!-- * experience -->
+
+
+
+            <!--  education -->
+            <div class="tab-pane fade" id="education" role="tabpanel">
+                <div class="section m-2">
+                    <h4>Education
+                        <a href="{{ url_for('education_edit') }}">
+                            <ion-icon name="add-circle-outline"></ion-icon>
+                        </a>
+                    </h4>
+                    <ul class="listview image-listview media flush transparent mt-1 mb-1">
+                        {% for edu_id in user["data"]["education"] %}
+                        <li class="mt-0 mb-0">
+                            <a href="{{ url_for('education_edit', education_id = edu_id) }}" class="item">
+                                <div class="imageWrapper" style="margin-left:-15px;">
+                                    <!-- <img src="../static/assets/img/sample/photo/1.jpg" alt="image" class="imaged w64"> -->
+                                    <ion-icon style="font-size:40px; --ionicon-stroke-width:15px; color:#1E74FD" name="library-outline"></ion-icon>
+                                </div>
+                                <div class="in">
+                                    <div>
+                                        {{user["data"]["education"][edu_id]["school"]}}
+                                        <div class="text-muted">{{user["data"]["education"][edu_id]["field"]}}</div>
+                                        <div class="text-muted">{{user["data"]["education"][edu_id]["degree"]}}</div>
+                                    </div>
+                                </div>
+                            </a>
+                        </li>
+                        <!--  -->
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            <!-- * education -->
+
+
+
+
+
+
+            <!-- * contacts -->
+            <div class="tab-pane fade" id="contacts" role="tabpanel">
+                <div class="section m-2">
+
                     <div class="row">
-                        <div class="col-4 mb-2">
-                            <img src="../static/assets/img/sample/photo/1.jpg" alt="image" class="imaged w-100">
-                        </div>
-                        <div class="col-4 mb-2">
-                            <img src="../static/assets/img/sample/photo/2.jpg" alt="image" class="imaged w-100">
-                        </div>
-                        <div class="col-4 mb-2">
-                            <img src="../static/assets/img/sample/photo/3.jpg" alt="image" class="imaged w-100">
-                        </div>
-                        <div class="col-4 mb-2">
-                            <img src="../static/assets/img/sample/photo/4.jpg" alt="image" class="imaged w-100">
-                        </div>
-                        <div class="col-4 mb-2">
-                            <img src="../static/assets/img/sample/photo/5.jpg" alt="image" class="imaged w-100">
-                        </div>
-                        <div class="col-4 mb-2">
-                            <img src="../static/assets/img/sample/photo/6.jpg" alt="image" class="imaged w-100">
-                        </div>
-                        <div class="col-4 mb-2">
-                            <img src="../static/assets/img/sample/photo/1.jpg" alt="image" class="imaged w-100">
-                        </div>
-                        <div class="col-4 mb-2">
-                            <img src="../static/assets/img/sample/photo/2.jpg" alt="image" class="imaged w-100">
-                        </div>
-                        <div class="col-4 mb-2">
-                            <img src="../static/assets/img/sample/photo/3.jpg" alt="image" class="imaged w-100">
-                        </div>
-                        <div class="col-4 mb-2">
-                            <img src="../static/assets/img/sample/photo/4.jpg" alt="image" class="imaged w-100">
-                        </div>
-                        <div class="col-4 mb-2">
-                            <img src="../static/assets/img/sample/photo/5.jpg" alt="image" class="imaged w-100">
-                        </div>
-                        <div class="col-4 mb-2">
-                            <img src="../static/assets/img/sample/photo/6.jpg" alt="image" class="imaged w-100">
+                        <div class="col-8">
+                            <h4>Contacts
+                                <a href="{{ url_for('contacts') }}">
+                                    <ion-icon name="add-circle-outline"></ion-icon>
+                                </a>
+                            </h4>
                         </div>
                     </div>
-                </div>
-                <div class="p-2 pt-0 pb-0">
-                    <a href="#" class="btn btn-primary btn-block">More Photo</a>
-                </div>
-            </div>
-            <!-- * feed -->
 
-            <!-- * friends -->
-            <div class="tab-pane fade" id="friends" role="tabpanel">
-                <ul class="listview image-listview flush transparent pt-1">
-                    <li>
-                        <a href="#" class="item">
-                            <img src="../static/assets/img/sample/avatar/avatar3.jpg" alt="image" class="image">
-                            <div class="in">
-                                <div>
-                                    Edward Lindgren
-                                    <div class="text-muted">532 followers</div>
+                    <ul class="listview image-listview flush transparent">
+                        {% for contact in contacts %}
+                        <li>
+                            <a href="{{ url_for('profile_details', email = contact.email) }}" class="item">
+                                <img src="{{ contact.photo }}" alt="image" class="image">
+                                <div class="in">
+                                    <div>{{ contact.firstname }} {{ contact.lastname }}</div>
                                 </div>
-                            </div>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" class="item">
-                            <img src="../static/assets/img/sample/avatar/avatar2.jpg" alt="image" class="image">
-                            <div class="in">
-                                <div>
-                                    Emelda Scandroot
-                                    <div class="text-muted">120k followers</div>
-                                </div>
-                            </div>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" class="item">
-                            <img src="../static/assets/img/sample/avatar/avatar5.jpg" alt="image" class="image">
-                            <div class="in">
-                                <div>
-                                    Henry Bove
-                                    <div class="text-muted">920k followers</div>
-                                </div>
-                            </div>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" class="item">
-                            <img src="../static/assets/img/sample/avatar/avatar4.jpg" alt="image" class="image">
-                            <div class="in">
-                                <div>
-                                    Ava Gregoraci
-                                    <div class="text-muted">5092 followers</div>
-                                </div>
-                            </div>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" class="item">
-                            <img src="../static/assets/img/sample/avatar/avatar6.jpg" alt="image" class="image">
-                            <div class="in">
-                                <div>
-                                    Emmy Elsner
-                                    <div class="text-muted">92 followers</div>
-                                </div>
-                            </div>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" class="item">
-                            <img src="../static/assets/img/sample/avatar/avatar7.jpg" alt="image" class="image">
-                            <div class="in">
-                                <div>
-                                    Lisanne Viscaal
-                                    <div class="text-muted">893 followers</div>
-                                </div>
-                            </div>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" class="item">
-                            <img src="../static/assets/img/sample/avatar/avatar10.jpg" alt="image" class="image">
-                            <div class="in">
-                                <div>
-                                    Cecilia Pozo
-                                    <div class="text-muted">51k followers</div>
-                                </div>
-                            </div>
-                        </a>
-                    </li>
-                </ul>
-            </div>
-            <!-- * friends -->
+                            </a>
+                        </li>
+                        {% endfor %}
 
-            <!--  bookmarks -->
-            <div class="tab-pane fade" id="bookmarks" role="tabpanel">
-                <ul class="listview image-listview media flush transparent pt-1">
-                    <li>
-                        <a href="#" class="item">
-                            <div class="imageWrapper">
-                                <img src="../static/assets/img/sample/photo/1.jpg" alt="image" class="imaged w64">
-                            </div>
-                            <div class="in">
-                                <div>
-                                    Birds
-                                    <div class="text-muted">62 photos</div>
-                                </div>
-                                <span class="badge badge-primary">5</span>
-                            </div>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" class="item">
-                            <div class="imageWrapper">
-                                <img src="../static/assets/img/sample/photo/2.jpg" alt="image" class="imaged w64">
-                            </div>
-                            <div class="in">
-                                <div>
-                                    Street Photos
-                                    <div class="text-muted">15 photos</div>
-                                </div>
-                            </div>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" class="item">
-                            <div class="imageWrapper">
-                                <img src="../static/assets/img/sample/photo/3.jpg" alt="image" class="imaged w64">
-                            </div>
-                            <div class="in">
-                                <div>
-                                    Dogs
-                                    <div class="text-muted">97 photos</div>
-                                </div>
-                            </div>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" class="item">
-                            <div class="imageWrapper">
-                                <img src="../static/assets/img/sample/photo/4.jpg" alt="image" class="imaged w64">
-                            </div>
-                            <div class="in">
-                                <div>
-                                    Favorites
-                                    <div class="text-muted">20 photos</div>
-                                </div>
-                            </div>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" class="item">
-                            <div class="imageWrapper">
-                                <img src="../static/assets/img/sample/photo/5.jpg" alt="image" class="imaged w64">
-                            </div>
-                            <div class="in">
-                                <div>
-                                    Nature
-                                    <div class="text-muted">51 photos</div>
-                                </div>
-                            </div>
-                        </a>
-                    </li>
-                </ul>
+                    </ul>
+
+                </div>
             </div>
-            <!-- * bookmarks -->
-            <!-- settings -->
-            <div class="tab-pane fade" id="settings" role="tabpanel">
-                <ul class="listview image-listview text flush transparent pt-1">
-                    <li>
-                        <div class="item">
-                            <div class="in">
-                                <div>
-                                    Mute
-                                    <footer>Disabled notifications from this person</footer>
-                                </div>
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" id="SwitchCheckDefault1">
-                                    <label class="form-check-label" for="SwitchCheckDefault1"></label>
-                                </div>
-                            </div>
-                        </div>
-                    </li>
-                    <li>
-                        <a href="#" class="item">
-                            <div class="in">
-                                <div class="text-danger">Block</div>
-                            </div>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" class="item">
-                            <div class="in">
-                                <div>Report</div>
-                            </div>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" class="item">
-                            <div class="in">
-                                <div>Share This Profile</div>
-                            </div>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" class="item">
-                            <div class="in">
-                                <div>Send a Message</div>
-                            </div>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" class="item">
-                            <div class="in">
-                                <div>Add to List</div>
-                            </div>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" class="item">
-                            <div class="in">
-                                <div>About</div>
-                            </div>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" class="item">
-                            <div class="in">
-                                <div>Ignore</div>
-                            </div>
-                        </a>
-                    </li>
-                </ul>
-            </div>
-            <!-- * settings -->
+            <!-- * contacts -->
+
         </div>
     </div>
     <!-- * tab content -->
 
 </div>
 <!-- * App Capsule -->
+
+<script src="../static/assets/js/plugins/progressbar-js/progressbar.min.js"></script>
+
+<!-- <script>
+    // Availability
+    var percent = 0;
+    var hrs = 0;
+    var availabilityVal = '{{ user.data.profile.availability }}';
+
+    document.addEventListener("DOMContentLoaded", function(event) {
+
+        if (availabilityVal) {
+            hrs = availabilityVal;
+            percent = hrs / 40;
+        }
+
+        var circleProgress1 = new ProgressBar.Circle(progress1, {
+            strokeWidth: 8,
+            easing: 'easeInOut',
+            duration: 2400,
+            color: '#1E74FD',
+            trailColor: '#E5E5E5',
+            trailWidth: 8,
+            svgStyle: null
+        });
+        circleProgress1.animate(percent); // percent
+    });
+</script> -->
+
 
 {% endblock %}

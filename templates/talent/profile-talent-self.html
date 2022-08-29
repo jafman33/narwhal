@@ -13,23 +13,82 @@
 <!--  -->
 {% block content %}
 
-<script>
-    document.addEventListener("DOMContentLoaded", function(event) {
+<style>
+    .overflow {
+        display: block;
+        width: 220px;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+    
+    .mytext-muted {
+        font-size: 12px;
+        color: gray;
+        margin-bottom: 0px
+    }
+    
+    .mytext-link {
+        font-size: 12px;
+        color: #1E74FD;
+    }
+</style>
 
+<script type="text/javascript">
+    var skillsStr = ''
+    var skills = new Array()
+
+    document.addEventListener("DOMContentLoaded", function(event) {
         fetch('{{ url_for("contacts") }}', {
             method: "POST",
         })
 
-        // var slides = ["slide 1", "slide 2", "slide 3", "slide 4", "slide 5"]
-        // var str = '<ul>'
-        // slides.forEach(function(slide) {
-        //     str += '<li>' + slide + '</li>';
-        // });
-        // str += '</ul>';
-
-        // document.getElementById("skillContainer").innerHTML = str;
-
+        skills = JSON.parse('{{skills|safe}}')
+        loadSkills(skills)
     });
+
+    function loadSkills(skills) {
+        skillsStr = ''
+        skills.forEach(function(skill) {
+            skillsStr += '<div class="chip chip-primary ms-05 mb-05"><span class="chip-label">' +
+                skill +
+                '</span><a href="#" class="chip-delete" onclick="deleteSkill(\'' + skill + '\')"><ion-icon name="close-circle"></ion-icon></a></div>';
+        });
+        document.getElementById("skillContainer").innerHTML = skillsStr;
+    }
+
+    function updateDatabase(skills) {
+        fetch('{{ url_for("update_skills") }}', {
+                method: "POST",
+                body: JSON.stringify({
+                    skills_info: skills,
+                }),
+            })
+            .then((response) => response.json())
+            .then((data) => {
+                console.log(data.status);
+            });
+    }
+
+    function appendSkill() {
+        var newSkill = document.getElementById("newSkill").value;
+        if (newSkill == '') {
+            return
+        }
+        // make sure it doesnt already exist -- TODO
+        skills.push(newSkill)
+        loadSkills(skills);
+        document.getElementById("newSkill").value = '';
+        updateDatabase(skills)
+    }
+
+    function deleteSkill(skill_id) {
+        skills = skills.filter(function(item) {
+            return item !== skill_id
+        })
+        loadSkills(skills);
+        updateDatabase(skills)
+    }
 </script>
 
 
@@ -164,9 +223,9 @@
                                 </div>
                                 <div class="in">
                                     <div>
-                                        {{user["data"]["experience"][exp_id]["company"]}}
-                                        <div class="text-muted">{{user["data"]["experience"][exp_id]["title"]}}</div>
-                                        <div class="text-muted">
+                                        <div class="overflow">{{user["data"]["experience"][exp_id]["company"]}}</div>
+                                        <div class="overflow mytext-muted">{{user["data"]["experience"][exp_id]["title"]}}</div>
+                                        <div class="overflow mytext-muted">
                                             {{user["data"]["experience"][exp_id]["start"]}} - {{user["data"]["experience"][exp_id]["end"]}}
                                         </div>
                                     </div>
@@ -204,7 +263,7 @@
                                 </div>
                                 <div class="in">
                                     <div>
-                                        {{user["data"]["education"][edu_id]["school"]}}
+                                        <div class="overflow">{{user["data"]["education"][edu_id]["school"]}}</div>
                                         <div class="text-muted">{{user["data"]["education"][edu_id]["field"]}}</div>
                                         <div class="text-muted">{{user["data"]["education"][edu_id]["degree"]}}</div>
                                     </div>
@@ -250,8 +309,38 @@
                         <div class="tab-pane fade show active" id="skillz" role="tabpanel">
 
                             <div class="section mt-2 mb-2">
+                                <h4 class="mb-2">Skills</h4>
+                                <div id="skillContainer"></div>
+                                <!-- <div class="chip chip-primary ms-05 mb-05">
+                                    <span class="chip-label">Skill</span>
+                                    <a href="#" class="chip-delete">
+                                        <ion-icon name="close-circle"></ion-icon>
+                                    </a>
+                                </div> -->
+                            </div>
 
-                                <h4 class="mb-2">Skills
+                            <div class="section mt-2 mb-2">
+                                <h4 class="mt-2 mb-2">Endorsed Skills</h4>
+
+                                <!-- 
+                                    Jinja Loop through endorsed skill and value 
+                                -->
+                                <div class="chip chip-primary chip-media ms-05 mb-05">
+                                    <p class="chip-icon bg-success">3</p>
+                                    <span class="chip-label">ROS2</span>
+                                    <a href="#" class="chip-delete">
+                                        <ion-icon name="close-circle"></ion-icon>
+                                    </a>
+                                </div>
+                                <!-- 
+                                    end loop
+                                 -->
+
+                            </div>
+
+                            <div class="section mt-2 mb-2">
+
+                                <h4 class="mb-2">Add Skills
                                     <!-- <a href="#">
                                         <ion-icon name="add-circle-outline"></ion-icon>
                                     </a> -->
@@ -273,96 +362,7 @@
                                 </div>
 
                             </div>
-                            <!-- 
-                                Todo    
-                                Search menu comes down, with button. 
-                                onclick = appendSkill()
-                                 -->
-                            <script type="text/javascript">
-                                var skillsStr = ''
-                                var skills = new Array()
 
-                                document.addEventListener("DOMContentLoaded", function(event) {
-                                    skills = JSON.parse('{{skills|safe}}')
-                                    loadSkills(skills)
-                                });
-
-                                function loadSkills(skills) {
-                                    skillsStr = ''
-                                    skills.forEach(function(skill) {
-                                        skillsStr += '<div class="chip chip-primary ms-05 mb-05"><span class="chip-label">' +
-                                            skill +
-                                            '</span><a href="#" class="chip-delete" onclick="deleteSkill(\'' + skill + '\')"><ion-icon name="close-circle"></ion-icon></a></div>';
-                                    });
-                                    document.getElementById("skillContainer").innerHTML = skillsStr;
-                                }
-
-                                function updateDatabase(skills) {
-                                    fetch('{{ url_for("update_skills") }}', {
-                                            method: "POST",
-                                            body: JSON.stringify({
-                                                skills_info: skills,
-                                            }),
-                                        })
-                                        .then((response) => response.json())
-                                        .then((data) => {
-                                            console.log(data.status);
-                                        });
-                                }
-
-                                function appendSkill() {
-                                    var newSkill = document.getElementById("newSkill").value;
-                                    if (newSkill == '') {
-                                        return
-                                    }
-                                    // make sure it doesnt already exist -- TODO
-                                    skills.push(newSkill)
-                                    loadSkills(skills);
-                                    document.getElementById("newSkill").value = '';
-                                    updateDatabase(skills)
-                                }
-
-                                function deleteSkill(skill_id) {
-                                    skills = skills.filter(function(item) {
-                                        return item !== skill_id
-                                    })
-                                    loadSkills(skills);
-                                    updateDatabase(skills)
-                                }
-                            </script>
-
-                            <div class="section mt-2 mb-2">
-
-                                <div id="skillContainer"></div>
-                                <!-- <div class="chip chip-primary ms-05 mb-05">
-                                    <span class="chip-label">Skill</span>
-                                    <a href="#" class="chip-delete">
-                                        <ion-icon name="close-circle"></ion-icon>
-                                    </a>
-                                </div> -->
-
-
-
-                            </div>
-
-                            <div class="section mt-2 mb-2">
-                                <h4 class="mt-2 mb-2">Endorsed Skills</h4>
-
-                                <!-- 
-                                    Jinja Loop through endorsed skill and value 
-                                -->
-                                <div class="chip chip-primary chip-media ms-05 mb-05">
-                                    <p class="chip-icon bg-success">3</p>
-                                    <span class="chip-label">Endorsed Skill</span>
-                                    <a href="#" class="chip-delete">
-                                        <ion-icon name="close-circle"></ion-icon>
-                                    </a>
-                                </div>
-                                <!-- 
-                                    end loop
-                                 -->
-
-                            </div>
 
                         </div>
 

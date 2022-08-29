@@ -99,7 +99,7 @@ def updateProfileContact(phone, calendly = ""):
             )
         )
     
-def updateProjectKeys(id,keys):
+def updateProjectKeys(id,keywordList):
     client.query(
             q.update(
                 q.ref(q.collection("users"), session["user"]["id"]),
@@ -107,7 +107,7 @@ def updateProjectKeys(id,keys):
                     "data": {
                         "projects": {
                             id: {
-                                "keys": keys,
+                                "keywords": keywordList,
                                 },
                             },
                         }
@@ -127,6 +127,24 @@ def updateSkills(id,skills):
             )
         )   
     
+def getSkills(user_id):
+    user_skills = client.query(q.get(q.match(q.index("skill_index"), user_id)))
+    try:
+        skills_list = [list(i.values())[0] for i in user_skills["data"]["skills"]]
+    except:
+        skills_list = []
+    return skills_list
+
+def getProjectKeys(user_data,id):
+    project_keywords = user_data["data"]["projects"][id]
+    print('-------')
+    print('key words',project_keywords)
+    print('-------')
+    try:
+        keyword_list = [list(i.values())[0] for i in project_keywords["keywords"]]
+    except:
+        keyword_list = []
+    return keyword_list
 
     
 def updateTalentBookmarks(bookmark):
@@ -141,21 +159,6 @@ def updateTalentBookmarks(bookmark):
             )
         )  
     
-# def deleteProjectKeys(id):
-#     client.query(
-#                 q.update(
-#                     q.ref(q.collection("users"), session["user"]["id"]),
-#                     {
-#                         "data": {
-#                             "projects": {
-#                                 id: {
-#                                     "keys": None,
-#                                     },
-#                                 },
-#                             }
-#                         },
-#                     )
-#                 )
 
 def updateProfileHeadline(headline):
     client.query(

@@ -241,39 +241,6 @@
                     </ul>
 
 
-                    <script>
-                        var skillsStr = ''
-                        var skills = ["skill 1", "skill 2", "skill 3", "skill 4", "skill 5"]
-
-                        document.addEventListener("DOMContentLoaded", function(event) {
-                            //get the skill list through jinja or through post...
-                            loadSkills(skills);
-                        });
-
-
-                        function loadSkills(skills) {
-                            skills.forEach(function(skill) {
-                                skillsStr += '<div class="chip chip-primary ms-05 mb-05"><span class="chip-label">' +
-                                    skill +
-                                    '</span><a href="#" class="chip-delete"><ion-icon name="close-circle"></ion-icon></a></div>';
-                            });
-                            document.getElementById("skillContainer").innerHTML = skillsStr;
-                        }
-
-                        function appendSkill() {
-                            // 1. get value from form
-
-                            // 2. add the value to the current list
-                            skills.push(skill)
-
-                            // 3. re-render the list with the new item
-                            loadSkills(skills);
-
-                            // 4. post to fauna
-                            // post to fauna
-                            // 
-                        }
-                    </script>
 
 
 
@@ -283,41 +250,117 @@
                         <div class="tab-pane fade show active" id="skillz" role="tabpanel">
 
                             <div class="section mt-2 mb-2">
+
                                 <h4 class="mb-2">Skills
                                     <!-- <a href="#">
                                         <ion-icon name="add-circle-outline"></ion-icon>
                                     </a> -->
                                 </h4>
 
+                                <div class="row" id="addSkill">
+                                    <div class="col-10">
+                                        <div class="form-group searchbox">
+                                            <i class="input-icon">
+                                                <ion-icon name="star-outline"></ion-icon>
+                                            </i>
+                                            <input type="text" class="form-control" name="newSkill" id="newSkill" placeholder="Enter Skill">
+                                        </div>
+                                    </div>
 
+                                    <div class="col-2">
+                                        <button class="btn btn-outline-secondary btn-sm me-1 ms-1" style="height:36px;" onclick="appendSkill()">Add</button>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <!-- 
+                                Todo    
+                                Search menu comes down, with button. 
+                                onclick = appendSkill()
+                                 -->
+                            <script type="text/javascript">
+                                var skillsStr = ''
+                                var skills = new Array()
+
+                                document.addEventListener("DOMContentLoaded", function(event) {
+                                    skills = JSON.parse('{{skills|safe}}')
+                                    loadSkills(skills)
+                                });
+
+                                function loadSkills(skills) {
+                                    skillsStr = ''
+                                    skills.forEach(function(skill) {
+                                        skillsStr += '<div class="chip chip-primary ms-05 mb-05"><span class="chip-label">' +
+                                            skill +
+                                            '</span><a href="#" class="chip-delete" onclick="deleteSkill(\'' + skill + '\')"><ion-icon name="close-circle"></ion-icon></a></div>';
+                                    });
+                                    document.getElementById("skillContainer").innerHTML = skillsStr;
+                                }
+
+                                function updateDatabase(skills) {
+                                    fetch('{{ url_for("update_skills") }}', {
+                                            method: "POST",
+                                            body: JSON.stringify({
+                                                skills_info: skills,
+                                            }),
+                                        })
+                                        .then((response) => response.json())
+                                        .then((data) => {
+                                            console.log(data.status);
+                                        });
+                                }
+
+                                function appendSkill() {
+                                    var newSkill = document.getElementById("newSkill").value;
+                                    if (newSkill == '') {
+                                        return
+                                    }
+                                    // make sure it doesnt already exist -- TODO
+                                    skills.push(newSkill)
+                                    loadSkills(skills);
+                                    document.getElementById("newSkill").value = '';
+                                    updateDatabase(skills)
+                                }
+
+                                function deleteSkill(skill_id) {
+                                    skills = skills.filter(function(item) {
+                                        return item !== skill_id
+                                    })
+                                    loadSkills(skills);
+                                    updateDatabase(skills)
+                                }
+                            </script>
+
+                            <div class="section mt-2 mb-2">
 
                                 <div id="skillContainer"></div>
-
-
-
-
-
-
-                                <div class="chip chip-primary ms-05 mb-05">
+                                <!-- <div class="chip chip-primary ms-05 mb-05">
                                     <span class="chip-label">Skill</span>
                                     <a href="#" class="chip-delete">
                                         <ion-icon name="close-circle"></ion-icon>
                                     </a>
-                                </div>
+                                </div> -->
+
+
 
                             </div>
 
                             <div class="section mt-2 mb-2">
                                 <h4 class="mt-2 mb-2">Endorsed Skills</h4>
 
-
+                                <!-- 
+                                    Jinja Loop through endorsed skill and value 
+                                -->
                                 <div class="chip chip-primary chip-media ms-05 mb-05">
-                                    <p class="chip-icon bg-success">1</p>
+                                    <p class="chip-icon bg-success">3</p>
                                     <span class="chip-label">Endorsed Skill</span>
                                     <a href="#" class="chip-delete">
                                         <ion-icon name="close-circle"></ion-icon>
                                     </a>
                                 </div>
+                                <!-- 
+                                    end loop
+                                 -->
 
                             </div>
 

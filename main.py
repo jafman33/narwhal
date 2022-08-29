@@ -1,4 +1,5 @@
 from curses import erasechar
+from urllib.parse import uses_relative
 from app import app
 from config import (
     socketio, 
@@ -182,6 +183,18 @@ def register():
                             "data": {
                                 "user_id": user["ref"].id(),
                                 "applications": [],
+                            }
+                        },
+                    )
+                )
+                
+                client.query(
+                    q.create(
+                        q.collection("skills"),
+                        {
+                            "data": {
+                                "user_id": user["ref"].id(),
+                                "skills": [],
                             }
                         },
                     )
@@ -518,6 +531,25 @@ def new_applicant_notification():
     return jsonify({
         "status": "success",
         "result": results
+    })
+    
+@app.route('/update-skills', methods=["POST"])
+def update_skills():
+    user_id = session["user"]["id"]
+    
+    json_data = request.get_json('skills_info')
+    skills = json_data["skills_info"]
+
+    # Get user skills document - user_skills document will always exist! no need to try:
+    user_skills = client.query(q.get(q.match(q.index("skill_index"), user_id)))
+    updated_skills = []
+    for skill in skills:
+        updated_skills.append({"skill": skill})
+        
+    myLib.updateSkills(user_skills["ref"].id(),updated_skills)
+    
+    return jsonify({
+        "status": "successfully updated database",
     })
 
 @app.route("/check-bookmark", methods=["POST"])
@@ -901,6 +933,7 @@ def profile_details():
         self = True
         user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
     self_type = session["user"]['usertype']
+    user_id = session["user"]["id"]
     
     # get contacts
     contacts_data = []
@@ -931,7 +964,12 @@ def profile_details():
     
     elif self_type == 'Engineering Talent':
         if self:
-            return render_template("talent/profile-talent-self.html", type=self_type, user=user_data, contacts = contacts_data)
+            user_skills = client.query(q.get(q.match(q.index("skill_index"), user_id)))
+            try:
+                skills_list = [list(i.values())[0] for i in user_skills["data"]["skills"]]
+            except:
+                skills_list = []
+            return render_template("talent/profile-talent-self.html", type=self_type, user=user_data, contacts = contacts_data, skills = json.dumps(skills_list))
         else:
             return render_template("pm/profile-pm.html", type=self_type, user=user_data)
         
@@ -981,6 +1019,8 @@ def schedule(user_email):
         return 'user does not have calendly setup'
 
     return render_template("common/calendly.html", user=user_data, self = session)
+
+
 
 @app.route("/new-contact", methods=["POST"])
 @login_required

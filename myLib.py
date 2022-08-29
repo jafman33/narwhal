@@ -115,6 +115,17 @@ def updateProjectKeys(id,keys):
                 )
             )   
     
+def updateSkills(id,skills):
+    client.query(
+            q.update(
+                q.ref(q.collection("skills"), id),
+                {
+                    "data": {
+                        "skills": skills
+                    }
+                },
+            )
+        )   
     
 
     

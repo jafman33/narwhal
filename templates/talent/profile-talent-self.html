@@ -101,12 +101,12 @@
     </div>
     <div class="pageTitle">My Profile</div>
     <div class="right">
-        {% if type != user.data.account.usertype %}
+        {% if type != profile.data.account.usertype %}
         <a href="#" class="headerButton">
             <ion-icon name="bookmark-outline"></ion-icon>
         </a>
         <form action="{{ url_for('new_contact') }}" method="POST">
-            <input hidden type="email" class="form-control" name="email" id="email" value="{{user.data.account.email}}">
+            <input hidden type="email" class="form-control" name="email" id="email" value="{{profile.data.account.email}}">
             <button type="input" class="headerButton" style="background: transparent !important; border-width: 0px !important;">
                 <ion-icon name="person-add-outline"></ion-icon>            
             </button>
@@ -128,14 +128,14 @@
         </h4>
         <div class="profile-head">
             <div class="avatar">
-                <img src="{{user.data.profile.photo}}" alt="avatar" class="imaged w64 rounded">
+                <img src="{{profile.data.profile.photo}}" alt="avatar" class="imaged w64 rounded">
             </div>
             <div class="in">
-                <h3 class="name" style="margin-bottom:0px">{{user.data.account.firstname}} {{user.data.account.lastname}}</h3>
+                <h3 class="name" style="margin-bottom:0px">{{profile.data.account.firstname}} {{profile.data.account.lastname}}</h3>
                 <div class="profile-info" style="margin-top:0px">
-                    <div class="link" style="margin-top:0px">{{user.data.profile.headline}}</div>
+                    <div class="link" style="margin-top:0px">{{profile.data.profile.headline}}</div>
                 </div>
-                <h5 class="subtext">{{user.data.profile.city}}, {{user.data.profile.zipcode}}</h5>
+                <h5 class="subtext">{{profile.data.profile.city}}, {{profile.data.profile.zipcode}}</h5>
             </div>
         </div>
     </div>
@@ -145,7 +145,7 @@
             <div class="col-9 m-0">
                 <div class="profile-info m-0">
                     <div class="bio m-0">
-                        {{user.data.profile.summary}}
+                        {{profile.data.profile.summary}}
                     </div>
                 </div>
             </div>
@@ -156,7 +156,7 @@
                             <div class="circle-progress-container">
                                 <div id="progress1">
                                     <div class="inner">
-                                        <p class="mt-2">{{user.data.profile.availability}} hrs.</p>
+                                        <p class="mt-2">{{profile.data.profile.availability}} hrs.</p>
                                     </div>
                                 </div>
                             </div>
@@ -173,7 +173,7 @@
         <div class="wide-block transparent p-0">
             <ul class="nav nav-tabs lined iconed" role="tablist">
                 <li class="nav-item">
-                    <a class="nav-link " data-bs-toggle="tab" href="#experience" role="tab">
+                    <a class="nav-link active" data-bs-toggle="tab" href="#experience" role="tab">
                         <ion-icon name="id-card-outline"></ion-icon>
                     </a>
                 </li>
@@ -183,7 +183,7 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link active" data-bs-toggle="tab" href="#skills" role="tab">
+                    <a class="nav-link" data-bs-toggle="tab" href="#skills" role="tab">
                         <ion-icon name="flask-outline"></ion-icon>
                     </a>
                 </li>
@@ -202,7 +202,7 @@
         <div class="tab-content">
 
             <!-- experience -->
-            <div class="tab-pane fade " id="experience" role="tabpanel">
+            <div class="tab-pane fade show active" id="experience" role="tabpanel">
                 <div class="section m-2">
 
 
@@ -214,7 +214,7 @@
 
 
                     <ul class="listview image-listview media flush transparent" style="margin-left: 0px;">
-                        {% for exp_id in user["data"]["experience"] %}
+                        {% for exp_id in profile["data"]["experience"] %}
                         <li>
                             <a href="{{ url_for('experience_edit', experience_id = exp_id) }}" class="item">
                                 <div class="imageWrapper" style="margin-left:-15px;">
@@ -223,10 +223,10 @@
                                 </div>
                                 <div class="in">
                                     <div>
-                                        <div class="overflow">{{user["data"]["experience"][exp_id]["company"]}}</div>
-                                        <div class="overflow mytext-muted">{{user["data"]["experience"][exp_id]["title"]}}</div>
+                                        <div class="overflow">{{profile["data"]["experience"][exp_id]["company"]}}</div>
+                                        <div class="overflow mytext-muted">{{profile["data"]["experience"][exp_id]["title"]}}</div>
                                         <div class="overflow mytext-muted">
-                                            {{user["data"]["experience"][exp_id]["start"]}} - {{user["data"]["experience"][exp_id]["end"]}}
+                                            {{profile["data"]["experience"][exp_id]["start"]}} - {{profile["data"]["experience"][exp_id]["end"]}}
                                         </div>
                                     </div>
                                 </div>
@@ -254,7 +254,7 @@
                         </a>
                     </h4>
                     <ul class="listview image-listview media flush transparent mt-1 mb-1">
-                        {% for edu_id in user["data"]["education"] %}
+                        {% for edu_id in profile["data"]["education"] %}
                         <li class="mt-0 mb-0">
                             <a href="{{ url_for('education_edit', education_id = edu_id) }}" class="item">
                                 <div class="imageWrapper" style="margin-left:-15px;">
@@ -263,9 +263,9 @@
                                 </div>
                                 <div class="in">
                                     <div>
-                                        <div class="overflow">{{user["data"]["education"][edu_id]["school"]}}</div>
-                                        <div class="text-muted">{{user["data"]["education"][edu_id]["field"]}}</div>
-                                        <div class="text-muted">{{user["data"]["education"][edu_id]["degree"]}}</div>
+                                        <div class="overflow">{{profile["data"]["education"][edu_id]["school"]}}</div>
+                                        <div class="text-muted">{{profile["data"]["education"][edu_id]["field"]}}</div>
+                                        <div class="text-muted">{{profile["data"]["education"][edu_id]["degree"]}}</div>
                                     </div>
                                 </div>
                             </a>
@@ -281,7 +281,7 @@
 
 
             <!-- skills -->
-            <div class="tab-pane fade show active" id="skills" role="tabpanel">
+            <div class="tab-pane fade" id="skills" role="tabpanel">
 
                 <!-- <div class="section full m-1"> -->
                 <div class="section m-2">
@@ -448,7 +448,7 @@
     // Availability
     var percent = 0;
     var hrs = 0;
-    var availabilityVal = '{{ user.data.profile.availability }}';
+    var availabilityVal = '{{ profile.data.profile.availability }}';
 
     document.addEventListener("DOMContentLoaded", function(event) {
 

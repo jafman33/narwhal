@@ -137,9 +137,6 @@ def getSkills(user_id):
 
 def getProjectKeys(user_data,id):
     project_keywords = user_data["data"]["projects"][id]
-    print('-------')
-    print('key words',project_keywords)
-    print('-------')
     try:
         keyword_list = [list(i.values())[0] for i in project_keywords["keywords"]]
     except:

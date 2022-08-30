@@ -34,14 +34,6 @@
     }
 </style>
 
-<script type="text/javascript">
-    document.addEventListener("DOMContentLoaded", function(event) {
-        fetch('{{ url_for("contacts") }}', {
-            method: "POST",
-        })
-    });
-</script>
-
 
 <!-- App Header -->
 <div class="appHeader bg-primary text-light">
@@ -52,12 +44,12 @@
     </div>
     <div class="pageTitle">My Profile</div>
     <div class="right">
-        {% if type != user.data.account.usertype %}
-        <a href="#" class="headerButton">
+        {% if type != profile.data.account.usertype %}
+        <!-- <a href="#" class="headerButton">
             <ion-icon name="bookmark-outline"></ion-icon>
-        </a>
+        </a> -->
         <form action="{{ url_for('new_contact') }}" method="POST">
-            <input hidden type="email" class="form-control" name="email" id="email" value="{{user.data.account.email}}">
+            <input hidden type="email" class="form-control" name="email" id="email" value="{{profile.data.account.email}}">
             <button type="input" class="headerButton" style="background: transparent !important; border-width: 0px !important;">
                 <ion-icon name="person-add-outline"></ion-icon>            
             </button>
@@ -79,14 +71,14 @@
         </h4>
         <div class="profile-head">
             <div class="avatar">
-                <img src="{{user.data.profile.photo}}" alt="avatar" class="imaged w64 rounded">
+                <img src="{{profile.data.profile.photo}}" alt="avatar" class="imaged w64 rounded">
             </div>
             <div class="in">
-                <h3 class="name" style="margin-bottom:0px">{{user.data.account.firstname}} {{user.data.account.lastname}}</h3>
+                <h3 class="name" style="margin-bottom:0px">{{profile.data.account.firstname}} {{profile.data.account.lastname}}</h3>
                 <div class="profile-info" style="margin-top:0px">
-                    <div class="link" style="margin-top:0px">{{user.data.profile.headline}}</div>
+                    <div class="link" style="margin-top:0px">{{profile.data.profile.headline}}</div>
                 </div>
-                <h5 class="subtext">{{user.data.profile.division}}</h5>
+                <h5 class="subtext">{{profile.data.profile.division}}</h5>
             </div>
         </div>
     </div>
@@ -94,7 +86,7 @@
     <div class="section mt-1 mb-2">
         <div class="profile-info m-0">
             <div class="bio m-0">
-                {{user.data.profile.summary}}
+                {{profile.data.profile.summary}}
             </div>
         </div>
     </div>
@@ -141,12 +133,15 @@
                         </a>
                     </h4>
                     <ul class="listview image-listview media flush transparent mt-1 mb-1">
-                        {% for projectID in user["data"]["projects"] %}
+
+
+                        <!--  -->
+                        {% for projectID in profile.data.projects %}
                         <li>
                             <a href="{{ url_for('project_edit', project_id = projectID) }}" class="item">
                                 <div class="imageWrapper" style="margin-left:-15px;">
-                                    {% if user["data"]["projects"][projectID]["banner"]%}
-                                    <img src='{{user["data"]["projects"][projectID]["banner"]}}' alt="image" class="imaged w64">
+                                    {% if profile.data.projects[projectID].banner%}
+                                    <img src='{{profile.data.projects[projectID].banner}}' alt="image" class="imaged w64">
                                     <!--  -->
                                     {% else %}
                                     <!-- <img src="../static/assets/img/sample/photo/wide0.jpg" alt="image" class="imaged w64"> -->
@@ -156,9 +151,9 @@
                                 </div>
                                 <div class="in">
                                     <div>
-                                        <div class="overflow">{{user["data"]["projects"][projectID]["title"]}}</div>
-                                        <div class="overflow mytext-muted">{{user["data"]["projects"][projectID]["headline"]}}</div>
-                                        <div class="overflow mytext-link">{{user["data"]["projects"][projectID]["sponsor"]}}</div>
+                                        <div class="overflow">{{profile.data.projects[projectID].title}}</div>
+                                        <div class="overflow mytext-muted">{{profile.data.projects[projectID].headline}}</div>
+                                        <div class="overflow mytext-link">{{profile.data.projects[projectID].sponsor}}</div>
                                     </div>
                                 </div>
                             </a>
@@ -185,7 +180,7 @@
 
 
                     <ul class="listview image-listview media flush transparent" style="margin-left: 0px;">
-                        {% for exp_id in user["data"]["experience"] %}
+                        {% for exp_id in profile.data.experience %}
                         <li>
                             <a href="{{ url_for('experience_edit', experience_id = exp_id) }}" class="item">
                                 <div class="imageWrapper" style="margin-left:-15px;">
@@ -194,10 +189,10 @@
                                 </div>
                                 <div class="in">
                                     <div>
-                                        {{user["data"]["experience"][exp_id]["company"]}}
-                                        <div class="text-muted">{{user["data"]["experience"][exp_id]["title"]}}</div>
+                                        {{profile.data.experience[exp_id].company}}
+                                        <div class="text-muted">{{profile.data.experience[exp_id].title}}</div>
                                         <div class="text-muted">
-                                            {{user["data"]["experience"][exp_id]["start"]}} - {{user["data"]["experience"][exp_id]["end"]}}
+                                            {{profile.data.experience[exp_id].start}} - {{profile.data.experience[exp_id].end}}
                                         </div>
                                     </div>
                                 </div>
@@ -225,7 +220,7 @@
                         </a>
                     </h4>
                     <ul class="listview image-listview media flush transparent mt-1 mb-1">
-                        {% for edu_id in user["data"]["education"] %}
+                        {% for edu_id in profile.data.education %}
                         <li class="mt-0 mb-0">
                             <a href="{{ url_for('education_edit', education_id = edu_id) }}" class="item">
                                 <div class="imageWrapper" style="margin-left:-15px;">
@@ -234,9 +229,9 @@
                                 </div>
                                 <div class="in">
                                     <div>
-                                        {{user["data"]["education"][edu_id]["school"]}}
-                                        <div class="text-muted">{{user["data"]["education"][edu_id]["field"]}}</div>
-                                        <div class="text-muted">{{user["data"]["education"][edu_id]["degree"]}}</div>
+                                        {{profile.data.education[edu_id].school}}
+                                        <div class="text-muted">{{profile.data.education[edu_id].field}}</div>
+                                        <div class="text-muted">{{profile.data.education[edu_id].degree}}</div>
                                     </div>
                                 </div>
                             </a>
@@ -298,7 +293,7 @@
     // Availability
     var percent = 0;
     var hrs = 0;
-    var availabilityVal = '{{ user.data.profile.availability }}';
+    var availabilityVal = '{{ profile.data.profile.availability }}';
 
     document.addEventListener("DOMContentLoaded", function(event) {
 

@@ -58,8 +58,8 @@ self.addEventListener("push", function(event) {
     let data = {};
     if (event.data) {
         data = event.data.json();
-        console.log("[Service Worker] Push had this title:", data.title)
-        console.log("[Service Worker] Push had this body:", data.body)
+        // console.log("[Service Worker] Push had this title:", data.title)
+        // console.log("[Service Worker] Push had this body:", data.body)
     }
 
     var title = data.title
@@ -84,5 +84,5 @@ self.addEventListener("push", function(event) {
 self.addEventListener("notificationclick", function(event) {
     console.log("[Service Worker] Notification click Received.");
     event.notification.close();
-    event.waitUntil(clients.openWindow("{{url_for('home')}}"));
+    event.waitUntil(clients.openWindow("https://narwhal-app.com"));
 });

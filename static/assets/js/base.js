@@ -982,7 +982,7 @@ if (Mobilekit.PWA.enable) {
         swRegistration.pushManager.getSubscription()
             .then(function(subscription) {
                 isSubscribed = !(subscription === null);
-                updateSubscriptionOnServer(subscription);
+                // updateSubscriptionOnServer(subscription);
                 if (isSubscribed) {
                     // console.log("User IS subscribed.");
                 } else {

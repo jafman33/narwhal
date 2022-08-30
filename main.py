@@ -581,7 +581,6 @@ def check_application():
 
     user_id = session["user"]["id"]
     project_id  = request.args.get('project_id', None)
-    print()
     # project_email  = request.args.get('project_email', None)
     # talent_id  = request.args.get('talent_id', None)
     
@@ -785,13 +784,7 @@ def project_edit():
     
     projectID = str(uuid.uuid4())
     if id:
-        print('-------')
-        print('userdata: ',user_data)
-        print('-------')
         keywords_list=myLib.getProjectKeys(user_data, id)
-        print('-------')
-        print('key words: ',keywords_list)
-        print('-------')
         projectID = id
 
     if request.method == 'POST':
@@ -979,17 +972,19 @@ def contacts():
 @login_required
 def profile_details():
     
-    email  = request.args.get('email', None)    
+    email  = request.args.get('email', None)
     if email:
         self = False
-        user_data = client.query(q.get(q.match(q.index("userEmail_index"), email)))
+        user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
+        profile_data = client.query(q.get(q.match(q.index("userEmail_index"), email)))
     else:
         self = True
         user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
-        
+        profile_data = user_data
+
     user_type = session["user"]['usertype']
-        
-    user_id = user_data["ref"].id()
+    user_id = profile_data["ref"].id()
+    
     contacts_data = []
     skills_list = []
 
@@ -1013,17 +1008,25 @@ def profile_details():
         
     if user_type == 'Project Manager':
         if self:
-            return render_template("pm/profile-pm-self.html", type=user_type, user=user_data, contacts = contacts_data)
+            print("Running as PM Self...")
+            return render_template("pm/profile-pm-self.html", type=user_type, user=user_data, profile=profile_data, contacts = contacts_data)
+        elif (not self and profile_data["data"]["account"]["usertype"] == 'Project Manager'):
+            print("Running as PM viewing PM...")
+            return render_template("pm/profile-pm.html", type=user_type, user=user_data, profile=profile_data, contacts = contacts_data)
         else:
+            print("Running as PM viewing Talent...")
             skills_list=myLib.getSkills(user_id)
-            return render_template("talent/profile-talent.html", type=user_type, user=user_data, contacts = contacts_data, skills = json.dumps(skills_list))
+            return render_template("talent/profile-talent.html", type=user_type, user=user_data, profile=profile_data, contacts = contacts_data, skills = json.dumps(skills_list))
     
     elif user_type == 'Engineering Talent':
         if self:
             skills_list=myLib.getSkills(user_id)
-            return render_template("talent/profile-talent-self.html", type=user_type, user=user_data, contacts = contacts_data, skills = json.dumps(skills_list))
+            return render_template("talent/profile-talent-self.html", type=user_type, user=user_data, profile=profile_data, contacts = contacts_data, skills = json.dumps(skills_list))
+        elif (not self and profile_data["data"]["account"]["usertype"] == 'Engineering Talent'):
+            skills_list=myLib.getSkills(user_id)
+            return render_template("talent/profile-talent.html", type=user_type, user=user_data, profile=profile_data, contacts = contacts_data, skills = json.dumps(skills_list))
         else:
-            return render_template("pm/profile-pm.html", type=user_type, user=user_data)
+            return render_template("pm/profile-pm.html", type=user_type, user=user_data, profile=profile_data, contacts = contacts_data)
         
     else:
       return None
@@ -1154,8 +1157,7 @@ def text():
             # Get all the message history 
             messages = client.query(q.get(q.match(q.index("message_index"), room_id)))["data"]["conversation"]
             # Get our contact's name
-            contactFirstName = client.query(q.get(q.ref(q.collection("users"), chats["user_id"])))["data"]["account"]["firstname"]
-            contactLastName = client.query(q.get(q.ref(q.collection("users"), chats["user_id"])))["data"]["account"]["lastname"]
+            contact_data = client.query(q.get(q.ref(q.collection("users"), chats["user_id"])))
             # Try to get the last message for the room
             try:
                 last_message = client.query(q.get(q.match(q.index("message_index"), chats["room_id"])))["data"]["conversation"][-1]["message"]
@@ -1164,7 +1166,7 @@ def text():
             
             data.append(
                 {
-                    "name": contactFirstName,
+                    "name": contact_data["data"]["account"]["firstname"],
                     "room_id": room_id,
                     "is_active": True,
                     "last_message": last_message,
@@ -1264,7 +1266,7 @@ def subscribe():
 
     try:
         client.query(q.get(q.match(q.index("sub_auth_index"), auth)))
-        print("Found Authorization on database")
+        print("Found Authorization on database...")
     except:
         print("Creating NEW Authorization on database")
         client.query(
@@ -1285,17 +1287,6 @@ def subscribe():
 def unsubscribe():
 
     try:
-        # client.query(
-        #     q.update(
-        #         q.ref(q.collection("users"), session["user"]["id"]),
-        #         {
-        #             "data": {
-        #                 "sub": None,
-        #                 }
-        #             },
-        #         )
-        #     )
-        
         client.query(
             q.update(
                 q.ref(q.collection("users"), session["user"]["id"]),
@@ -1311,7 +1302,7 @@ def unsubscribe():
                 )
             )
         
-        print("Subscription Removed")
+        print("Subscription Removed!")
     except:
         print("Fauna could not find push subscription for this user")
     return '', 204

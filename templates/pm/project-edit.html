@@ -305,25 +305,23 @@
 
                         <div class="form-group boxed">
                             <div class="input-wrapper">
+                                <label class="form-label" for="newKey">Key Words</label>
 
                                 <div class="row" id="addKey">
                                     <div class="col-10">
                                         <div class="form-group searchbox">
-                                            <i class="input-icon">
-                                            <ion-icon name="star-outline"></ion-icon>
-                                        </i>
                                             <input type="text" class="form-control" name="newKey" id="newKey" placeholder="Enter Key Word">
                                         </div>
                                     </div>
 
                                     <div class="col-2" id="addBtn">
-                                        <a class="btn btn-outline-secondary btn-sm me-1 ms-1" style="height:36px;" onclick="appendKey()">Add</a>
+                                        <a class="btn btn-outline-secondary btn-sm me-1 ms-1" style="height:40px;" onclick="appendKey()">Add</a>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="form-group boxed">
+                        <div class="form-group boxed mt-2">
                             <div class="input-wrapper">
                                 <div id="keysContainer"></div>
                             </div>
@@ -398,6 +396,7 @@
         function appendKey() {
             var newKey = document.getElementById("newKey").value;
             if (newKey == '') {
+                console.log("no empty key words")
                 return
             }
             // make sure it doesnt already exist -- TODO

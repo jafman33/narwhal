@@ -134,9 +134,10 @@
             <h4>Key Words</h4>
             <p>
                 <!-- for loop the key words -->
-                {% for key in project["data"]["projects"][id]["keywords"]%} {{key}}
+                {% for key in project["data"]["projects"][id]["keywords"]%}
+                <!--  -->
                 <div class="chip chip-primary ms-05 mb-05">
-                    <span class="chip-label">{{key["keyword"][loop.index0]}}</span>
+                    <span class="chip-label">{{key["keyword"]}}</span>
                 </div>
                 {% endfor %}
             </p>

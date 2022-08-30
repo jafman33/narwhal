@@ -63,7 +63,15 @@
 
     var projects = '{{ user.data.projects|length }}';
 
+    var keyword = '{{keyword|safe}}';
+
     document.addEventListener("DOMContentLoaded", function(event) {
+
+        if (keyword != "") {
+            document.getElementById("search-text").innerHTML = 'Displaying results for keyword: ' + keyword;
+            document.getElementById("search-text-btn").style.display = "none";
+        }
+
         // About
         if (photo) {
             percent += 20;
@@ -145,6 +153,52 @@
         <img src="../static/assets/img/logo.png" style="width: 100px; margin: 0px;" alt="icon">
     </div>
 
+    <!-- Talent -->
+    <div class="section mt-3 mb-3">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-subtitle">Discover</h6>
+                <h5 class="card-title">Search Narwhal Talent</h5>
+
+                <p class="card-text mb-2" id="search-text">Enter Talent Key Word</p>
+
+
+                <a href="#" class="btn btn-primary toggle-searchbox" id="search-text-btn">
+                    <ion-icon name="search-outline"></ion-icon>
+                    Search
+                </a>
+
+
+
+                {% for talent in talents %}
+                <div class="section mt-2 mb-2">
+                    <div class="card product-card">
+                        <div class="card-body">
+                            <a href="{{url_for('profile_details', email = talent.data.account.email)}}">
+                                <div class="profile-head">
+                                    <div class="avatar">
+                                        <img src="{{talent.data.profile.photo}}" alt="avatar" class="imaged w64 rounded">
+                                    </div>
+                                    <div class="in">
+                                        <h3 class="name" style="margin-bottom:0px">{{talent.data.account.firstname}} {{talent.data.account.lastname}}</h3>
+                                        <div class="profile-info" style="margin-top:0px">
+                                            <div class="link" style="margin-top:0px">{{talent.data.profile.headline}}</div>
+                                        </div>
+                                        <h5 class="subtext">Availability: {{talent.data.profile.availability}} hrs.</h5>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+
+            </div>
+        </div>
+    </div>
+    <!-- * Talent -->
+
+
     <div class="section full mt-3 mb-3">
 
         <div class="section mb-3">
@@ -180,7 +234,7 @@
 
                     <li class="splide__slide">
                         <div class="card">
-                            <lottie-player src="https://assets2.lottiefiles.com/private_files/lf30_7BCPlZ.json" background="transparent" speed="1" style="width: 150px; height: 150px;" loop autoplay></lottie-player>
+                            <lottie-player src="https://assets2.lottiefiles.com/private_files/lf30_7BCPlZ.json" background="transparent" speed="0.25" style="width: 150px; height: 150px;" loop autoplay></lottie-player>
                             <div class="card-body pt-2">
                                 <div class="col-12 mt-2 text-center">
                                     <a href="{{ url_for('project_edit') }}" class="btn btn-primary btn-sm">
@@ -193,7 +247,7 @@
 
                     <li class="splide__slide">
                         <div class="card">
-                            <lottie-player src="https://assets3.lottiefiles.com/packages/lf20_z5kmjeap.json" background="transparent" speed="1" style="width: 100px; height: 100px; margin-top:40px; margin-bottom:10px" loop autoplay></lottie-player>
+                            <lottie-player src="https://assets3.lottiefiles.com/packages/lf20_z5kmjeap.json" background="transparent" speed="0.5" style="width: 100px; height: 100px; margin-top:40px; margin-bottom:10px" loop autoplay></lottie-player>
                             <div class="card-body pt-2">
                                 <div class="col-12 mt-2 text-center">
                                     <a href="{{ url_for('profile_edit') }}" class="btn btn-primary btn-sm">
@@ -206,7 +260,7 @@
 
                     <li class="splide__slide">
                         <div class="card">
-                            <lottie-player src="https://assets2.lottiefiles.com/packages/lf20_qdmxvg00.json" background="transparent" speed="1" style="width: 150px; height: 150px;" loop autoplay></lottie-player>
+                            <lottie-player src="https://assets2.lottiefiles.com/packages/lf20_qdmxvg00.json" background="transparent" speed="0.5" style="width: 150px; height: 150px;" loop autoplay></lottie-player>
                             <div class="card-body pt-2">
                                 <div class="col-12 mt-2 text-center">
                                     <a href="{{ url_for('experience_edit') }}" class="btn btn-primary btn-sm">
@@ -219,7 +273,7 @@
 
                     <li class="splide__slide">
                         <div class="card">
-                            <lottie-player src="https://assets1.lottiefiles.com/packages/lf20_DMgKk1.json" background="transparent" speed="1" style="width: 150px; height: 150px;" loop autoplay></lottie-player>
+                            <lottie-player src="https://assets1.lottiefiles.com/packages/lf20_DMgKk1.json" background="transparent" speed="0.5" style="width: 150px; height: 150px;" loop autoplay></lottie-player>
                             <div class="card-body pt-2">
                                 <div class="col-12 mt-2 text-center">
                                     <a href="{{ url_for('education_edit') }}" class="btn btn-primary btn-sm">
@@ -234,54 +288,6 @@
         </div>
         <!-- * carousel multiple -->
 
-
-        <div class="section mt-3 mb-3">
-            <div class="card">
-                <!-- <img src="../static/assets/img/sample/photo/wide2.jpg" class="card-img-top" alt="image"> -->
-                <div class="card-body">
-                    <h6 class="card-subtitle">Discover</h6>
-                    <h5 class="card-title">Search Narwhal Talent</h5>
-                    <p class="card-text">
-                        Enter Talent Key Word
-                    </p>
-                    <a href="#" class="btn btn-primary toggle-searchbox mb-3">
-                        <ion-icon name="search-outline"></ion-icon>
-                        Search
-                    </a>
-
-                    {% for talent in talents %}
-                    <div class="section mb-3">
-                        <div class="card product-card">
-                            <div class="card-body">
-                                <a href="{{url_for('profile_details', email = talent.data.account.email)}}">
-                                    <div class="profile-head">
-                                        <div class="avatar">
-                                            <img src="{{talent.data.profile.photo}}" alt="avatar" class="imaged w64 rounded">
-                                        </div>
-                                        <div class="in">
-                                            <h3 class="name" style="margin-bottom:0px">{{talent.data.account.firstname}} {{talent.data.account.lastname}}</h3>
-                                            <div class="profile-info" style="margin-top:0px">
-                                                <div class="link" style="margin-top:0px">{{talent.data.profile.headline}}</div>
-                                            </div>
-                                            <h5 class="subtext">Availability: {{talent.data.profile.availability}} hrs.</h5>
-                                        </div>
-                                    </div>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                    {% endfor %}
-
-                </div>
-            </div>
-        </div>
-
-
-        <!-- Talent -->
-
-
-
-        <!-- * Talent -->
 
 
     </div>

@@ -276,18 +276,17 @@ def intro():
 @login_required
 def home():
 
-    keyword =''
+    keyword = ""
     if request.method == "POST":
         keyword = request.form["keyword"]
         
     user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
 
-    
     if session["user"]['usertype'] == 'Project Manager':
         
         # get all talents
         talents = []
-        if (keyword != ''):
+        if (keyword != ""):
             try:
                 talent_ids = client.query(
                     q.map_(
@@ -300,11 +299,10 @@ def home():
 
             # filter talents
             for talent in talent_ids:
-                 talent_data = client.query(q.get(q.match(q.index("userID2_index"), talent["data"]["user_id"] )))
-                 talents.append(talent_data)
-                 print(talents)
+                talent_data = client.query(q.get(q.ref(q.collection("users"), talent["data"]["user_id"])))
+                talents.append(talent_data)
         
-        return render_template("pm/home.html", user=user_data, talents = talents)
+        return render_template("pm/home.html", user=user_data, talents = talents, keyword=keyword)
     
     elif session["user"]['usertype'] == 'Engineering Talent':
          
@@ -313,7 +311,7 @@ def home():
         skills_list = [list(i.values())[0] for i in skills]
         
         managers = []
-        if (keyword != ''):
+        if (keyword != ""):
             managers = client.query(
                 q.map_(
                     q.lambda_("project", q.get(q.var("project"))),
@@ -321,7 +319,7 @@ def home():
                 )      
             )["data"]
         
-        return render_template("talent/home.html", user=user_data, managers = managers, skills = json.dumps(skills_list))
+        return render_template("talent/home.html", user=user_data, managers = managers, skills = json.dumps(skills_list), keyword = keyword)
     else:
       return None
   
@@ -1010,6 +1008,7 @@ def profile_details():
         self = False
         user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
         profile_data = client.query(q.get(q.match(q.index("userEmail_index"), email)))
+        print("viewing external profile")
     else:
         self = True
         user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
@@ -1017,6 +1016,7 @@ def profile_details():
 
     user_type = session["user"]['usertype']
     user_id = profile_data["ref"].id()
+    print(user_id)
     
     contacts_data = []
     skills_list = []
@@ -1436,5 +1436,6 @@ def get_public_key():
 #     return app.send_from_directory('static', 'manifest.json')
 
 if __name__ == "__main__":
-    socketio.run(app, debug=True, host="0.0.0.0")
+    socketio.run(app, debug=True)
+
 

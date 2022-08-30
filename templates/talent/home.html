@@ -65,7 +65,15 @@
     skills = JSON.parse('{{skills|safe}}');
     skillsLen = skills.length;
 
+    var keyword = '{{keyword|safe}}';
+
     document.addEventListener("DOMContentLoaded", function(event) {
+
+        if (keyword != "") {
+            document.getElementById("search-text").innerHTML = 'Displaying results for keyword: ' + keyword;
+            document.getElementById("search-text-btn").style.display = "none";
+        }
+
         // About
         if (photo) {
             percent += 20;
@@ -145,136 +153,17 @@
         <img src="../static/assets/img/logo.png" style="width: 100px; margin: 0px;" alt="icon">
     </div>
 
-    <div class="section full mt-3 mb-3">
-
-        <div class="section mb-3">
-            <div class="card">
-                <div class="card-body">
-                    <h2 class="card-subtitle">Profile Completion</h2>
-                    <p>Get noticed! Complete your profile.</p>
-
-                    <div class="progress" id="about-progress">
-                        <div class="progress-bar" role="progressbar" style="width: 25%" aria-valuemin="0" aria-valuemax="100" id="about">&nbsp;&nbsp;About: 0%</div>
-                    </div>
-
-                    <div class="progress mt-1" id="experience-progress">
-                        <div class="progress-bar bg-success" role="progressbar" style="width: 25%" aria-valuemin="0" aria-valuemax="100" id="experience">&nbsp;&nbsp;Experience: 0%</div>
-                    </div>
-
-                    <div class="progress mt-1" id="education-progress">
-                        <div class="progress-bar bg-info" role="progressbar" style="width: 25%" aria-valuemin="0" aria-valuemax="100" id="education">&nbsp;&nbsp;Education: 0%</div>
-                    </div>
-
-                    <div class="progress mt-1" id="skills-progress">
-                        <div class="progress-bar bg-warning" role="progressbar" style="width: 25%" aria-valuemin="0" aria-valuemax="100" id="skills">&nbsp;&nbsp;Skills: 0%</div>
-                    </div>
-
-                </div>
-            </div>
-        </div>
-
-        <!-- carousel multiple -->
-        <div class="carousel-multiple splide">
-            <div class="splide__track">
-                <ul class="splide__list">
-
-                    <li class="splide__slide">
-                        <div class="card">
-                            <lottie-player src="https://assets3.lottiefiles.com/packages/lf20_z5kmjeap.json" background="transparent" speed="1" style="width: 100px; height: 100px; margin-top:40px; margin-bottom:10px" loop autoplay></lottie-player>
-                            <div class="card-body pt-2">
-                                <div class="col-12 mt-2 text-center">
-                                    <a href="{{ url_for('profile_edit') }}" class="btn btn-primary btn-sm">
-                                        <ion-icon name="create-outline-outline"></ion-icon> About
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </li>
-
-                    <li class="splide__slide">
-                        <div class="card">
-                            <lottie-player src="https://assets2.lottiefiles.com/packages/lf20_qdmxvg00.json" background="transparent" speed="1" style="width: 150px; height: 150px;" loop autoplay></lottie-player>
-                            <div class="card-body pt-2">
-                                <div class="col-12 mt-2 text-center">
-                                    <a href="{{ url_for('experience_edit') }}" class="btn btn-primary btn-sm">
-                                        <ion-icon name="create-outline-outline"></ion-icon> Experience
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </li>
-
-                    <li class="splide__slide">
-                        <div class="card">
-                            <lottie-player src="https://assets1.lottiefiles.com/packages/lf20_DMgKk1.json" background="transparent" speed="1" style="width: 150px; height: 150px;" loop autoplay></lottie-player>
-                            <div class="card-body pt-2">
-                                <div class="col-12 mt-2 text-center">
-                                    <a href="{{ url_for('education_edit') }}" class="btn btn-primary btn-sm">
-                                        <ion-icon name="create-outline-outline"></ion-icon> Education
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </li>
-
-                    <li class="splide__slide">
-                        <div class="card">
-                            <lottie-player src="https://assets2.lottiefiles.com/private_files/lf30_obidsi0t.json" background="transparent" speed="1" style="width: 150px; height: 150px;" loop autoplay></lottie-player>
-                            <div class="card-body pt-2">
-                                <div class="col-12 mt-2 text-center">
-                                    <a href="{{ url_for('under_construction') }}" class="btn btn-primary btn-sm">
-                                        <ion-icon name="create-outline-outline"></ion-icon> Skills
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </li>
-
-                    <li class="splide__slide">
-                        <div class="card">
-                            <lottie-player src="https://assets5.lottiefiles.com/packages/lf20_dts7rqmw.json" background="transparent" speed="1" style="width: 150px; height: 120px; margin-top:30px;" loop autoplay></lottie-player>
-                            <div class="card-body pt-2">
-                                <div class="col-12 mt-2 text-center">
-                                    <a href="{{ url_for('under_construction') }}" class="btn btn-primary btn-sm">
-                                        <ion-icon name="create-outline-outline"></ion-icon> Publications
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </li>
-
-                    <li class="splide__slide">
-                        <div class="card">
-                            <lottie-player src="https://assets9.lottiefiles.com/temp/lf20_hT22rr.json" background="transparent" speed="1" style="width: 150px; height: 150px;" loop autoplay></lottie-player>
-                            <div class="card-body pt-2">
-                                <div class="col-12 mt-2 text-center">
-                                    <a href="{{ url_for('under_construction') }}" class="btn btn-primary btn-sm">
-                                        <ion-icon name="create-outline-outline"></ion-icon> Patents
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </li>
-
-
-                </ul>
-            </div>
-        </div>
-        <!-- * carousel multiple -->
-
-    </div>
-
 
     <div class="section mt-3 mb-3">
         <div class="card">
             <!-- <img src="../static/assets/img/sample/photo/wide2.jpg" class="card-img-top" alt="image"> -->
             <div class="card-body">
                 <h6 class="card-subtitle">Discover</h6>
-                <h5 class="card-title">Search Narwhal Talent</h5>
-                <p class="card-text">
-                    Enter Talent Key Word
-                </p>
-                <a href="#" class="btn btn-primary toggle-searchbox mb-3">
+                <h5 class="card-title">Search Narwhal Projects</h5>
+                <p class="card-text mb-2" id="search-text">Enter Project Key Word</p>
+
+
+                <a href="#" class="btn btn-primary toggle-searchbox" id="search-text-btn">
                     <ion-icon name="search-outline"></ion-icon>
                     Search
                 </a>
@@ -312,6 +201,130 @@
             </div>
         </div>
     </div>
+
+
+
+    <div class="section full mt-3 mb-3">
+
+        <div class="section mb-3">
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="card-subtitle">Profile Completion</h2>
+                    <p>Get noticed! Complete your profile.</p>
+
+                    <div class="progress" id="about-progress">
+                        <div class="progress-bar" role="progressbar" style="width: 25%" aria-valuemin="0" aria-valuemax="100" id="about">&nbsp;&nbsp;About: 0%</div>
+                    </div>
+
+                    <div class="progress mt-1" id="experience-progress">
+                        <div class="progress-bar bg-success" role="progressbar" style="width: 25%" aria-valuemin="0" aria-valuemax="100" id="experience">&nbsp;&nbsp;Experience: 0%</div>
+                    </div>
+
+                    <div class="progress mt-1" id="education-progress">
+                        <div class="progress-bar bg-info" role="progressbar" style="width: 25%" aria-valuemin="0" aria-valuemax="100" id="education">&nbsp;&nbsp;Education: 0%</div>
+                    </div>
+
+                    <div class="progress mt-1" id="skills-progress">
+                        <div class="progress-bar bg-warning" role="progressbar" style="width: 25%" aria-valuemin="0" aria-valuemax="100" id="skills">&nbsp;&nbsp;Skills: 0%</div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- carousel multiple -->
+        <div class="carousel-multiple splide">
+            <div class="splide__track">
+                <ul class="splide__list">
+
+                    <li class="splide__slide">
+                        <div class="card">
+                            <lottie-player src="https://assets3.lottiefiles.com/packages/lf20_z5kmjeap.json" background="transparent" speed="0.5" style="width: 100px; height: 100px; margin-top:40px; margin-bottom:10px" loop autoplay></lottie-player>
+                            <div class="card-body pt-2">
+                                <div class="col-12 mt-2 text-center">
+                                    <a href="{{ url_for('profile_edit') }}" class="btn btn-primary btn-sm">
+                                        <ion-icon name="create-outline"></ion-icon> About
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+
+                    <li class="splide__slide">
+                        <div class="card">
+                            <lottie-player src="https://assets2.lottiefiles.com/packages/lf20_qdmxvg00.json" background="transparent" speed="1" style="width: 150px; height: 150px;" loop autoplay></lottie-player>
+                            <div class="card-body pt-2">
+                                <div class="col-12 mt-2 text-center">
+                                    <a href="{{ url_for('experience_edit') }}" class="btn btn-primary btn-sm">
+                                        <ion-icon name="create-outline"></ion-icon> Experience
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+
+                    <li class="splide__slide">
+                        <div class="card">
+                            <lottie-player src="https://assets1.lottiefiles.com/packages/lf20_DMgKk1.json" background="transparent" speed="0.5" style="width: 150px; height: 150px;" loop autoplay></lottie-player>
+                            <div class="card-body pt-2">
+                                <div class="col-12 mt-2 text-center">
+                                    <a href="{{ url_for('education_edit') }}" class="btn btn-primary btn-sm">
+                                        <ion-icon name="create-outline"></ion-icon> Education
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+
+                    <li class="splide__slide">
+                        <div class="card">
+                            <lottie-player src="https://assets2.lottiefiles.com/private_files/lf30_obidsi0t.json" background="transparent" speed="0.5" style="width: 150px; height: 150px;" loop autoplay></lottie-player>
+                            <div class="card-body pt-2">
+                                <div class="col-12 mt-2 text-center">
+                                    <a href="{{ url_for('under_construction') }}" class="btn btn-primary btn-sm">
+                                        <ion-icon name="create-outline"></ion-icon> Skills
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+
+                    <li class="splide__slide">
+                        <div class="card">
+                            <lottie-player src="https://assets5.lottiefiles.com/packages/lf20_dts7rqmw.json" background="transparent" speed="0.5" style="width: 150px; height: 120px; margin-top:30px;" loop autoplay></lottie-player>
+                            <div class="card-body pt-2">
+                                <div class="col-12 mt-2 text-center">
+                                    <a href="{{ url_for('under_construction') }}" class="btn btn-primary btn-sm">
+                                        <ion-icon name="create-outline"></ion-icon> Publications
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+
+                    <li class="splide__slide">
+                        <div class="card">
+                            <lottie-player src="https://assets9.lottiefiles.com/temp/lf20_hT22rr.json" background="transparent" speed="1" style="width: 150px; height: 150px;" loop autoplay></lottie-player>
+                            <div class="card-body pt-2">
+                                <div class="col-12 mt-2 text-center">
+                                    <a href="{{ url_for('under_construction') }}" class="btn btn-primary btn-sm">
+                                        <ion-icon name="create-outline"></ion-icon> Patents
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+
+
+                </ul>
+            </div>
+        </div>
+        <!-- * carousel multiple -->
+
+    </div>
+
+
+
 
 
 

@@ -39,10 +39,6 @@
     var skills = new Array()
 
     document.addEventListener("DOMContentLoaded", function(event) {
-        // fetch('{{ url_for("contacts", email = profile.data.account.email) }}', {
-        //     method: "POST",
-        // })
-
         skills = JSON.parse('{{skills|safe}}')
         if (skills.length > 0) {
             displaySkills(skills)

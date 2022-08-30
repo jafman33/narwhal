@@ -297,7 +297,6 @@ def home():
             except:
                 talent_ids = []
 
-            # filter talents
             for talent in talent_ids:
                 talent_data = client.query(q.get(q.ref(q.collection("users"), talent["data"]["user_id"])))
                 talents.append(talent_data)
@@ -306,11 +305,10 @@ def home():
     
     elif session["user"]['usertype'] == 'Engineering Talent':
          
-               
         skills = client.query(q.get(q.match(q.index("skill_index"), user_data["ref"].id())))["data"]["skills"]
         skills_list = [list(i.values())[0] for i in skills]
         
-        managers = []
+        manager_match = []
         if (keyword != ""):
             managers = client.query(
                 q.map_(
@@ -318,8 +316,16 @@ def home():
                     q.paginate(q.match(q.index("userType_index"), "Project Manager"),size=100)
                 )      
             )["data"]
-        
-        return render_template("talent/home.html", user=user_data, managers = managers, skills = json.dumps(skills_list), keyword = keyword)
+            
+            # horrible and non scalable.... 
+            # Really need to do it like we do talents, but no time... :(
+            for manager in managers:
+                for project_id in manager["data"]["projects"]:
+                    for key in manager["data"]["projects"][project_id]["keywords"]:
+                        if key["keyword"] == keyword:
+                            manager_match.append(manager)
+                
+        return render_template("talent/home.html", user=user_data, managers = manager_match, skills = json.dumps(skills_list), keyword = keyword)
     else:
       return None
   

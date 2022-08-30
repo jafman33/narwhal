@@ -1008,13 +1008,10 @@ def profile_details():
         
     if user_type == 'Project Manager':
         if self:
-            print("Running as PM Self...")
             return render_template("pm/profile-pm-self.html", type=user_type, user=user_data, profile=profile_data, contacts = contacts_data)
         elif (not self and profile_data["data"]["account"]["usertype"] == 'Project Manager'):
-            print("Running as PM viewing PM...")
             return render_template("pm/profile-pm.html", type=user_type, user=user_data, profile=profile_data, contacts = contacts_data)
         else:
-            print("Running as PM viewing Talent...")
             skills_list=myLib.getSkills(user_id)
             return render_template("talent/profile-talent.html", type=user_type, user=user_data, profile=profile_data, contacts = contacts_data, skills = json.dumps(skills_list))
     

@@ -23,13 +23,30 @@
     <div class="pageTitle">
         <img src="../static/assets/img/logo.png" style="width: 100px; margin: 0px; filter: brightness(0) invert(1);" alt="icon">
     </div>
-    <!-- <div class="right">
+    <div class="right">
         <a href="#" class="headerButton toggle-searchbox">
             <ion-icon name="search-outline"></ion-icon>
         </a>
-    </div> -->
+    </div>
 </div>
 <!-- * App Header -->
+
+<!-- Search Component -->
+<div id="search" class="appHeader">
+    <form class="search-form" action="{{ url_for('home') }}" method="POST">
+        <div class="form-group searchbox">
+            <i class="input-icon">
+                <ion-icon name="search-outline"></ion-icon>
+            </i>
+            <input type="text" class="form-control" name="keyword" id="keyword" placeholder="Search project by key word...">
+
+            <a href="#" class="ms-1 close toggle-searchbox">
+                <ion-icon name="close-circle"></ion-icon>
+            </a>
+        </div>
+    </form>
+</div>
+<!-- * Search Component -->
 
 
 <script>
@@ -43,30 +60,29 @@
 
     var education = '{{ user.data.education|length }}';
     var experience = '{{ user.data.experience|length }}';
-    var skills = '{{ user.data.skills|length }}';
+
+    var skills = new Array();
+    skills = JSON.parse('{{skills|safe}}');
+    skillsLen = skills.length;
 
     document.addEventListener("DOMContentLoaded", function(event) {
         // About
         if (photo) {
             percent += 20;
-            document.getElementById("about").style.width = String(percent) + '%';
         }
         if (headline) {
             percent += 20;
-            document.getElementById("about").style.width = String(percent) + '%';
         }
         if (summary) {
             percent += 20;
-            document.getElementById("about").style.width = String(percent) + '%';
         }
         if (availability) {
             percent += 20;
-            document.getElementById("about").style.width = String(percent) + '%';
         }
         if (phone) {
             percent += 20;
-            document.getElementById("about").style.width = String(percent) + '%';
         }
+        document.getElementById("about").style.width = String(percent) + '%';
         document.getElementById("about").innerText = '\xa0\xa0\xa0' + ' About: ' + String(percent) + '%';
         if (percent == 100) {
             // document.getElementById("about-progress").style.display = "none";
@@ -75,30 +91,30 @@
 
         // Experience
         percent = 0;
-        if (experience) {
+        if (experience > 0) {
             for (let step = 0; step <= education; step++) {
-                percent += 33.3333;
-                if (percent > 99)
-                    percent = 100;
+                percent += 50;
+                // if (percent > 99)
+                //     percent = 100;
             }
             document.getElementById("experience").style.width = String(percent) + '%';
         }
-        document.getElementById("experience").innerText = '\xa0\xa0\xa0' + ' Experience: ' + String(Math.round(percent)) + '%';
+        document.getElementById("experience").innerText = '\xa0\xa0\xa0' + ' Experience: ' + String(Math.round(percent / 50)) + ' / 2';
         if (percent == 100) {
             // document.getElementById("experience-progress").style.display = "none";
         }
 
         // Education
         percent = 0;
-        if (education) {
+        if (education > 0) {
             for (let step = 0; step <= education; step++) {
-                percent += 33.3333;
-                if (percent > 99)
-                    percent = 100;
+                percent += 50;
+                // if (percent > 99)
+                //     percent = 100;
             }
             document.getElementById("education").style.width = String(percent) + '%';
         }
-        document.getElementById("education").innerText = '\xa0\xa0\xa0' + ' Education: ' + String(Math.round(percent)) + '%';
+        document.getElementById("education").innerText = '\xa0\xa0\xa0' + ' Education: ' + String(Math.round(percent / 50)) + ' / 2';
         if (percent == 100) {
             // document.getElementById("education-progress").style.display = "none";
         }
@@ -106,11 +122,15 @@
 
         // Skills
         percent = 0;
-        if (skills) {
-            percent += 80;
+        if (skillsLen > 0) {
+            for (let step = 0; step <= skillsLen; step++) {
+                percent += 10;
+                if (percent > 99)
+                    percent = 100;
+            }
             document.getElementById("skills").style.width = String(percent) + '%';
         }
-        document.getElementById("skills").innerText = '\xa0\xa0\xa0' + ' Skills: ' + String(percent) + '%';
+        document.getElementById("skills").innerText = '\xa0\xa0\xa0' + ' Skills: ' + String(percent / 10) + ' / 10';
         if (percent == 100) {
             // document.getElementById("skills-progress").style.display = "none";
         }
@@ -127,12 +147,6 @@
 
     <div class="section full mt-3 mb-3">
 
-
-
-        <!-- 
-            These widgets show up until you complete your profile!
-         -->
-
         <div class="section mb-3">
             <div class="card">
                 <div class="card-body">
@@ -144,15 +158,15 @@
                     </div>
 
                     <div class="progress mt-1" id="experience-progress">
-                        <div class="progress-bar bg-success" role="progressbar" style="width: 25%" aria-valuemin="0" aria-valuemax="25" id="experience">&nbsp;&nbsp;Experience: 0%</div>
+                        <div class="progress-bar bg-success" role="progressbar" style="width: 25%" aria-valuemin="0" aria-valuemax="100" id="experience">&nbsp;&nbsp;Experience: 0%</div>
                     </div>
 
                     <div class="progress mt-1" id="education-progress">
-                        <div class="progress-bar bg-info" role="progressbar" style="width: 25%" aria-valuemin="0" aria-valuemax="25" id="education">&nbsp;&nbsp;Education: 0%</div>
+                        <div class="progress-bar bg-info" role="progressbar" style="width: 25%" aria-valuemin="0" aria-valuemax="100" id="education">&nbsp;&nbsp;Education: 0%</div>
                     </div>
 
                     <div class="progress mt-1" id="skills-progress">
-                        <div class="progress-bar bg-warning" role="progressbar" style="width: 25%" aria-valuemin="0" aria-valuemax="25" id="skills">&nbsp;&nbsp;Skills: 0%</div>
+                        <div class="progress-bar bg-warning" role="progressbar" style="width: 25%" aria-valuemin="0" aria-valuemax="100" id="skills">&nbsp;&nbsp;Skills: 0%</div>
                     </div>
 
                 </div>
@@ -170,7 +184,7 @@
                             <div class="card-body pt-2">
                                 <div class="col-12 mt-2 text-center">
                                     <a href="{{ url_for('profile_edit') }}" class="btn btn-primary btn-sm">
-                                        <ion-icon name="add-circle-outline"></ion-icon> About
+                                        <ion-icon name="create-outline-outline"></ion-icon> About
                                     </a>
                                 </div>
                             </div>
@@ -183,7 +197,7 @@
                             <div class="card-body pt-2">
                                 <div class="col-12 mt-2 text-center">
                                     <a href="{{ url_for('experience_edit') }}" class="btn btn-primary btn-sm">
-                                        <ion-icon name="add-circle-outline"></ion-icon> Experience
+                                        <ion-icon name="create-outline-outline"></ion-icon> Experience
                                     </a>
                                 </div>
                             </div>
@@ -196,7 +210,7 @@
                             <div class="card-body pt-2">
                                 <div class="col-12 mt-2 text-center">
                                     <a href="{{ url_for('education_edit') }}" class="btn btn-primary btn-sm">
-                                        <ion-icon name="add-circle-outline"></ion-icon> Education
+                                        <ion-icon name="create-outline-outline"></ion-icon> Education
                                     </a>
                                 </div>
                             </div>
@@ -209,7 +223,7 @@
                             <div class="card-body pt-2">
                                 <div class="col-12 mt-2 text-center">
                                     <a href="{{ url_for('under_construction') }}" class="btn btn-primary btn-sm">
-                                        <ion-icon name="add-circle-outline"></ion-icon> Skills
+                                        <ion-icon name="create-outline-outline"></ion-icon> Skills
                                     </a>
                                 </div>
                             </div>
@@ -222,7 +236,7 @@
                             <div class="card-body pt-2">
                                 <div class="col-12 mt-2 text-center">
                                     <a href="{{ url_for('under_construction') }}" class="btn btn-primary btn-sm">
-                                        <ion-icon name="add-circle-outline"></ion-icon> Publications
+                                        <ion-icon name="create-outline-outline"></ion-icon> Publications
                                     </a>
                                 </div>
                             </div>
@@ -235,7 +249,7 @@
                             <div class="card-body pt-2">
                                 <div class="col-12 mt-2 text-center">
                                     <a href="{{ url_for('under_construction') }}" class="btn btn-primary btn-sm">
-                                        <ion-icon name="add-circle-outline"></ion-icon> Patents
+                                        <ion-icon name="create-outline-outline"></ion-icon> Patents
                                     </a>
                                 </div>
                             </div>
@@ -251,35 +265,55 @@
     </div>
 
 
-
-    {% for manager in managers %}
-    <!--  -->
-    {% for projectID in manager.data.projects %}
-    <!--  -->
-    {% if manager["data"]["projects"][projectID]["title"] %}
     <div class="section mt-3 mb-3">
+        <div class="card">
+            <!-- <img src="../static/assets/img/sample/photo/wide2.jpg" class="card-img-top" alt="image"> -->
+            <div class="card-body">
+                <h6 class="card-subtitle">Discover</h6>
+                <h5 class="card-title">Search Narwhal Talent</h5>
+                <p class="card-text">
+                    Enter Talent Key Word
+                </p>
+                <a href="#" class="btn btn-primary toggle-searchbox mb-3">
+                    <ion-icon name="search-outline"></ion-icon>
+                    Search
+                </a>
 
-        <a href="{{ url_for('project_details', project_email = manager.data.account.email, project_id = projectID) }}" class="item">
-            <div class="card">
-                <img src='{{manager["data"]["projects"][projectID]["banner"]}}' class="card-img-top" alt="image">
-                <div class="card-body">
-                    <h2 class="card-subtitle m-0">{{manager["data"]["projects"][projectID]["title"]}}</h2>
-                    <p class="text-muted m-0" style="font-size: 14px;">
-                        {{manager["data"]["projects"][projectID]["headline"]}}
-                    </p>
-                    <p class="card-text mt-0 mb-0" style="font-size: 14px;">
-                        {{manager["data"]["projects"][projectID]["sponsor"]}}
-                    </p>
+                {% for manager in managers %}
+                <!--  -->
+                {% for projectID in manager.data.projects %}
+                <!--  -->
+                {% if manager["data"]["projects"][projectID]["title"] %}
+                <div class="section mb-3">
+
+                    <a href="{{ url_for('project_details', project_email = manager.data.account.email, project_id = projectID) }}">
+                        <div class="card">
+                            <img src='{{manager["data"]["projects"][projectID]["banner"]}}' class="card-img-top" alt="image">
+                            <div class="card-body">
+                                <h2 class="card-subtitle m-0">{{manager["data"]["projects"][projectID]["title"]}}</h2>
+                                <p class="text-muted m-0" style="font-size: 14px;">
+                                    {{manager["data"]["projects"][projectID]["headline"]}}
+                                </p>
+                                <p class="card-text mt-0 mb-0" style="font-size: 14px;">
+                                    {{manager["data"]["projects"][projectID]["sponsor"]}}
+                                </p>
+                            </div>
+                        </div>
+                    </a>
+
                 </div>
+
+                {% endif %}
+                <!--  -->
+                {% endfor %}
+                <!--  -->
+                {% endfor %}
+
             </div>
-        </a>
+        </div>
     </div>
 
-    {% endif %}
-    <!--  -->
-    {% endfor %}
-    <!--  -->
-    {% endfor %}
+
 
 
 

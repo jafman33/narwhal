@@ -274,21 +274,54 @@ def intro():
 
 @app.route("/home", methods=["GET","POST"])
 @login_required
-def home(flag=None):
-    flag = request.args.get('flag')
+def home():
+
+    keyword =''
+    if request.method == "POST":
+        keyword = request.form["keyword"]
+        
+    user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
+
+    
     if session["user"]['usertype'] == 'Project Manager':
-        user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
-        return render_template("pm/home.html", user=user_data)
+        
+        # get all talents
+        talents = []
+        if (keyword != ''):
+            try:
+                talent_ids = client.query(
+                    q.map_(
+                        q.lambda_("skill", q.get(q.var("skill"))),
+                        q.paginate(q.match(q.index("skill3_match_index"), keyword),size=100)
+                    )      
+                )["data"]
+            except:
+                talent_ids = []
+
+            # filter talents
+            for talent in talent_ids:
+                 talent_data = client.query(q.get(q.match(q.index("userID2_index"), talent["data"]["user_id"] )))
+                 talents.append(talent_data)
+                 print(talents)
+        
+        return render_template("pm/home.html", user=user_data, talents = talents)
     
     elif session["user"]['usertype'] == 'Engineering Talent':
-        user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
-        managers = client.query(
-            q.map_(
-                q.lambda_("project", q.get(q.var("project"))),
-                q.paginate(q.match(q.index("userType_index"), "Project Manager"),size=100)
-            )      
-        )["data"]
-        return render_template("talent/home.html", user=user_data, flag = flag, managers = managers)
+         
+               
+        skills = client.query(q.get(q.match(q.index("skill_index"), user_data["ref"].id())))["data"]["skills"]
+        skills_list = [list(i.values())[0] for i in skills]
+        
+        managers = []
+        if (keyword != ''):
+            managers = client.query(
+                q.map_(
+                    q.lambda_("project", q.get(q.var("project"))),
+                    q.paginate(q.match(q.index("userType_index"), "Project Manager"),size=100)
+                )      
+            )["data"]
+        
+        return render_template("talent/home.html", user=user_data, managers = managers, skills = json.dumps(skills_list))
     else:
       return None
   
@@ -1403,5 +1436,5 @@ def get_public_key():
 #     return app.send_from_directory('static', 'manifest.json')
 
 if __name__ == "__main__":
-    socketio.run(app, debug=True)
+    socketio.run(app, debug=True, host="0.0.0.0")
 

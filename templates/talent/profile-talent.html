@@ -39,9 +39,9 @@
     var skills = new Array()
 
     document.addEventListener("DOMContentLoaded", function(event) {
-        fetch('{{ url_for("contacts", email = profile.data.account.email) }}', {
-            method: "POST",
-        })
+        // fetch('{{ url_for("contacts", email = profile.data.account.email) }}', {
+        //     method: "POST",
+        // })
 
         skills = JSON.parse('{{skills|safe}}')
         if (skills.length > 0) {
@@ -128,7 +128,7 @@
     <div class="section mt-2">
         <h4>About
             <!-- <a href="{{ url_for('profile_edit') }}">
-                <ion-icon name="add-circle-outline"></ion-icon>
+                <ion-icon name="create-outline"></ion-icon>
             </a> -->
         </h4>
         <div class="profile-head">
@@ -213,7 +213,7 @@
 
                     <h4>Experience
                         <!-- <a href="{{ url_for('experience_edit') }}">
-                            <ion-icon name="add-circle-outline"></ion-icon>
+                            <ion-icon name="create-outline"></ion-icon>
                         </a> -->
                     </h4>
 
@@ -255,7 +255,7 @@
                 <div class="section m-2">
                     <h4>Education
                         <!-- <a href="{{ url_for('education_edit') }}">
-                            <ion-icon name="add-circle-outline"></ion-icon>
+                            <ion-icon name="create-outline"></ion-icon>
                         </a> -->
                     </h4>
                     <ul class="listview image-listview media flush transparent mt-1 mb-1">
@@ -405,7 +405,7 @@
                         <div class="col-8">
                             <h4>Contacts
                                 <!-- <a href="{{ url_for('contacts') }}">
-                                    <ion-icon name="add-circle-outline"></ion-icon>
+                                    <ion-icon name="create-outline"></ion-icon>
                                 </a> -->
                             </h4>
                         </div>

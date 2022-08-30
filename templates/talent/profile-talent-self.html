@@ -39,12 +39,14 @@
     var skills = new Array()
 
     document.addEventListener("DOMContentLoaded", function(event) {
-        fetch('{{ url_for("contacts") }}', {
-            method: "POST",
-        })
+        // fetch('{{ url_for("contacts") }}', {
+        //     method: "POST",
+        // })
 
         skills = JSON.parse('{{skills|safe}}')
-        loadSkills(skills)
+        if (skills.length > 0) {
+            loadSkills(skills)
+        }
     });
 
     function loadSkills(skills) {
@@ -123,7 +125,7 @@
     <div class="section mt-2">
         <h4>About
             <a href="{{ url_for('profile_edit') }}">
-                <ion-icon name="add-circle-outline"></ion-icon>
+                <ion-icon name="create-outline"></ion-icon>
             </a>
         </h4>
         <div class="profile-head">
@@ -208,7 +210,7 @@
 
                     <h4>Experience
                         <a href="{{ url_for('experience_edit') }}">
-                            <ion-icon name="add-circle-outline"></ion-icon>
+                            <ion-icon name="create-outline"></ion-icon>
                         </a>
                     </h4>
 
@@ -250,7 +252,7 @@
                 <div class="section m-2">
                     <h4>Education
                         <a href="{{ url_for('education_edit') }}">
-                            <ion-icon name="add-circle-outline"></ion-icon>
+                            <ion-icon name="create-outline"></ion-icon>
                         </a>
                     </h4>
                     <ul class="listview image-listview media flush transparent mt-1 mb-1">
@@ -342,7 +344,7 @@
 
                                 <h4 class="mb-2">Add Skills
                                     <!-- <a href="#">
-                                        <ion-icon name="add-circle-outline"></ion-icon>
+                                        <ion-icon name="create-outline"></ion-icon>
                                     </a> -->
                                 </h4>
 
@@ -411,7 +413,7 @@
                         <div class="col-8">
                             <h4>Contacts
                                 <a href="{{ url_for('contacts') }}">
-                                    <ion-icon name="add-circle-outline"></ion-icon>
+                                    <ion-icon name="create-outline"></ion-icon>
                                 </a>
                             </h4>
                         </div>

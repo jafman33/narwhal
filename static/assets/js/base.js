@@ -950,8 +950,6 @@ if (Mobilekit.PWA.enable) {
                 // console.log("Service Worker is registered", swReg);
                 // console.log("scope: ", swReg.scope);
                 console.log("Service Worker is registered and Push is supported");
-
-
                 swRegistration = swReg;
                 initializeUI();
             })

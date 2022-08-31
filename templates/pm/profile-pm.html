@@ -34,13 +34,7 @@
     }
 </style>
 
-<!-- <script type="text/javascript">
-    document.addEventListener("DOMContentLoaded", function(event) {
-        fetch('{{ url_for("contacts", email=profile.data.account.email)}}', {
-            method: "POST",
-        })
-    });
-</script> -->
+
 
 
 <!-- App Header -->
@@ -52,10 +46,10 @@
     </div>
     <div class="pageTitle">Narwhal Profile</div>
     <div class="right">
-        {% if type != profile.data.account.usertype %}
-        <!-- <a href="#" class="headerButton">
+        <!-- <ion-button class="headerButton" onclick="updateBookmark(this)" id="bookmark-button">
             <ion-icon name="bookmark-outline"></ion-icon>
-        </a> -->
+        </ion-button> -->
+        {% if type != profile.data.account.usertype %}
         <form action="{{ url_for('new_contact') }}" method="POST">
             <input hidden type="email" class="form-control" name="email" id="email" value="{{profile.data.account.email}}">
             <button type="input" class="headerButton" style="background: transparent !important; border-width: 0px !important;">
@@ -67,6 +61,31 @@
     </div>
 </div>
 <!-- * App Header -->
+
+<!-- <script>
+    document.addEventListener("DOMContentLoaded", function(event) {
+
+        var bookmark_button = document.getElementById('bookmark-button')
+        fetch('{{ url_for("check_bookmark", user_id = profile.ref.id() ) }}', {
+                method: "POST",
+            })
+            .then((response) => response.json())
+            .then((data) => {
+                bookmark_button.querySelector('ion-icon').setAttribute('name', data.name);
+            });
+
+    });
+
+    function updateBookmark(el) {
+        fetch('{{ url_for("add_bookmark", user_id = profile.ref.id() ) }}', {
+                method: "POST",
+            })
+            .then((response) => response.json())
+            .then((data) => {
+                el.querySelector('ion-icon').setAttribute('name', data.name);
+            });
+    }
+</script> -->
 
 <!-- App Capsule -->
 <div id="appCapsule">

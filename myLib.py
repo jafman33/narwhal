@@ -143,18 +143,19 @@ def getProjectKeys(user_data,id):
         keyword_list = []
     return keyword_list
 
-    
-def updateTalentBookmarks(bookmark):
+
+
+def updateUserBookmarks(id,bookmarks):
     client.query(
-            q.update(
-                q.ref(q.collection("users"), session["user"]["id"]),
-                {
-                    "data": {
-                        "bookmarks": bookmark,
-                    }
-                },
-            )
-        )  
+        q.update(
+            q.ref(q.collection("bookmarks"), id),
+            {
+                "data": {
+                    "bookmarks": bookmarks
+                }
+            },
+        )
+    )
     
 
 def updateProfileHeadline(headline):

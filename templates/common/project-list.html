@@ -156,7 +156,6 @@
 
             <ul class="listview image-listview media mb-2">
 
-                <!-- loop here -->
                 {% for manager in managers %} {% for proj_id in bookmarks %} {% if manager["data"]["projects"][proj_id] %}
                 <li>
                     <a href="{{ url_for('project_details', project_email = manager.data.account.email, project_id = proj_id) }}" class="item">
@@ -178,7 +177,6 @@
                         </div>
                     </a>
                 </li>
-                <!--  -->
                 {% endif %} {% endfor %} {% endfor %}
 
             </ul>

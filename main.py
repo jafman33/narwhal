@@ -427,62 +427,84 @@ def profile_edit():
     else:
         return None
 
+@app.route("/check-bookmark", methods=["POST"])
+@login_required
+def check_bookmark():
+
+    user_id = session["user"]["id"]
+    project_id  = request.args.get('project_id', None)
+    talent_id  = request.args.get('talent_id', None)
+    
+    if session["user"]['usertype'] == 'Project Manager':
+        user_bookmarks = client.query(q.get(q.match(q.index("bookmark_index"), user_id)))
+        try:
+            bookmark_list = [list(i.values())[0] for i in user_bookmarks["data"]["bookmarks"]]
+        except:
+            bookmark_list = []
+        if talent_id not in bookmark_list:     
+            return jsonify({
+            "status": "success",
+            "name": "bookmark-outline"
+            })
+        else:
+            return jsonify({
+            "status": "success",
+            "name": "bookmark"
+            })
+    
+    elif session["user"]['usertype'] == 'Engineering Talent':
+        user_bookmarks = client.query(q.get(q.match(q.index("bookmark_index"), user_id)))
+        try:
+            bookmark_list = [list(i.values())[0] for i in user_bookmarks["data"]["bookmarks"]]
+        except:
+            bookmark_list = []
+        if project_id not in bookmark_list:     
+            return jsonify({
+            "status": "success",
+            "name": "bookmark-outline"
+            })
+        else:
+            return jsonify({
+            "status": "success",
+            "name": "bookmark"
+            })
+
 @app.route("/add-bookmark", methods=["POST"])
 @login_required
 def add_bookmark():
     
     project_id  = request.args.get('project_id', None)
-    # project_email  = request.args.get('project_email', None)
-    # talent_id  = request.args.get('talent_id', None)
-    user_id = session["user"]["id"]
+    user_id  = request.args.get('user_id', None)
     
     if session["user"]['usertype'] == 'Project Manager':
-        # Todo: bookmark talent!
-        return '', 204
-    
-    elif session["user"]['usertype'] == 'Engineering Talent':
-        
-        user_bookmarks = client.query(q.get(q.match(q.index("bookmark_index"), user_id)))
-        # Create current bookmark list...
+        user_bookmarks = client.query(q.get(q.match(q.index("bookmark_index"), session["user"]["id"])))
         try:
             bookmark_list = [list(i.values())[0] for i in user_bookmarks["data"]["bookmarks"]]
         except:
             bookmark_list = []
-        # ...and make sure new bookmark is not already on the list
+        if user_id not in bookmark_list:     
+            user_bookmarks["data"]["bookmarks"].append({"user_id": user_id})
+            myLib.updateUserBookmarks(user_bookmarks["ref"].id(),user_bookmarks["data"]["bookmarks"])
+            return jsonify({"status": "success","name": "bookmark"})
+        else:
+            user_bookmarks["data"]["bookmarks"].remove({"user_id": user_id})
+            myLib.updateUserBookmarks(user_bookmarks["ref"].id(),user_bookmarks["data"]["bookmarks"])
+            return jsonify({"status": "success","name": "bookmark-outline"})
+    
+    elif session["user"]['usertype'] == 'Engineering Talent':
+        user_bookmarks = client.query(q.get(q.match(q.index("bookmark_index"), session["user"]["id"])))
+        try:
+            bookmark_list = [list(i.values())[0] for i in user_bookmarks["data"]["bookmarks"]]
+        except:
+            bookmark_list = []
         if project_id not in bookmark_list:     
-            # append the project bookmark
             user_bookmarks["data"]["bookmarks"].append({"project_id": project_id})
-            # Update the user's bookmark document
-            client.query(
-                q.update(
-                    q.ref(q.collection("bookmarks"), user_bookmarks["ref"].id()),
-                    {
-                        "data": {
-                            "bookmarks": user_bookmarks["data"]["bookmarks"]
-                        }
-                    },
-                )
-            )
-            return jsonify({
-            "status": "success",
-            "name": "bookmark"
-            })
+            myLib.updateUserBookmarks(user_bookmarks["ref"].id(),user_bookmarks["data"]["bookmarks"])
+            return jsonify({"status": "success","name": "bookmark"})
         else:
             user_bookmarks["data"]["bookmarks"].remove({"project_id": project_id})
-            client.query(
-                q.update(
-                    q.ref(q.collection("bookmarks"), user_bookmarks["ref"].id()),
-                    {
-                        "data": {
-                            "bookmarks": user_bookmarks["data"]["bookmarks"]
-                        }
-                    },
-                )
-            )
-            return jsonify({
-            "status": "success",
-            "name": "bookmark-outline"
-            })
+            myLib.updateUserBookmarks(user_bookmarks["ref"].id(),user_bookmarks["data"]["bookmarks"])
+            return jsonify({"status": "success","name": "bookmark-outline"})
             
 @app.route("/add-application", methods=["GET","POST"])
 @login_required
@@ -582,35 +604,7 @@ def new_applicant_notification():
     
 
 
-@app.route("/check-bookmark", methods=["POST"])
-@login_required
-def check_bookmark():
 
-    user_id = session["user"]["id"]
-    project_id  = request.args.get('project_id', None)
-    # project_email  = request.args.get('project_email', None)
-    # talent_id  = request.args.get('talent_id', None)
-    
-    if session["user"]['usertype'] == 'Project Manager':
-        # Todo: bookmark talent!
-        return '', 204
-    
-    elif session["user"]['usertype'] == 'Engineering Talent':
-        user_bookmarks = client.query(q.get(q.match(q.index("bookmark_index"), user_id)))
-        try:
-            bookmark_list = [list(i.values())[0] for i in user_bookmarks["data"]["bookmarks"]]
-        except:
-            bookmark_list = []
-        if project_id not in bookmark_list:     
-            return jsonify({
-            "status": "success",
-            "name": "bookmark-outline"
-            })
-        else:
-            return jsonify({
-            "status": "success",
-            "name": "bookmark"
-            })
             
 @app.route("/check-application", methods=["POST"])
 @login_required
@@ -804,6 +798,58 @@ def projects():
         bookmarks=bookmark_list, 
         applications=application_list
         )
+    
+@app.route("/talent", methods=["GET", "POST"])
+@login_required
+def talent():
+    user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
+    user_id = session["user"]['id']
+
+    # ###################
+    # Call to all talents
+    # ###################
+    talents_all = client.query(
+        q.map_(
+            q.lambda_("talent", q.get(q.var("talent"))),
+            q.paginate(q.match(q.index("userType_index"), "Engineering Talent"),size=100)
+        )      
+    )["data"]
+    
+    # ##################################
+    # Call to talents matching key words
+    # ##################################
+    project_keywords= []
+    for project_id in user_data["data"]["projects"]:
+        for key in user_data["data"]["projects"][project_id]["keywords"]:
+            project_keywords.append(key["keyword"])
+    talents_matched = []
+    if (project_keywords != []):
+        for keyword in project_keywords:
+            try:
+                talent_ids = client.query(
+                    q.map_(
+                        q.lambda_("skill", q.get(q.var("skill"))),
+                        q.paginate(q.match(q.index("skill3_match_index"), keyword),size=100)
+                    )      
+                )["data"]
+            except:
+                talent_ids = []
+            for talent in talent_ids:
+                talent_data = client.query(q.get(q.ref(q.collection("users"), talent["data"]["user_id"])))
+                talents_matched.append(talent_data)
+                
+    # #####################
+    # Call to all bookmarks
+    # #####################         
+    bookmarks = client.query(q.get(q.match(q.index("bookmark_index"), user_id)))["data"]["bookmarks"]
+    bookmark_list = [list(i.values())[0] for i in bookmarks]
+    
+    return render_template(
+        "common/talent-list.html", 
+        user=user_data, 
+        talents=talents_all, 
+        matches=talents_matched,
+        bookmarks=bookmark_list)
 
 @app.route("/project-edit", methods=["GET","POST"])
 @login_required
@@ -912,19 +958,7 @@ def add_project_keyword():
         })
 
     
-@app.route("/talent", methods=["GET", "POST"])
-@login_required
-def talent():
-    user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
 
-    talents = client.query(
-        q.map_(
-            q.lambda_("talent", q.get(q.var("talent"))),
-            q.paginate(q.match(q.index("userType_index"), "Engineering Talent"),size=100)
-        )      
-    )["data"]
-    
-    return render_template("common/talent-list.html", user=user_data, talents=talents)
 
 @app.route("/project-details", methods=["GET", "POST"])
 @login_required

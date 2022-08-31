@@ -544,12 +544,12 @@ def add_application():
                 return '', 204
 
             return jsonify({
-            "status": "success",
-            "name": "git-branch-outline",
-            "text": "Un-Apply",
-            "auth": auth,
-            "title": "New Applicant!",
-            "body": project_title,
+                "status": "success",
+                "name": "git-branch-outline",
+                "text": "Un-Apply",
+                "auth": auth,
+                "title": "New Applicant!",
+                "body": project_title,
             })
         else:
             user_applications["data"]["applications"].remove({"project_id": project_id})
@@ -564,9 +564,9 @@ def add_application():
                 )
             )
             return jsonify({
-            "status": "success",
-            "name": "git-pull-request-outline",
-            "text": "Apply"            
+                "status": "success",
+                "name": "git-pull-request-outline",
+                "text": "Apply"            
             })
             
 @app.route('/new-applicant-notification', methods=["GET","POST"])
@@ -822,26 +822,31 @@ def talent():
         )      
     )["data"]
     
-    # Call to talents matching key words
+    # Call to talents with matching key words
     project_keywords= []
     for project_id in user_data["data"]["projects"]:
         for key in user_data["data"]["projects"][project_id]["keywords"]:
             project_keywords.append(key["keyword"])
-    talents_matched = []
-    if (project_keywords != []):
-        for keyword in project_keywords:
-            try:
-                talent_ids = client.query(
-                    q.map_(
-                        q.lambda_("skill", q.get(q.var("skill"))),
-                        q.paginate(q.match(q.index("skill3_match_index"), keyword),size=100)
-                    )      
-                )["data"]
-            except:
-                talent_ids = []
-            for talent in talent_ids:
-                talent_data = client.query(q.get(q.ref(q.collection("users"), talent["data"]["user_id"])))
-                talents_matched.append(talent_data)
+    try:
+        matched_skills = client.query(
+            q.map_(
+                q.lambda_("ref", q.get(q.var("ref"))),
+                q.paginate(
+                    q.union(
+                        q.map_(
+                            q.lambda_("element",q.match(q.index("skill3_match_index"), q.var("element"))),
+                            project_keywords
+                        )
+                    )
+                )
+            )
+        )["data"]
+    except:
+        matched_skills = []
+    talents_matched = [
+        client.query(q.get(q.ref(q.collection("users"), skill_doc["data"]["user_id"] ))
+            ) for skill_doc in matched_skills
+    ]
                 
     # Query User's Bookmarks
     bookmarks = client.query(q.get(q.match(q.index("bookmark_index"), user_id)))["data"]["bookmarks"]
@@ -855,7 +860,8 @@ def talent():
         user=user_data, 
         talents=talents_all, 
         matches=talents_matched,
-        bookmarks=bookmark_list)
+        bookmarks=bookmark_list
+        )
 
 @app.route("/project-edit", methods=["GET","POST"])
 @login_required

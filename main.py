@@ -306,7 +306,10 @@ def home():
     elif session["user"]['usertype'] == 'Engineering Talent':
          
         skills = client.query(q.get(q.match(q.index("skill_index"), user_data["ref"].id())))["data"]["skills"]
-        skills_list = [list(i.values())[0] for i in skills]
+        try:
+            skills_list = [list(i.values())[0] for i in skills]
+        except:
+            skills_list = []
         
         manager_match = []
         if (keyword != ""):
@@ -419,7 +422,6 @@ def profile_edit():
             if zipcode and city:
                 myLib.updateProfileLocation(zipcode, city)
      
-            
             if request.form['btn'] == 'Save':
                 return redirect(url_for('profile_details'))
 
@@ -442,15 +444,9 @@ def check_bookmark():
         except:
             bookmark_list = []
         if talent_id not in bookmark_list:     
-            return jsonify({
-            "status": "success",
-            "name": "bookmark-outline"
-            })
+            return jsonify({"status": "success","name": "bookmark-outline"})
         else:
-            return jsonify({
-            "status": "success",
-            "name": "bookmark"
-            })
+            return jsonify({"status": "success","name": "bookmark"})
     
     elif session["user"]['usertype'] == 'Engineering Talent':
         user_bookmarks = client.query(q.get(q.match(q.index("bookmark_index"), user_id)))
@@ -459,15 +455,9 @@ def check_bookmark():
         except:
             bookmark_list = []
         if project_id not in bookmark_list:     
-            return jsonify({
-            "status": "success",
-            "name": "bookmark-outline"
-            })
+            return jsonify({"status": "success","name": "bookmark-outline"})
         else:
-            return jsonify({
-            "status": "success",
-            "name": "bookmark"
-            })
+            return jsonify({"status": "success","name": "bookmark"})
 
 @app.route("/add-bookmark", methods=["POST"])
 @login_required
@@ -603,8 +593,6 @@ def new_applicant_notification():
     })
     
 
-
-
             
 @app.route("/check-application", methods=["POST"])
 @login_required
@@ -612,14 +600,12 @@ def check_application():
 
     user_id = session["user"]["id"]
     project_id  = request.args.get('project_id', None)
-    # project_email  = request.args.get('project_email', None)
-    # talent_id  = request.args.get('talent_id', None)
     
-    if session["user"]['usertype'] == 'Project Manager':
-        # Todo: bookmark talent!
-        return '', 204
+    # Todo: bookmark talent!
+    # if session["user"]['usertype'] == 'Project Manager':
+    #     return '', 204
     
-    elif session["user"]['usertype'] == 'Engineering Talent':
+    if session["user"]['usertype'] == 'Engineering Talent':
         user_applications = client.query(q.get(q.match(q.index("application_index"), user_id)))
         try:
             application_list = [list(i.values())[0] for i in user_applications["data"]["applications"]]
@@ -627,15 +613,15 @@ def check_application():
             application_list = []
         if project_id not in application_list:     
             return jsonify({
-            "status": "success",
-            "name": "git-pull-request-outline",
-            "text": "Apply"
+                "status": "success",
+                "name": "git-pull-request-outline",
+                "text": "Apply"
             })
         else:
             return jsonify({
-            "status": "success",
-            "name": "git-branch-outline",
-            "text": "Un-Apply"
+                "status": "success",
+                "name": "git-branch-outline",
+                "text": "Un-Apply"
             })
   
 @app.route("/experience-edit", methods=["GET","POST"])
@@ -776,7 +762,7 @@ def projects():
     user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
     user_id = session["user"]['id']
     
-    # ultimately, we dont want to pull up 200k managers here... Need to be more specific
+    # Query Project Managers (100)
     managers = client.query(
         q.map_(
             q.lambda_("project", q.get(q.var("project"))),
@@ -784,19 +770,42 @@ def projects():
         )      
     )["data"]
     
-    
+    # Query User's Bookmarks
     bookmarks = client.query(q.get(q.match(q.index("bookmark_index"), user_id)))["data"]["bookmarks"]
-    bookmark_list = [list(i.values())[0] for i in bookmarks]
+    try:
+        bookmark_list = [list(i.values())[0] for i in bookmarks]
+    except:
+        bookmark_list = []
     
+    # Query User's Applications
     applications = client.query(q.get(q.match(q.index("application_index"), user_id)))["data"]["applications"]
-    application_list = [list(i.values())[0] for i in applications]
+    try:
+        application_list = [list(i.values())[0] for i in applications]
+    except:
+        application_list = []
+    
+    # Query User's Skills
+    skills = client.query(q.get(q.match(q.index("skill_index"), user_id)))["data"]["skills"]
+    try:
+        skill_list = [list(i.values())[0] for i in skills]
+    except:
+        skill_list = []
+    
+    manager_match = []
+    for skill in skill_list:
+        for manager in managers:
+            for project_id in manager["data"]["projects"]:
+                for key in manager["data"]["projects"][project_id]["keywords"]:
+                    if key["keyword"] == skill:
+                        manager_match.append(manager)
 
     return render_template(
         "common/project-list.html", 
         user=user_data, 
         managers=managers, 
         bookmarks=bookmark_list, 
-        applications=application_list
+        applications=application_list, 
+        matches = manager_match
         )
     
 @app.route("/talent", methods=["GET", "POST"])
@@ -805,9 +814,7 @@ def talent():
     user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
     user_id = session["user"]['id']
 
-    # ###################
-    # Call to all talents
-    # ###################
+    # Query Engineering Talent (100)
     talents_all = client.query(
         q.map_(
             q.lambda_("talent", q.get(q.var("talent"))),
@@ -815,9 +822,7 @@ def talent():
         )      
     )["data"]
     
-    # ##################################
     # Call to talents matching key words
-    # ##################################
     project_keywords= []
     for project_id in user_data["data"]["projects"]:
         for key in user_data["data"]["projects"][project_id]["keywords"]:
@@ -838,11 +843,12 @@ def talent():
                 talent_data = client.query(q.get(q.ref(q.collection("users"), talent["data"]["user_id"])))
                 talents_matched.append(talent_data)
                 
-    # #####################
-    # Call to all bookmarks
-    # #####################         
+    # Query User's Bookmarks
     bookmarks = client.query(q.get(q.match(q.index("bookmark_index"), user_id)))["data"]["bookmarks"]
-    bookmark_list = [list(i.values())[0] for i in bookmarks]
+    try:
+        bookmark_list = [list(i.values())[0] for i in bookmarks]
+    except:
+        bookmark_list = []
     
     return render_template(
         "common/talent-list.html", 

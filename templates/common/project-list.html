@@ -14,7 +14,7 @@
 <style>
     .overflow {
         display: block;
-        width: 220px;
+        width: 240px;
         overflow: hidden;
         white-space: nowrap;
         text-overflow: ellipsis;
@@ -132,21 +132,28 @@
 
             <ul class="listview image-listview media mb-2">
 
-                <!-- loop here -->
+                {% for manager in matches %} {% for projectID in manager.data.projects %}
                 <li>
-                    <a href="#" class="item">
+                    <a href="{{ url_for('project_details', project_email = manager.data.account.email, project_id = projectID) }}" class="item">
                         <div class="imageWrapper">
-                            <img src="../static/assets/img/sample/photo/3.jpg" alt="image" class="imaged w64">
+                            {% if manager["data"]["projects"][projectID]["banner"]%}
+                            <img src='{{manager["data"]["projects"][projectID]["banner"]}}' alt="image" class="imaged w64">
+                            <!--  -->
+                            {% else %}
+                            <img src="../static/assets/img/sample/photo/wide0.jpg" alt="image" class="imaged w64">
+                            <!--  -->
+                            {% endif %}
                         </div>
                         <div class="in">
                             <div>
-                                Project Title
-                                <div class="text-muted">Division Name</div>
-                                <div class="text-muted">Project Manager Name</div>
+                                <div class="overflow">{{manager["data"]["projects"][projectID]["title"]}}</div>
+                                <div class="overflow mytext-muted">{{manager["data"]["projects"][projectID]["headline"]}}</div>
+                                <div class="overflow mytext-link">{{manager["data"]["projects"][projectID]["sponsor"]}}</div>
                             </div>
                         </div>
                     </a>
                 </li>
+                {% endfor %} {% endfor %}
 
             </ul>
 

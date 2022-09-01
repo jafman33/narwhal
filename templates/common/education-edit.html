@@ -24,12 +24,11 @@
             document.getElementById("start").value = startdate;
             '{% endif %}'
 
-            '{% if education.data.education.end != "Present" %}'
+            '{% if education.data.education.end != "Present" and education.data.education.end != "null" %}'
             var end = '{{education.data.education.end}}'
             const enddate = new Date(end).toISOString().slice(0, 10);
             document.getElementById("end").value = enddate;
             '{% endif %}'
-
 
             '{% if education.data.education.status == "Present" %}'
             document.getElementById("mystatus").click();

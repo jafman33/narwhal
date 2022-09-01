@@ -30,7 +30,6 @@ from pywebpush import webpush, WebPushException
 from flask_socketio import join_room
 from faunadb import query as q
 from faunadb.objects import Ref
-import uuid
 
 import myLib
 import json
@@ -786,6 +785,8 @@ def contacts():
 @login_required
 def profile_details():
     
+    contacts_data = []
+    skills_list = []
     user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
     email  = request.args.get('email', None)
     
@@ -801,11 +802,8 @@ def profile_details():
     
     profile_experience = myLib.getDocs("experience","experience_index",profile_id)
     profile_education = myLib.getDocs("education","education_index",profile_id)
-            
-    contacts_data = []
-    skills_list = []
+    profile_projects = myLib.getDocs("project","project_index",profile_id)
 
-    # get contacts
     try:
         contact_list = client.query(q.get(q.match(q.index("contact_index"), profile_id)))["data"]["contacts"]
     except:
@@ -823,7 +821,6 @@ def profile_details():
         )  
         
     if user_type == 'Program Manager':
-        profile_projects = myLib.getDocs("project","project_index",profile_id)
         if self:
             return render_template(
                 "pm/profile-pm-self.html", 

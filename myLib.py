@@ -51,7 +51,7 @@ def deleteItem(collection,id):
     
 
 def getMatches_byList(index, list):
-    client.query(
+    result = client.query(
         q.map_(
             q.lambda_("ref", q.get(q.var("ref"))),
             q.paginate(
@@ -64,6 +64,7 @@ def getMatches_byList(index, list):
             )
         )
     )["data"]
+    return result
 
     
 
@@ -77,12 +78,13 @@ def getDocs(var, index, id):
     return result
 
 def getCollection(var, collection):
-    client.query(
+    result = client.query(
         q.map_(
             q.lambda_(var, q.get(q.var(var))),
             q.paginate(q.documents(q.collection(collection)),size=100)
         )      
     )["data"]
+    return result
 
 def getDocsCount(var, index, id):
     result = client.query(
@@ -228,6 +230,7 @@ def newEducationsDoc():
                             "user_id": session["user"]["id"],
                             "education": {
                                 "start": "null",
+                                "end": "null",
                                 "school": "null",
                                 "degree": "null",
                                 "field": "null",

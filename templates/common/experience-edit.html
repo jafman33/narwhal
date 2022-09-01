@@ -25,7 +25,7 @@
             '{% endif %}'
 
 
-            '{% if experience.data.experience.end != "Present" %}'
+            '{% if experience.data.experience.end != "Present" and experience.data.experience.end != "null" %}'
             var end = '{{experience.data.experience.end}}'
             const enddate = new Date(end).toISOString().slice(0, 10);
             document.getElementById("end").value = enddate;

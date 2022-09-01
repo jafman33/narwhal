@@ -18,8 +18,6 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function(event) {
-
-
             '{% if project.data.project.start  != "null" %}'
             var start = '{{project.data.project.start}}'
             const startdate = new Date(start).toISOString().slice(0, 10);

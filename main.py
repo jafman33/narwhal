@@ -128,19 +128,15 @@ def home():
     count_dict = {}
         
     user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
-    
     user_experiencesNo = myLib.getDocsCount("experience","experience_index",user_id)
     user_educationsNo = myLib.getDocsCount("education","education_index",user_id)
     count_dict.update({"experiences":  user_experiencesNo})
     count_dict.update({"educations":  user_educationsNo})
 
-
     if session["user"]['usertype'] == 'Program Manager':
         user_projectsNo = myLib.getDocsCount("project","project_index",user_id)
         count_dict.update({"projects":  user_projectsNo})
 
-        
-        # Search skill by keyword - could be list in future
         matched_skills =  myLib.getDocs("skill","skill_match_index",keyword)
         talents_matched = [
             client.query(q.get(q.ref(q.collection("users"), talent["data"]["user_id"] ))
@@ -156,16 +152,13 @@ def home():
     
     elif session["user"]['usertype'] == 'Engineering Talent':
         
-        # Get user's skills
-        skills = client.query(q.get(q.match(q.index("skill_index"), user_data["ref"].id())))["data"]["skills"]
         try:
+            skills = client.query(q.get(q.match(q.index("skill_index"), user_data["ref"].id())))["data"]["skills"]
             skills_list = [list(i.values())[0] for i in skills]
         except:
             skills_list = []
             
-        # Search skill by keyword - could be list in future
         matched_projects = myLib.getDocs("project_keyword","project_keyword_index",keyword)
-            
         projects_matched = [
             client.query(q.get(q.ref(q.collection("projects"), projects["ref"].id() ))
             ) for projects in matched_projects
@@ -191,7 +184,6 @@ def profile_edit():
     user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
 
     if session["user"]['usertype'] == 'Program Manager':
-        
         if request.method == 'POST':   
             
             photo = request.files['file']
@@ -227,8 +219,7 @@ def profile_edit():
 
         return render_template("pm/profile-pm-edit.html", user=user_data)
     
-    elif session["user"]['usertype'] == 'Engineering Talent':
-                
+    elif session["user"]['usertype'] == 'Engineering Talent':   
         if request.method == 'POST':            
             
             photo = request.files['file']
@@ -265,8 +256,6 @@ def profile_edit():
                 return redirect(url_for('profile_details'))
 
         return render_template("talent/profile-talent-edit.html", user = user_data)
-    else:
-        return None
 
 @app.route("/check-bookmark", methods=["POST"])
 @login_required
@@ -277,8 +266,8 @@ def check_bookmark():
     talent_id  = request.args.get('talent_id', None)
     
     if session["user"]['usertype'] == 'Program Manager':
-        user_bookmarks = client.query(q.get(q.match(q.index("bookmark_index"), user_id)))
         try:
+            user_bookmarks = client.query(q.get(q.match(q.index("bookmark_index"), user_id)))
             bookmark_list = [list(i.values())[0] for i in user_bookmarks["data"]["bookmarks"]]
         except:
             bookmark_list = []
@@ -288,8 +277,8 @@ def check_bookmark():
             return jsonify({"status": "success","name": "bookmark"})
     
     elif session["user"]['usertype'] == 'Engineering Talent':
-        user_bookmarks = client.query(q.get(q.match(q.index("bookmark_index"), user_id)))
         try:
+            user_bookmarks = client.query(q.get(q.match(q.index("bookmark_index"), user_id)))
             bookmark_list = [list(i.values())[0] for i in user_bookmarks["data"]["bookmarks"]]
         except:
             bookmark_list = []
@@ -306,8 +295,8 @@ def add_bookmark():
     user_id  = request.args.get('user_id', None)
     
     if session["user"]['usertype'] == 'Program Manager':
-        user_bookmarks = client.query(q.get(q.match(q.index("bookmark_index"), session["user"]["id"])))
         try:
+            user_bookmarks = client.query(q.get(q.match(q.index("bookmark_index"), session["user"]["id"])))
             bookmark_list = [list(i.values())[0] for i in user_bookmarks["data"]["bookmarks"]]
         except:
             bookmark_list = []
@@ -321,8 +310,8 @@ def add_bookmark():
             return jsonify({"status": "success","name": "bookmark-outline"})
     
     elif session["user"]['usertype'] == 'Engineering Talent':
-        user_bookmarks = client.query(q.get(q.match(q.index("bookmark_index"), session["user"]["id"])))
         try:
+            user_bookmarks = client.query(q.get(q.match(q.index("bookmark_index"), session["user"]["id"])))
             bookmark_list = [list(i.values())[0] for i in user_bookmarks["data"]["bookmarks"]]
         except:
             bookmark_list = []
@@ -344,28 +333,15 @@ def add_application():
     user_id = session["user"]["id"]
     
     if session["user"]['usertype'] == 'Engineering Talent':
-        
-        user_applications = client.query(q.get(q.match(q.index("application_index"), user_id)))
-        # Create application list...
         try:
+            user_applications = client.query(q.get(q.match(q.index("application_index"), user_id)))
             application_list = [list(i.values())[0] for i in user_applications["data"]["applications"]]
         except:
             application_list = []
-        # ...and make sure new bookmark is not already on the list
+            
         if project_id not in application_list:     
-            # append the project bookmark
             user_applications["data"]["applications"].append({"project_id": project_id})
-            # Update the user's application document
-            client.query(
-                q.update(
-                    q.ref(q.collection("applications"), user_applications["ref"].id()),
-                    {
-                        "data": {
-                            "applications": user_applications["data"]["applications"]
-                        }
-                    },
-                )
-            )
+            myLib.updateUserApplications(user_applications["ref"].id(),user_applications["data"]["applications"])
 
             try:
                 auth = client.query(q.get(q.match(q.index("userEmail_index"), project_email)))["data"]["sub"]["keys"]["auth"]
@@ -430,10 +406,6 @@ def check_application():
     user_id = session["user"]["id"]
     project_id  = request.args.get('project_id', None)
     
-    # Todo: bookmark talent!
-    # if session["user"]['usertype'] == 'Program Manager':
-    #     return '', 204
-    
     if session["user"]['usertype'] == 'Engineering Talent':
         user_applications = client.query(q.get(q.match(q.index("application_index"), user_id)))
         try:
@@ -457,13 +429,12 @@ def check_application():
 @login_required
 def experience_edit():
     
+    user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
     id  = request.args.get('experience_id', None)
     erase  = request.args.get('erase', None)
     experience_data = []
     payload = {}
     
-    user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
-
     if not id:
         experience_data = myLib.newExperiencesDoc()
         id = experience_data["ref"].id()
@@ -475,7 +446,6 @@ def experience_edit():
         return redirect(url_for('profile_details'))
 
     if request.method == 'POST' and not erase:    
-    # data
         start = request.form['start']
         if start:
             date_time_obj = datetime.strptime(start, '%Y-%m-%d')
@@ -492,7 +462,6 @@ def experience_edit():
         company = request.form['company']  
         location = request.form['location']  
         status = request.form['status']  
-
         industry = request.form['industry']  
 
         payload.update({"title": title})
@@ -501,7 +470,6 @@ def experience_edit():
         payload.update({"location": location})
         payload.update({"status": status})
         payload.update({"industry": industry})
-
         myLib.updateExperienceDocument(id,payload)      
         
         if request.form['btn'] == 'Save and Back':
@@ -515,12 +483,11 @@ def experience_edit():
 @login_required
 def education_edit():
     
+    user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
     id  = request.args.get('education_id', None)
     erase  = request.args.get('erase', None)
     education_data = []
     payload = {}
-    
-    user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
 
     if not id:
         education_data = myLib.newEducationsDoc()
@@ -528,14 +495,12 @@ def education_edit():
     else:
         education_data = client.query(q.get(q.ref(q.collection("educations"), id)))
         
-            
     if request.method == 'POST' and erase:
         myLib.deleteItem("educations",id)
         return redirect(url_for('profile_details'))
 
     if request.method == 'POST' and not erase:
                 
-    # data
         start = request.form['start']
         if start:
             date_time_obj = datetime.strptime(start, '%Y-%m-%d')
@@ -557,7 +522,6 @@ def education_edit():
         payload.update({"degree": degree})
         payload.update({"field": field})
         payload.update({"status": status})
-                
         myLib.updateEducationDocument(id,payload)      
         
         if request.form['btn'] == 'Save and Back':
@@ -573,17 +537,10 @@ def projects():
     user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
     user_id = session["user"]['id']
     
-    # Query All Projects
-    projects_all = client.query(
-        q.map_(
-            q.lambda_("project", q.get(q.var("project"))),
-            q.paginate(q.documents(q.collection("projects")),size=100)
-        )      
-    )["data"]
+    projects_all = myLib.getCollection("project","projects")
     
-    # Query User's Bookmarks
-    bookmarks = client.query(q.get(q.match(q.index("bookmark_index"), user_id)))["data"]["bookmarks"]
     try:
+        bookmarks = client.query(q.get(q.match(q.index("bookmark_index"), user_id)))["data"]["bookmarks"]
         bookmark_list = [list(i.values())[0] for i in bookmarks]
     except:
         bookmark_list = []
@@ -592,9 +549,8 @@ def projects():
             ) for project_id in bookmark_list
     ]
 
-    # Query User's Applications
-    applications = client.query(q.get(q.match(q.index("application_index"), user_id)))["data"]["applications"]
     try:
+        applications = client.query(q.get(q.match(q.index("application_index"), user_id)))["data"]["applications"]
         application_list = [list(i.values())[0] for i in applications]
     except:
         application_list = []
@@ -603,29 +559,12 @@ def projects():
             ) for project_id in application_list
     ]
     
-    # Get user's project matches based on skills
-    skills = client.query(q.get(q.match(q.index("skill_index"), user_id)))["data"]["skills"]
     try:
+        skills = client.query(q.get(q.match(q.index("skill_index"), user_id)))["data"]["skills"]
         skills_list = [list(i.values())[0] for i in skills]
     except:
         skills_list = []
-        
-    try:
-        matched_projects = client.query(
-            q.map_(
-                q.lambda_("ref", q.get(q.var("ref"))),
-                q.paginate(
-                    q.union(
-                        q.map_(
-                            q.lambda_("element",q.match(q.index("project_keyword_index"), q.var("element"))),
-                            skills_list
-                        )
-                    )
-                )
-            )
-        )["data"]
-    except:
-        matched_projects = []
+    matched_projects = myLib.getMatches_byList("project_keyword_index", skills_list)
 
     return render_template(
         "common/project-list.html", 
@@ -659,43 +598,16 @@ def talent():
     user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
     user_id = session["user"]["id"]
 
-    # Query Engineering Talent (100)
     talents_all = myLib.getDocs("talent","user_type_index","Engineering Talent")
-    # talents_all = client.query(
-    #     q.map_(
-    #         q.lambda_("talent", q.get(q.var("talent"))),
-    #         q.paginate(q.match(q.index("user_type_index"), "Engineering Talent"),size=100)
-    #     )      
-    # )["data"]
-    
-    # Get All your projects and their key words
     user_projects = myLib.getDocs("project","project_index",user_id)
-    # user_projects = client.query(
-    #     q.map_(
-    #         q.lambda_("project", q.get(q.var("project"))),
-    #         q.paginate(q.match(q.index("project_index"), user_id),size=100)
-    #     )      
-    # )["data"]
     
-    # Find matches between user skills and project key words
+    # Find matches
     project_keywords= []
     for item in user_projects:
         for key in item["data"]["project"]["keywords"]:
             project_keywords.append(key["keyword"])
     try:
-        matched_docs = client.query(
-            q.map_(
-                q.lambda_("ref", q.get(q.var("ref"))),
-                q.paginate(
-                    q.union(
-                        q.map_(
-                            q.lambda_("element",q.match(q.index("skill_match_index"), q.var("element"))),
-                            project_keywords
-                        )
-                    )
-                )
-            )
-        )["data"]
+        matched_docs = myLib.getMatches_byList("skill_match_index", project_keywords)
     except:
         matched_docs = []
     talents_matched = [
@@ -704,8 +616,8 @@ def talent():
     ]
                 
     # Query User's Bookmarks
-    bookmarks = client.query(q.get(q.match(q.index("bookmark_index"), user_id)))["data"]["bookmarks"]
     try:
+        bookmarks = client.query(q.get(q.match(q.index("bookmark_index"), user_id)))["data"]["bookmarks"]
         bookmark_list = [list(i.values())[0] for i in bookmarks]
     except:
         bookmark_list = []
@@ -739,8 +651,8 @@ def project_edit():
         project_data = myLib.newProjectsDoc()
         id = project_data["ref"].id()
     else:
-        project_data = client.query(q.get(q.ref(q.collection("projects"), id)))
         try:
+            project_data = client.query(q.get(q.ref(q.collection("projects"), id)))
             keywords = project_data["data"]["project"]["keywords"]
             for key in keywords:
                 keyword_list.append(key["keyword"])
@@ -753,16 +665,12 @@ def project_edit():
 
     if request.method == 'POST' and not erase:
 
-        # banner
         banner = request.files['file']
         if banner.filename != '':
             if myLib.allowed_file(banner.filename):
                 bannerUrl = myLib.uploadPhotoS3(banner)
                 payload.update({"banner": bannerUrl})
-            else:
-                flash("Invalid File Name")
                 
-        # data
         start = request.form['start']  
         if start:
             date_time_obj = datetime.strptime(start, '%Y-%m-%d')
@@ -791,7 +699,6 @@ def project_edit():
         payload.update({"summary": summary})
         payload.update({"talent": talent})
         payload.update({"postdate": date})
-                
         myLib.updateProjectDocument(id,payload)                
         
         if request.form['btn'] == 'Save and Back':
@@ -816,12 +723,8 @@ def add_project_keyword():
             
         myLib.updateProjectKeys(id,updated_keys)
 
-        return jsonify({
-            "status": "successfully updated database",
-        })
-    return jsonify({
-            "status": "new project: ID has not been assigned",
-        })
+        return jsonify({"status": "successfully updated database",})
+    return jsonify({"status": "new project: ID has not been assigned",})
 
 
 @app.route('/update-skills', methods=["POST"])
@@ -836,17 +739,14 @@ def update_skills():
     json_data = request.get_json('skills_info')
     skills = json_data["skills_info"]
 
-    # Get user skills document - user_skills document will always exist! no need to try:
+    # Get user skills
     user_skills = client.query(q.get(q.match(q.index("skill_index"), user_id)))
     updated_skills = []
     for skill in skills:
         updated_skills.append({"skill": skill})
-        
     myLib.updateSkills(user_skills["ref"].id(),updated_skills)
     
-    return jsonify({
-        "status": "successfully updated database",
-    })
+    return jsonify({"status": "successfully updated database",})
     
 @app.route("/contacts", methods=["GET","POST"])
 @login_required
@@ -859,10 +759,8 @@ def contacts():
         user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
         user_id = session["user"]["id"]
 
-    
     contacts_data = []
     try:
-        # Get the chat list of all their contacts
         contact_list = client.query(q.get(q.match(q.index("contact_index"), user_id)))["data"]["contacts"]
     except:
         contact_list = []
@@ -901,30 +799,8 @@ def profile_details():
     user_type = session["user"]['usertype']
     profile_id = profile_data["ref"].id()
     
-    # maybe setup try method here?
     profile_experience = myLib.getDocs("experience","experience_index",profile_id)
-    # profile_experience = client.query(
-    #     q.map_(
-    #         q.lambda_("experience", q.get(q.var("experience"))),
-    #         q.paginate(q.match(q.index("experience_index"), str(profile_id)),size=100)
-    #     )      
-    # )["data"]
-    
     profile_education = myLib.getDocs("education","education_index",profile_id)
-    # profile_education = client.query(
-    #     q.map_(
-    #         q.lambda_("education", q.get(q.var("education"))),
-    #         q.paginate(q.match(q.index("education_index"), str(profile_id)),size=100)
-    #     )      
-    # )["data"]
-    
-    profile_projects = myLib.getDocs("project","project_index",profile_id)
-    # profile_projects = client.query(
-    #     q.map_(
-    #         q.lambda_("project", q.get(q.var("project"))),
-    #         q.paginate(q.match(q.index("project_index"), str(profile_id)),size=100)
-    #     )      
-    # )["data"]
             
     contacts_data = []
     skills_list = []
@@ -947,7 +823,7 @@ def profile_details():
         )  
         
     if user_type == 'Program Manager':
-
+        profile_projects = myLib.getDocs("project","project_index",profile_id)
         if self:
             return render_template(
                 "pm/profile-pm-self.html", 
@@ -979,7 +855,6 @@ def profile_details():
                 contacts = contacts_data, 
                 skills = json.dumps(skills_list)
                 )
-    
     elif user_type == 'Engineering Talent':
         if self:
             skills_list=myLib.getSkills(profile_id)
@@ -1013,28 +888,16 @@ def profile_details():
                 projects=profile_projects,
                 contacts = contacts_data
                 )
-        
-    else:
-      return None
-    
-
-
-    
-    
-
-
+            
 
 @app.route("/calendly/<user_email>", methods=["GET","POST"])
 @login_required
 def schedule(user_email):
-    
     try:
         user_data = client.query(q.get(q.match(q.index("userEmail_index"), user_email)))
     except:
         return 'user does not have calendly setup'
-
     return render_template("common/calendly.html", user=user_data, self = session)
-
 
 
 @app.route("/new-contact", methods=["POST"])
@@ -1046,26 +909,21 @@ def new_contact():
     
     # If user is trying to add their self, do nothing
     if new_contact == session["user"]["email"]:
-        # print('cant contact yourself!')
         return redirect(url_for("contacts"))
 
-    # If user tries to add an email which has not been registerd...
     try:
         new_contact_id = client.query(q.get(q.match(q.index("userEmail_index"), new_contact)))
-        # print('contact added')
     except:
         # need to alert here that contact was not found!
-        # currenlty just refreshes
-        # print('contact not found')
         return redirect(url_for("contacts"))
     
     # Get the contacts | related to both users
-    contacts = client.query(q.get(q.match(q.index("contact_index"), user_id)))
+    user_contacts = client.query(q.get(q.match(q.index("contact_index"), user_id)))
     recepient_contacts = client.query(q.get(q.match(q.index("contact_index"), new_contact_id["ref"].id())))
     
     # Check if the chat the user is trying to add has not been added before
     try:
-        contact_list = [list(i.values())[0] for i in contacts["data"]["contacts"]]
+        contact_list = [list(i.values())[0] for i in user_contacts["data"]["contacts"]]
     except:
         contact_list = []
 
@@ -1073,7 +931,7 @@ def new_contact():
         
         # Append the new chat to the chat list of the user
         room_id = str(int(new_contact_id["ref"].id()) + int(user_id))[-4:]
-        contacts["data"]["contacts"].append({
+        user_contacts["data"]["contacts"].append({
                 "user_id": new_contact_id["ref"].id(), 
                 "room_id": room_id
             }
@@ -1084,51 +942,20 @@ def new_contact():
         )
 
         # Update chat list for both users
-        client.query(
-            q.update(
-                q.ref(q.collection("contacts"), contacts["ref"].id()),
-                {
-                    "data": {
-                        "contacts": contacts["data"]["contacts"]
-                    }
-                },
-            )
-        )
-        client.query(
-            q.update(
-                q.ref(q.collection("contacts"), recepient_contacts["ref"].id()),
-                {
-                    "data": {
-                        "contacts": recepient_contacts["data"]["contacts"]
-                    }
-                },
-            )
-        )
-        client.query(
-            q.create(
-                q.collection("messages"),
-                {
-                    "data": {
-                        "room_id": room_id, "conversation": []
-                    }
-                },
-            )
-        )
+        myLib.updateUserContacts(user_contacts["ref"].id(),user_contacts["data"]["contacts"])
+        myLib.updateUserContacts(recepient_contacts["ref"].id(),recepient_contacts["data"]["contacts"])
+
+        # create new document for their conversations
+        myLib.newMessagesDoc(room_id)
 
     return redirect(url_for("contacts"))
 
-# @app.route("/save-project", methods=["POST"])
-# @login_required
-# def save_project():
-# # 
-#     return redirect(url_for("contacts"))
 
 @app.route("/text", methods=["GET","POST"])
 @login_required
 def text():
-        # Get the room id in the url or set to None
+    
     room_id = request.args.get("rid", None)
-    # Initialize context that contains information about the chat room
     data = []
     messages = []
 
@@ -1183,7 +1010,6 @@ def join_private_chat(data):
         "joined-chat",
         {"msg": f"{room} is now online."},
         room=room,
-        # include_self=False,
     )
 
 # Outgoing event handler
@@ -1209,7 +1035,11 @@ def chatting_event(json, methods=["GET", "POST"]):
     client.query(
         q.update(
             q.ref(q.collection("messages"), messages["ref"].id()),
-            {"data": {"conversation": conversation}},
+            {
+            "data": {
+                "conversation": conversation
+                }
+            },
         )
     )
     # Emit the message(s) sent to other users in the room

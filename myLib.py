@@ -47,6 +47,25 @@ def deleteItem(collection,id):
 )
     
 
+# def getMatches_byKey(index, key):
+    
+
+def getMatches_byList(index, list):
+    client.query(
+        q.map_(
+            q.lambda_("ref", q.get(q.var("ref"))),
+            q.paginate(
+                q.union(
+                    q.map_(
+                        q.lambda_("element",q.match(q.index(index), q.var("element"))),
+                        list
+                    )
+                )
+            )
+        )
+    )["data"]
+
+    
 
 def getDocs(var, index, id):
     result = client.query(
@@ -56,6 +75,14 @@ def getDocs(var, index, id):
         )      
     )["data"]
     return result
+
+def getCollection(var, collection):
+    client.query(
+        q.map_(
+            q.lambda_(var, q.get(q.var(var))),
+            q.paginate(q.documents(q.collection(collection)),size=100)
+        )      
+    )["data"]
 
 def getDocsCount(var, index, id):
     result = client.query(
@@ -69,8 +96,6 @@ def getDocsCount(var, index, id):
     return result
     
     
-
-    
 def getSkills(user_id):
     user_skills = client.query(q.get(q.match(q.index("skill_index"), user_id)))
     try:
@@ -82,7 +107,6 @@ def getSkills(user_id):
 
 
 # New Docs
-    
 def newCollectionDoc(collection,id):
     client.query(
         q.create(
@@ -95,6 +119,19 @@ def newCollectionDoc(collection,id):
             },
         )
     )
+    
+def newMessagesDoc(room_id):
+    client.query(
+            q.create(
+                q.collection("messages"),
+                {
+                    "data": {
+                        "room_id": room_id, 
+                        "conversation": []
+                    }
+                },
+            )
+        )
     
 def newUserDoc(type,firstname,lastname,email,password,date):
     user = client.query(
@@ -216,6 +253,30 @@ def updateUserBookmarks(id,bookmarks):
         )
     )
     
+def updateUserApplications(id,applications):
+    client.query(
+        q.update(
+            q.ref(q.collection("applications"), id),
+            {
+                "data": {
+                    "applications": applications
+                }
+            },
+        )
+    )
+  
+def updateUserContacts(id,contacts):
+    client.query(
+        q.update(
+            q.ref(q.collection("contacts"), id),
+            {
+                "data": {
+                    "contacts": contacts
+                }
+            },
+        )
+    )  
+
 
 def updateProfile(account_payload,profile_payload):
     client.query(

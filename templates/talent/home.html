@@ -58,8 +58,8 @@
     var availability = '{{ user.data.profile.availability }}';
     var phone = '{{ user.data.profile.phone }}';
 
-    var education = '{{ user.data.education|length }}';
-    var experience = '{{ user.data.experience|length }}';
+    var education = '{{ education.data.educations|length }}';
+    var experience = '{{ experience.data.experiences|length }}';
 
     var skills = new Array();
     skills = JSON.parse('{{skills|safe}}');
@@ -171,34 +171,25 @@
                     Search
                 </a>
 
-                {% for manager in managers %}
-                <!--  -->
-                {% for projectID in manager.data.projects %}
-                <!--  -->
-                {% if manager["data"]["projects"][projectID]["title"] %}
+                {% for item in projects %}
                 <div class="section mb-3">
 
-                    <a href="{{ url_for('project_details', project_email = manager.data.account.email, project_id = projectID) }}">
+                    <a href="#">
                         <div class="card">
-                            <img src='{{manager["data"]["projects"][projectID]["banner"]}}' class="card-img-top" alt="image">
+                            <img src='{{item.data.project.banner}}' class="card-img-top" alt="image">
                             <div class="card-body">
-                                <h2 class="card-subtitle m-0">{{manager["data"]["projects"][projectID]["title"]}}</h2>
+                                <h2 class="card-subtitle m-0">{{item.data.project.title}}</h2>
                                 <p class="text-muted m-0" style="font-size: 14px;">
-                                    {{manager["data"]["projects"][projectID]["headline"]}}
+                                    {{item.data.project.headline}}
                                 </p>
                                 <p class="card-text mt-0 mb-0" style="font-size: 14px;">
-                                    {{manager["data"]["projects"][projectID]["sponsor"]}}
+                                    {{item.data.project.sponsor}}
                                 </p>
                             </div>
                         </div>
                     </a>
 
                 </div>
-
-                {% endif %}
-                <!--  -->
-                {% endfor %}
-                <!--  -->
                 {% endfor %}
 
             </div>

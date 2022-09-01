@@ -207,45 +207,35 @@
             <div class="tab-pane fade show active" id="experience" role="tabpanel">
                 <div class="section m-2">
 
-
                     <h4>Experience
                         <a href="{{ url_for('experience_edit') }}">
                             <ion-icon name="create-outline"></ion-icon>
                         </a>
                     </h4>
-
-
                     <ul class="listview image-listview media flush transparent" style="margin-left: 0px;">
-                        {% for exp_id in profile["data"]["experience"] %}
+                        {% for item in experiences %}
                         <li>
-                            <a href="{{ url_for('experience_edit', experience_id = exp_id) }}" class="item">
+                            <a href="#" class="item">
                                 <div class="imageWrapper" style="margin-left:-15px;">
-                                    <!-- <img src="../static/assets/img/sample/photo/1.jpg" alt="image" class="imaged w64"> -->
                                     <ion-icon style="font-size:40px; --ionicon-stroke-width:15px; color:#1E74FD" name="id-card-outline"></ion-icon>
                                 </div>
                                 <div class="in">
                                     <div>
-                                        <div class="overflow">{{profile["data"]["experience"][exp_id]["company"]}}</div>
-                                        <div class="overflow mytext-muted">{{profile["data"]["experience"][exp_id]["title"]}}</div>
+                                        <div class="overflow">{{item.experience.company}}</div>
+                                        <div class="overflow mytext-muted">{{item.experience.title}}</div>
                                         <div class="overflow mytext-muted">
-                                            {{profile["data"]["experience"][exp_id]["start"]}} - {{profile["data"]["experience"][exp_id]["end"]}}
+                                            {{item.experience.start}} - {{item.experience.end}}
                                         </div>
                                     </div>
                                 </div>
                             </a>
                         </li>
-                        <!--  -->
                         {% endfor %}
                     </ul>
 
                 </div>
-
-
-
             </div>
             <!-- * experience -->
-
-
 
             <!--  education -->
             <div class="tab-pane fade" id="education" role="tabpanel">
@@ -256,23 +246,22 @@
                         </a>
                     </h4>
                     <ul class="listview image-listview media flush transparent mt-1 mb-1">
-                        {% for edu_id in profile["data"]["education"] %}
+                        {% for item in educations %}
                         <li class="mt-0 mb-0">
-                            <a href="{{ url_for('education_edit', education_id = edu_id) }}" class="item">
+                            <!-- url_for('education_edit', education_id = edu_id) -->
+                            <a href="#" class="item">
                                 <div class="imageWrapper" style="margin-left:-15px;">
-                                    <!-- <img src="../static/assets/img/sample/photo/1.jpg" alt="image" class="imaged w64"> -->
                                     <ion-icon style="font-size:40px; --ionicon-stroke-width:15px; color:#1E74FD" name="library-outline"></ion-icon>
                                 </div>
                                 <div class="in">
                                     <div>
-                                        <div class="overflow">{{profile["data"]["education"][edu_id]["school"]}}</div>
-                                        <div class="text-muted">{{profile["data"]["education"][edu_id]["field"]}}</div>
-                                        <div class="text-muted">{{profile["data"]["education"][edu_id]["degree"]}}</div>
+                                        <div class="overflow">{{item.education.school}}</div>
+                                        <div class="text-muted">{{item.education.field}}</div>
+                                        <div class="text-muted">{{item.education.degree}}</div>
                                     </div>
                                 </div>
                             </a>
                         </li>
-                        <!--  -->
                         {% endfor %}
                     </ul>
                 </div>
@@ -300,10 +289,6 @@
                             </a>
                         </li>
                     </ul>
-
-
-
-
 
                     <div class="tab-content mt-2">
 
@@ -380,18 +365,6 @@
                                     This content is under construction!
                                 </div>
                             </div>
-                            <!-- <ul class="listview image-listview flush transparent">
-                                <li class="multi-level">
-                                    <a href="#" class="item">
-                                        <img src="../static/assets/img/sample/avatar/avatar1.jpg" alt="image" class="image">
-                                        <div class="in">
-                                            <div>Dave</div>
-                                        </div>
-                                    </a>
-                                    <ul class="listview simple-listview transparent">
-                                        <p>text</p>
-                                    </ul>
-                            </ul> -->
 
                         </div>
                         <!-- *recommendations -->

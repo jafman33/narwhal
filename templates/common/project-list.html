@@ -93,140 +93,94 @@
         <div class="tab-pane active" id="all" role="tabpanel" aria-labelledby="all-tab">
 
             <ul class="listview image-listview media mb-2">
-
-                {% for manager in managers %}
-                <!--  -->
-                {% for projectID in manager.data.projects %}
-                <!--  -->
-                {% if manager["data"]["projects"][projectID]["title"] %}
+                {% for item in projects %}
                 <li>
-                    <a href="{{ url_for('project_details', project_email = manager.data.account.email, project_id = projectID) }}" class="item">
+                    <a href="{{ url_for('project_details', project_id = item.ref.id()) }}" class="item">
                         <div class="imageWrapper">
-                            {% if manager["data"]["projects"][projectID]["banner"]%}
-                            <img src='{{manager["data"]["projects"][projectID]["banner"]}}' alt="image" class="imaged w64">
-                            <!--  -->
-                            {% else %}
-                            <img src="../static/assets/img/sample/photo/wide0.jpg" alt="image" class="imaged w64">
-                            <!--  -->
-                            {% endif %}
+                            <img src='{{item.data.project.banner}}' alt="image" class="imaged w64">
                         </div>
                         <div class="in">
                             <div>
-                                <div class="overflow">{{manager["data"]["projects"][projectID]["title"]}}</div>
-                                <div class="overflow mytext-muted">{{manager["data"]["projects"][projectID]["headline"]}}</div>
-                                <div class="overflow mytext-link">{{manager["data"]["projects"][projectID]["sponsor"]}}</div>
+                                <div class="overflow">{{item.data.project.title}}</div>
+                                <div class="overflow mytext-muted">{{item.data.project.headline}}</div>
+                                <div class="overflow mytext-link">{{item.data.project.sponsor}}</div>
                             </div>
                         </div>
                     </a>
                 </li>
-                {% endif %}
-                <!--  -->
                 {% endfor %}
-                <!--  -->
-                {% endfor %}
-
             </ul>
-
         </div>
         <!-- * All Projects -->
 
         <!-- All Matches -->
         <div class="tab-pane" id="active" role="tabpanel" aria-labelledby="active-tab">
-
             <ul class="listview image-listview media mb-2">
-
-                {% for manager in matches %} {% for projectID in manager.data.projects %}
+                {% for item in matches %}
                 <li>
-                    <a href="{{ url_for('project_details', project_email = manager.data.account.email, project_id = projectID) }}" class="item">
+                    <a href="{{ url_for('project_details', project_id = item.ref.id()) }}" class="item">
                         <div class="imageWrapper">
-                            {% if manager["data"]["projects"][projectID]["banner"]%}
-                            <img src='{{manager["data"]["projects"][projectID]["banner"]}}' alt="image" class="imaged w64">
-                            <!--  -->
-                            {% else %}
-                            <img src="../static/assets/img/sample/photo/wide0.jpg" alt="image" class="imaged w64">
-                            <!--  -->
-                            {% endif %}
+                            <img src='{{item.data.project.banner}}' alt="image" class="imaged w64">
                         </div>
                         <div class="in">
                             <div>
-                                <div class="overflow">{{manager["data"]["projects"][projectID]["title"]}}</div>
-                                <div class="overflow mytext-muted">{{manager["data"]["projects"][projectID]["headline"]}}</div>
-                                <div class="overflow mytext-link">{{manager["data"]["projects"][projectID]["sponsor"]}}</div>
+                                <div class="overflow">{{item.data.project.title}}</div>
+                                <div class="overflow mytext-muted">{{item.data.project.headline}}</div>
+                                <div class="overflow mytext-link">{{item.data.project.sponsor}}</div>
                             </div>
                         </div>
                     </a>
                 </li>
-                {% endfor %} {% endfor %}
-
+                {% endfor %}
             </ul>
-
         </div>
         <!-- * All Matches -->
 
+        <!-- Bookmarks -->
         <div class="tab-pane" id="saved" role="tabpanel" aria-labelledby="saved-tab">
-
             <ul class="listview image-listview media mb-2">
-
-                {% for manager in managers %} {% for proj_id in bookmarks %} {% if manager["data"]["projects"][proj_id] %}
+                {% for item in bookmarks %}
                 <li>
-                    <a href="{{ url_for('project_details', project_email = manager.data.account.email, project_id = proj_id) }}" class="item">
+                    <a href="{{ url_for('project_details', project_id = item.ref.id()) }}" class="item">
                         <div class="imageWrapper">
-                            {% if manager["data"]["projects"][proj_id]["banner"] != ''%}
-                            <img src='{{manager["data"]["projects"][proj_id]["banner"]}}' alt="image" class="imaged w64">
-                            <!--  -->
-                            {% else %}
-                            <img src="../static/assets/img/sample/photo/wide0.jpg" alt="image" class="imaged w64">
-                            <!--  -->
-                            {% endif %}
+                            <img src='{{item.data.project.banner}}' alt="image" class="imaged w64">
                         </div>
                         <div class="in">
                             <div>
-                                <div class="overflow">{{manager["data"]["projects"][proj_id]["title"]}}</div>
-                                <div class="overflow mytext-muted">{{manager["data"]["projects"][proj_id]["headline"]}}</div>
-                                <div class="overflow mytext-link">{{manager["data"]["projects"][proj_id]["sponsor"]}}</div>
+                                <div class="overflow">{{item.data.project.title}}</div>
+                                <div class="overflow mytext-muted">{{item.data.project.headline}}</div>
+                                <div class="overflow mytext-link">{{item.data.project.sponsor}}</div>
                             </div>
                         </div>
                     </a>
                 </li>
-                {% endif %} {% endfor %} {% endfor %}
-
+                {% endfor %}
             </ul>
-
         </div>
+        <!-- * Bookmarks -->
 
+        <!-- Applied -->
         <div class="tab-pane" id="applied" role="tabpanel" aria-labelledby="applied-tab">
-
             <ul class="listview image-listview media mb-2">
-
-                <!-- loop here -->
-                {% for manager in managers %} {% for proj_id in applications %} {% if manager["data"]["projects"][proj_id] %}
+                {% for item in applications %}
                 <li>
-                    <a href="{{ url_for('project_details', project_email = manager.data.account.email, project_id = proj_id) }}" class="item">
+                    <a href="{{ url_for('project_details', project_id = item.ref.id()) }}" class="item">
                         <div class="imageWrapper">
-                            {% if manager["data"]["projects"][proj_id]["banner"] != ''%}
-                            <img src='{{manager["data"]["projects"][proj_id]["banner"]}}' alt="image" class="imaged w64">
-                            <!--  -->
-                            {% else %}
-                            <img src="../static/assets/img/sample/photo/wide0.jpg" alt="image" class="imaged w64">
-                            <!--  -->
-                            {% endif %}
+                            <img src='{{item.data.project.banner}}' alt="image" class="imaged w64">
                         </div>
                         <div class="in">
                             <div>
-                                <div class="overflow">{{manager["data"]["projects"][proj_id]["title"]}}</div>
-                                <div class="overflow mytext-muted">{{manager["data"]["projects"][proj_id]["headline"]}}</div>
-                                <div class="overflow mytext-link">{{manager["data"]["projects"][proj_id]["sponsor"]}}</div>
+                                <div class="overflow">{{item.data.project.title}}</div>
+                                <div class="overflow mytext-muted">{{item.data.project.headline}}</div>
+                                <div class="overflow mytext-link">{{item.data.project.sponsor}}</div>
                             </div>
                         </div>
                     </a>
                 </li>
-                <!--  -->
-                {% endif %} {% endfor %} {% endfor %}
-
-
+                {% endfor %}
             </ul>
-
         </div>
+        <!-- * Applied -->
 
     </div>
 

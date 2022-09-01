@@ -39,35 +39,56 @@ def updateProfilePhoto(url):
             )
         )
     
-def updateProjectBanner(id, url):
-    client.query(
-        q.update(
-            q.ref(q.collection("users"), session["user"]["id"]),
-            {
-                "data": {
-                    "projects": {
-                        id: {
-                            "banner": url,
-                            },
-                        },
-                    }
-                },
-            )
-        )
+
+
+# def newProjectDoc(collection,id):
+#     result = client.query(
+#         q.create(
+#             q.collection(collection),
+#             {
+#                 "data": {
+#                     "user_id": id,
+#                     "project": [],
+#                 }
+#             },
+#         )
+#     )
+#     return result
+
     
-def deleteItem(item,id):
-    client.query(
-        q.update(
-            q.ref(q.collection("users"), session["user"]["id"]),
+def newCollectionDoc(collection,id):
+    result = client.query(
+        q.create(
+            q.collection(collection),
             {
                 "data": {
-                    item: {
-                        id: None,
-                        },
+                    "user_id": id,
+                    collection: [],
+                }
+            },
+        )
+    )
+    return result
+    
+
+def updateProjectDocument(id, payload):
+    client.query(
+        q.update(
+            q.ref(q.collection("projects"), id),
+            {
+                "data": {
+                    "project": payload
                     }
                 },
             )
         )
+
+    
+def deleteItem(collection,id):
+    client.query(
+    q.delete(q.ref(q.collection(collection), id))
+)
+    
     
 def updateAccountName(firstname, lastname):
     client.query(
@@ -102,13 +123,11 @@ def updateProfileContact(phone, calendly = ""):
 def updateProjectKeys(id,keywordList):
     client.query(
             q.update(
-                q.ref(q.collection("users"), session["user"]["id"]),
+                q.ref(q.collection("projects"), id),
                 {
                     "data": {
-                        "projects": {
-                            id: {
+                        "project": {
                                 "keywords": keywordList,
-                                },
                             },
                         }
                     },
@@ -134,14 +153,6 @@ def getSkills(user_id):
     except:
         skills_list = []
     return skills_list
-
-def getProjectKeys(user_data,id):
-    project_keywords = user_data["data"]["projects"][id]
-    try:
-        keyword_list = [list(i.values())[0] for i in project_keywords["keywords"]]
-    except:
-        keyword_list = []
-    return keyword_list
 
 
 
@@ -242,4 +253,72 @@ def updateProfileLocation(zipcode,city):
                 },
             )
         )
+    
+def newUserDoc(type,firstname,lastname,email,password,date):
+    user = client.query(
+        q.create(
+            q.collection("users"),
+            {
+                "data": {
+                    "account": {
+                        "usertype": type,
+                        "firstname": firstname,
+                        "lastname": lastname,
+                        "email": email,
+                        "password": password,
+                        },
+                    "profile": {
+                        "photo": "https://bidztr.s3.amazonaws.com/65463811-61ff-49d0-a714-c93369649d94-docs-avatar.png",
+                        },
+                    "sub": {
+                        "keys": {
+                            "auth": "none",
+                            },
+                        },
+                    "date": date,
+                }
+            },
+        )
+    )
+    return user
+
+def newCollectionDoc(collection,id):
+    client.query(
+        q.create(
+            q.collection(collection),
+            {
+                "data": {
+                    "user_id": id,
+                    collection: [],
+                }
+            },
+        )
+    )
+    
+
+    
+# def newAuthorizationDoc(collection,id):
+#     client.query(
+#         q.create(
+#             q.collection(collection),
+#             {
+#                 "data": {
+#                     "user_id": id,
+#                     "keys": {
+#                         "auth": "null"
+#                     },
+#                 }
+#             },
+#         )
+#     )
+    
+def createSession(user):
+    session["user"] = {
+        "id": user["ref"].id(),
+        "firstname": user["data"]["account"]["firstname"],
+        "lastname": user["data"]["account"]["lastname"],
+        "email": user["data"]["account"]["email"],
+        "usertype": user["data"]["account"]["usertype"],
+        "loggedin": True,
+    }
     

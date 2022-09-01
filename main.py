@@ -1,4 +1,5 @@
 from curses import erasechar
+from platform import python_branch
 from urllib.parse import uses_relative
 from app import app
 from config import (
@@ -34,8 +35,7 @@ import uuid
 import myLib
 import json
 
-
-# Login decorator to ensure user is logged in before accessing certain routes
+# Decorator to ensure login before routing
 def login_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
@@ -46,210 +46,61 @@ def login_required(f):
     return decorated
 
 
-# Index route, this route redirects to login/register page
 @app.route("/", methods=["GET", "POST"])
 def index():
     return redirect(url_for("login"))
-
 
 # Register a new user and hash password
 @app.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "POST":
         
-        # To setup validator for email
         firstname = request.form["firstname"]
         lastname = request.form["lastname"]
         email = request.form["email"].strip().lower()
         password = request.form["password"]
         type = request.form["type"] 
         
-        # Make sure no ther user with similar credentials is already registered
         try:
             user = client.query(q.get(q.match(q.index("userEmail_index"), email)))
             if user:
                 flash("Email already exists.")
                 return redirect(url_for('register'))
-        
         except:
-            
             if not firstname or not lastname or not password or not email:
                 flash("Please fill out the form completely.")
                 return redirect(url_for('register'))
-            
             else:
-        
-            # Todo - add check for terms and conditions
-            
-            # make this USER TYPE specific!
-                if type == 'Engineering Talent':
-                    user = client.query(
-                        q.create(
-                            q.collection("users"),
-                            {
-                                "data": {
-                                    "account": {
-                                        "usertype": type,
-                                        "firstname": firstname,
-                                        "lastname": lastname,
-                                        "email": email,
-                                        "password": hashlib.sha512(password.encode()).hexdigest(),
-                                        },
-                                    "profile": {
-                                        "photo": "https://bidztr.s3.amazonaws.com/65463811-61ff-49d0-a714-c93369649d94-docs-avatar.png",
-                                        "phone": "",
-                                        "calendly": "",
-                                        "headline": "",
-                                        "summary": "",
-                                        "industry": "",
-                                        "zipcode": "",
-                                        "city": "",
-                                        },
-                                    "experience": {
-                                        },
-                                    "education": {
-                                        },
-                                    "sub": {
-                                        "keys": {
-                                            "auth": "null"
-                                            },
-                                        },
-                                    "date": datetime.now(pytz.UTC),
-                                }
-                            },
-                        )
-                    )
+                user = myLib.newUserDoc(
+                    type, firstname, lastname,email, 
+                    hashlib.sha512(password.encode()).hexdigest(),
+                    datetime.now(pytz.UTC)
+                )
+                myLib.newCollectionDoc("bookmarks",user["ref"].id())
+                myLib.newCollectionDoc("contacts",user["ref"].id())
+                # myLib.newCollectionDoc("educations",user["ref"].id())
+                # myLib.newCollectionDoc("experiences",user["ref"].id())
+                
+                if type == 'Engineering Talent': 
+                    myLib.newCollectionDoc("applications",user["ref"].id())
+                    myLib.newCollectionDoc("skills",user["ref"].id())
                     
-                    client.query(
-                            q.create(
-                                q.collection("applications"),
-                                {
-                                    "data": {
-                                        "user_id": user["ref"].id(),
-                                        "applications": [],
-                                    }
-                                },
-                            )
-                        )
-                
-                    client.query(
-                        q.create(
-                            q.collection("skills"),
-                            {
-                                "data": {
-                                    "user_id": user["ref"].id(),
-                                    "skills": [],
-                                }
-                            },
-                        )
-                    )
-                else:
-                    user = client.query(
-                        q.create(
-                            q.collection("users"),
-                            {
-                                "data": {
-                                    "account": {
-                                        "usertype": type,
-                                        "firstname": firstname,
-                                        "lastname": lastname,
-                                        "email": email,
-                                        "password": hashlib.sha512(password.encode()).hexdigest(),
-                                        },
-                                    "profile": {
-                                        "photo": "https://bidztr.s3.amazonaws.com/65463811-61ff-49d0-a714-c93369649d94-docs-avatar.png",
-                                        "phone": "",
-                                        "calendly": "",
-                                        "headline": "",
-                                        "summary": "",
-                                        "division": "",
-                                        "zipcode": "",
-                                        "city": "",
-                                        },
-                                    "projects": {
-                                        },
-                                    "experience": {
-                                        },
-                                    "education": {
-                                        },
-                                    "sub": {
-                                        "keys": {
-                                            "auth": "null"
-                                            },
-                                        },
-                                    "date": datetime.now(pytz.UTC),
-                                }
-                            },
-                        )
-                    )
-                
-                # Create a new chat list for newly registered user
-                client.query(
-                    q.create(
-                        q.collection("chats"),
-                        {
-                            "data": {
-                                "user_id": user["ref"].id(),
-                                "chat_list": [],
-                            }
-                        },
-                    )
-                )
-                
-                # Create a new chat list for newly registered user
-                client.query(
-                    q.create(
-                        q.collection("bookmarks"),
-                        {
-                            "data": {
-                                "user_id": user["ref"].id(),
-                                "bookmarks": [],
-                            }
-                        },
-                    )
-                )
-                
-                
-                # Create new session for newly logged in user
-                session["user"] = {
-                    "id": user["ref"].id(),
-                    "firstname": user["data"]["account"]["firstname"],
-                    "lastname": user["data"]["account"]["lastname"],
-                    "email": user["data"]["account"]["email"],
-                    "usertype": user["data"]["account"]["usertype"],
-                    "loggedin": True,
-                }
-                            
+                myLib.createSession(user)
                 return redirect(url_for("intro"))
             
     return render_template("common/register.html")
 
+
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
-        
-        # To add email validator here
         email = request.form["email"].strip().lower()
         password = request.form["password"]
-
         try:
-            # Query the data base for the inputed email address
             user = client.query(q.get(q.match(q.index("userEmail_index"), email)))
-            
             if (hashlib.sha512(password.encode()).hexdigest() == user["data"]["account"]["password"]):
-                
-                # Create new session for newly logged in user
-                session["user"] = {
-                    "id": user["ref"].id(),
-                    "firstname": user["data"]["account"]["firstname"],
-                    "lastname": user["data"]["account"]["lastname"],
-                    "email": user["data"]["account"]["email"],
-                    "usertype": user["data"]["account"]["usertype"],
-                    "loggedin": True,
-                }
-                            
+                myLib.createSession(user)   
                 return redirect(url_for("home"))
-        
             else:
                 raise Exception()
         except Exception as e:
@@ -258,19 +109,15 @@ def login():
     return render_template("common/login.html")
 
 
-
-# Register a new user and hash password
 @app.route("/intro", methods=["GET", "POST"])
 @login_required
 def intro():
-    if session["user"]['usertype'] == 'Project Manager':
+    if session["user"]['usertype'] == 'Program Manager':
         return render_template("pm/intro.html", user=session["user"])
     elif session["user"]['usertype'] == 'Engineering Talent':
         return render_template("talent/intro.html", user=session["user"])
     else:
         return None
-    
-    
 
 @app.route("/home", methods=["GET","POST"])
 @login_required
@@ -281,54 +128,69 @@ def home():
         keyword = request.form["keyword"]
         
     user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
+    user_experience = client.query(q.get(q.match(q.index("experience_index"), session["user"]['id'])))
+    user_education = client.query(q.get(q.match(q.index("education_index"), session["user"]['id'])))
 
-    if session["user"]['usertype'] == 'Project Manager':
+    if session["user"]['usertype'] == 'Program Manager':
+        user_projects = client.query(q.get(q.match(q.index("project_index"), session["user"]['id'])))
+        # Search skill by keyword - could be list in future
+        try:
+            matched_skills = client.query(
+                q.map_(
+                    q.lambda_("skill", q.get(q.var("skill"))),
+                    q.paginate(q.match(q.index("skill_match_index"), keyword),size=100)
+                )      
+            )["data"]
+        except:
+            matched_skills = []
+            
+        talents_matched = [
+            client.query(q.get(q.ref(q.collection("users"), talent["data"]["user_id"] ))
+            ) for talent in matched_skills
+        ]
         
-        # get all talents
-        talents = []
-        if (keyword != ""):
-            try:
-                talent_ids = client.query(
-                    q.map_(
-                        q.lambda_("skill", q.get(q.var("skill"))),
-                        q.paginate(q.match(q.index("skill3_match_index"), keyword),size=100)
-                    )      
-                )["data"]
-            except:
-                talent_ids = []
-
-            for talent in talent_ids:
-                talent_data = client.query(q.get(q.ref(q.collection("users"), talent["data"]["user_id"])))
-                talents.append(talent_data)
-        
-        return render_template("pm/home.html", user=user_data, talents = talents, keyword=keyword)
+        return render_template(
+            "pm/home.html",
+            user=user_data,
+            experience=user_experience,
+            education=user_education,
+            projects=user_projects,
+            talents = talents_matched, 
+            keyword=keyword)
     
     elif session["user"]['usertype'] == 'Engineering Talent':
-         
+        
+        # Get user's skills
         skills = client.query(q.get(q.match(q.index("skill_index"), user_data["ref"].id())))["data"]["skills"]
         try:
             skills_list = [list(i.values())[0] for i in skills]
         except:
             skills_list = []
-        
-        manager_match = []
-        if (keyword != ""):
-            managers = client.query(
+            
+        # Search skill by keyword - could be list in future
+        try:
+            matched_projects = client.query(
                 q.map_(
-                    q.lambda_("project", q.get(q.var("project"))),
-                    q.paginate(q.match(q.index("userType_index"), "Project Manager"),size=100)
+                    q.lambda_("project_keyword", q.get(q.var("project_keyword"))),
+                    q.paginate(q.match(q.index("project_keyword_index"), keyword),size=100)
                 )      
             )["data"]
+        except:
+            matched_projects = []
             
-            # horrible and non scalable.... 
-            # Really need to do it like we do talents, but no time... :(
-            for manager in managers:
-                for project_id in manager["data"]["projects"]:
-                    for key in manager["data"]["projects"][project_id]["keywords"]:
-                        if key["keyword"] == keyword:
-                            manager_match.append(manager)
+        projects_matched = [
+            client.query(q.get(q.ref(q.collection("projects"), projects["ref"].id() ))
+            ) for projects in matched_projects
+        ]
                 
-        return render_template("talent/home.html", user=user_data, managers = manager_match, skills = json.dumps(skills_list), keyword = keyword)
+        return render_template(
+            "talent/home.html", 
+            user=user_data,
+            experience=user_experience,
+            education=user_education,
+            projects = projects_matched,
+            skills = json.dumps(skills_list), 
+            keyword = keyword)
     else:
       return None
   
@@ -337,7 +199,7 @@ def home():
 @app.route("/profile-edit", methods=["GET","POST"])
 @login_required
 def profile_edit():
-    if session["user"]['usertype'] == 'Project Manager':
+    if session["user"]['usertype'] == 'Program Manager':
         # get values from fauna using id... pass them to render the form pre-populated
         user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
         
@@ -437,7 +299,7 @@ def check_bookmark():
     project_id  = request.args.get('project_id', None)
     talent_id  = request.args.get('talent_id', None)
     
-    if session["user"]['usertype'] == 'Project Manager':
+    if session["user"]['usertype'] == 'Program Manager':
         user_bookmarks = client.query(q.get(q.match(q.index("bookmark_index"), user_id)))
         try:
             bookmark_list = [list(i.values())[0] for i in user_bookmarks["data"]["bookmarks"]]
@@ -466,7 +328,7 @@ def add_bookmark():
     project_id  = request.args.get('project_id', None)
     user_id  = request.args.get('user_id', None)
     
-    if session["user"]['usertype'] == 'Project Manager':
+    if session["user"]['usertype'] == 'Program Manager':
         user_bookmarks = client.query(q.get(q.match(q.index("bookmark_index"), session["user"]["id"])))
         try:
             bookmark_list = [list(i.values())[0] for i in user_bookmarks["data"]["bookmarks"]]
@@ -502,10 +364,11 @@ def add_application():
 
     project_id  = request.args.get('project_id', None)
     project_email  = request.args.get('project_email', None)
+    
     # talent_id  = request.args.get('talent_id', None)
     user_id = session["user"]["id"]
     
-    if session["user"]['usertype'] == 'Project Manager':
+    if session["user"]['usertype'] == 'Program Manager':
         # Todo: bookmark talent!
         return '', 204
     
@@ -535,15 +398,9 @@ def add_application():
             )
 
             try:
-                pm_data = client.query(q.get(q.match(q.index("userEmail_index"), project_email)))["data"]
-                auth = pm_data["sub"]["keys"]["auth"]
-                project_title = pm_data["projects"][project_id]["title"]
-            except:
-                auth = ''
-                project_title = ''
-                return '', 204
-
-            return jsonify({
+                auth = client.query(q.get(q.match(q.index("userEmail_index"), project_email)))["data"]["sub"]["keys"]["auth"]
+                project_title = client.query(q.get(q.ref(q.collection("projects"), project_id)))["data"]["project"]["title"]
+                return jsonify({
                 "status": "success",
                 "name": "git-branch-outline",
                 "text": "Un-Apply",
@@ -551,6 +408,10 @@ def add_application():
                 "title": "New Applicant!",
                 "body": project_title,
             })
+            except:
+                print("[Warning]: Manager has not allowed push notifications")
+                return '', 204
+
         else:
             user_applications["data"]["applications"].remove({"project_id": project_id})
             client.query(
@@ -577,20 +438,21 @@ def new_applicant_notification():
     auth = data['auth']
     title = data['title']
     body = data['body']
-   
-    try:
-        subscription = client.query(q.get(q.match(q.index("sub_auth_index"), auth)))["data"]["sub"]
-    except:
-        return '', 204
-    results = trigger_push_notification(
-        subscription,
-        title,
-        body
-        )
-    return jsonify({
-        "status": "success",
-        "result": results
-    })
+    
+    if (auth != "null"):
+        try:
+            subscription = client.query(q.get(q.match(q.index("sub_auth_index"), auth)))["data"]["sub"]
+            print(subscription)
+            
+            results = trigger_push_notification(subscription,title,body)
+            return jsonify({
+                "status": "success",
+                "result": results
+            })
+        except:
+            print("[Error]: new_application_notification()")
+            return '', 204
+    
     
 
             
@@ -602,7 +464,7 @@ def check_application():
     project_id  = request.args.get('project_id', None)
     
     # Todo: bookmark talent!
-    # if session["user"]['usertype'] == 'Project Manager':
+    # if session["user"]['usertype'] == 'Program Manager':
     #     return '', 204
     
     if session["user"]['usertype'] == 'Engineering Talent':
@@ -762,11 +624,11 @@ def projects():
     user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
     user_id = session["user"]['id']
     
-    # Query Project Managers (100)
-    managers = client.query(
+    # Query All Projects
+    projects_all = client.query(
         q.map_(
             q.lambda_("project", q.get(q.var("project"))),
-            q.paginate(q.match(q.index("userType_index"), "Project Manager"),size=100)
+            q.paginate(q.documents(q.collection("projects")),size=100)
         )      
     )["data"]
     
@@ -776,65 +638,108 @@ def projects():
         bookmark_list = [list(i.values())[0] for i in bookmarks]
     except:
         bookmark_list = []
-    
+    print(bookmark_list)
+    projects_bookmarked = [
+        client.query(q.get(q.ref(q.collection("projects"), project_id))
+            ) for project_id in bookmark_list
+    ]
+
     # Query User's Applications
     applications = client.query(q.get(q.match(q.index("application_index"), user_id)))["data"]["applications"]
     try:
         application_list = [list(i.values())[0] for i in applications]
     except:
         application_list = []
+    projects_applied = [
+        client.query(q.get(q.ref(q.collection("projects"), project_id))
+            ) for project_id in application_list
+    ]
     
-    # Query User's Skills
+    # Get user's project matches based on skills
     skills = client.query(q.get(q.match(q.index("skill_index"), user_id)))["data"]["skills"]
     try:
-        skill_list = [list(i.values())[0] for i in skills]
+        skills_list = [list(i.values())[0] for i in skills]
     except:
-        skill_list = []
-    
-    manager_match = []
-    for skill in skill_list:
-        for manager in managers:
-            for project_id in manager["data"]["projects"]:
-                for key in manager["data"]["projects"][project_id]["keywords"]:
-                    if key["keyword"] == skill:
-                        manager_match.append(manager)
+        skills_list = []
+        
+    try:
+        matched_projects = client.query(
+            q.map_(
+                q.lambda_("ref", q.get(q.var("ref"))),
+                q.paginate(
+                    q.union(
+                        q.map_(
+                            q.lambda_("element",q.match(q.index("project_keyword_index"), q.var("element"))),
+                            skills_list
+                        )
+                    )
+                )
+            )
+        )["data"]
+    except:
+        matched_projects = []
 
     return render_template(
         "common/project-list.html", 
         user=user_data, 
-        managers=managers, 
-        bookmarks=bookmark_list, 
-        applications=application_list, 
-        matches = manager_match
+        projects=projects_all, 
+        bookmarks=projects_bookmarked, 
+        applications=projects_applied, 
+        matches=matched_projects
+        )
+    
+@app.route("/project-details", methods=["GET", "POST"])
+@login_required
+def project_details():
+    project_id  = request.args.get('project_id', None)
+    user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
+    project = client.query(q.get(q.ref(q.collection("projects"), project_id)))
+    owner_data = client.query(q.get(q.ref(q.collection("users"), project["data"]["user_id"])))
+    project_data = project["data"]["project"]
+    
+    return render_template(
+        "common/project-details.html", 
+        user = user_data, 
+        project=project_data, 
+        manager=owner_data,
+        id = project_id
         )
     
 @app.route("/talent", methods=["GET", "POST"])
 @login_required
 def talent():
     user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
-    user_id = session["user"]['id']
+    user_id = session["user"]["id"]
 
     # Query Engineering Talent (100)
     talents_all = client.query(
         q.map_(
             q.lambda_("talent", q.get(q.var("talent"))),
-            q.paginate(q.match(q.index("userType_index"), "Engineering Talent"),size=100)
+            q.paginate(q.match(q.index("user_type_index"), "Engineering Talent"),size=100)
         )      
     )["data"]
     
-    # Call to talents with matching key words
+    # Get All your projects and their key words
+    user_projects = client.query(
+        q.map_(
+            q.lambda_("project", q.get(q.var("project"))),
+            q.paginate(q.match(q.index("project_index"), user_id),size=100)
+        )      
+    )["data"]
+    
+    # Find matches between user skills and project key words
     project_keywords= []
-    for project_id in user_data["data"]["projects"]:
-        for key in user_data["data"]["projects"][project_id]["keywords"]:
+    for item in user_projects:
+        for key in item["data"]["project"]["keywords"]:
             project_keywords.append(key["keyword"])
     try:
-        matched_skills = client.query(
+        matched_docs = client.query(
             q.map_(
                 q.lambda_("ref", q.get(q.var("ref"))),
                 q.paginate(
                     q.union(
                         q.map_(
-                            q.lambda_("element",q.match(q.index("skill3_match_index"), q.var("element"))),
+                            q.lambda_("element",q.match(q.index("skill_match_index"), q.var("element"))),
                             project_keywords
                         )
                     )
@@ -842,10 +747,10 @@ def talent():
             )
         )["data"]
     except:
-        matched_skills = []
+        matched_docs = []
     talents_matched = [
-        client.query(q.get(q.ref(q.collection("users"), skill_doc["data"]["user_id"] ))
-            ) for skill_doc in matched_skills
+        client.query(q.get(q.ref(q.collection("users"), doc["data"]["user_id"] ))
+            ) for doc in matched_docs
     ]
                 
     # Query User's Bookmarks
@@ -854,13 +759,17 @@ def talent():
         bookmark_list = [list(i.values())[0] for i in bookmarks]
     except:
         bookmark_list = []
-    
+    talents_bookmarked = [
+        client.query(q.get(q.ref(q.collection("users"), user_id ))
+            ) for user_id in bookmark_list
+    ]
+
     return render_template(
         "common/talent-list.html", 
         user=user_data, 
         talents=talents_all, 
         matches=talents_matched,
-        bookmarks=bookmark_list
+        bookmarks=talents_bookmarked
         )
 
 @app.route("/project-edit", methods=["GET","POST"])
@@ -869,38 +778,66 @@ def project_edit():
     
     id  = request.args.get('project_id', None)
     erase  = request.args.get('erase', None)
-    keywords_list = []
-
+    date = datetime.today().strftime("%m/%d/%y")
+    keyword_list = []
+    project_data = []
+    payload = {}
+    
+    # if erase project button clicked
     if request.method == 'POST' and erase:
         myLib.deleteItem("projects",id)
         return redirect(url_for('profile_details'))
-    
+
     user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
-    
-    projectID = str(uuid.uuid4())
-    if id:
-        keywords_list=myLib.getProjectKeys(user_data, id)
-        projectID = id
+
+    # if no id, call new doc! and use this id!
+    if not id:
+        project_data = client.query(
+            q.create(
+                q.collection("projects"),
+                {
+                    "data": {
+                        "user_id": session["user"]["id"],
+                        "project": {
+                            "banner": "https://bidztr.s3.amazonaws.com/profile_photo-340335658474143823-cbdf807e-aae5-4bd3-a976-2fd1f1f8f7ba"
+                        },
+                    }
+                },
+            )
+        )
+        id = project_data["ref"].id()
+    else:
+        project_data = client.query(q.get(q.ref(q.collection("projects"), id)))
+        try:
+            keywords = project_data["data"]["project"]["keywords"]
+            for key in keywords:
+                keyword_list.append(key["keyword"])
+        except:
+            keyword_list = []
 
     if request.method == 'POST':
 
+        # banner
         banner = request.files['file']
         if banner.filename != '':
             if myLib.allowed_file(banner.filename):
                 bannerUrl = myLib.uploadPhotoS3(banner)
-                myLib.updateProjectBanner(projectID,bannerUrl)
+                payload.update({"banner": bannerUrl})
             else:
                 flash("Invalid File Name")
-         
+                
+        # data
         start = request.form['start']  
         if start:
             date_time_obj = datetime.strptime(start, '%Y-%m-%d')
             start = date_time_obj.strftime("%m/%d/%Y")
-        
+            payload.update({"start": start})
         end = request.form['end']  
+        
         if end and end != 'Present':
             date_time_obj = datetime.strptime(end, '%Y-%m-%d')
-            end = date_time_obj.strftime("%m/%d/%Y")
+            end = date_time_obj.strftime("%m/%d/%Y")   
+            payload.update({"end": end})
             
         sponsor = request.form['sponsor']
         title = request.form['title']  
@@ -910,45 +847,30 @@ def project_edit():
         summary = request.form['summary']
         talent = request.form['talent']
         
-            
-        if sponsor and title and headline and link and location and summary and start and end and talent:
-            client.query(
-                q.update(
-                    q.ref(q.collection("users"), session["user"]["id"]),
-                    {
-                        "data": {
-                            "projects": {
-                                projectID: {
-                                    "sponsor": sponsor,
-                                    "title": title,
-                                    "headline": headline,
-                                    "link": link,
-                                    "location": location,
-                                    "summary": summary,
-                                    "start": start,
-                                    "end": end,
-                                    "talent": talent,
-                                    "postdate": datetime.today().strftime("%m/%d/%y"),
-                                    },
-                                },
-                            }
-                        },
-                    )
-                )
+        payload.update({"sponsor": sponsor})
+        payload.update({"title": title})
+        payload.update({"title": title})
+        payload.update({"headline": headline})
+        payload.update({"link": link})
+        payload.update({"location": location})
+        payload.update({"summary": summary})
+        payload.update({"talent": talent})
+                
+        myLib.updateProjectDocument(id,payload)                
         
         if request.form['btn'] == 'Save and Back':
             return redirect(url_for('profile_details'))
         elif request.form['btn'] == 'Save and Add':
             return redirect(url_for('project_edit'))
-        else:
-            return '', 204
+
         
-    return render_template("pm/project-edit.html", user = user_data, id = id, keys=json.dumps(keywords_list))
+    return render_template("pm/project-edit.html", user = user_data, project=project_data, id = id, keys=json.dumps(keyword_list))
 
 
 @app.route('/add-keyword', methods=["POST"])
 def add_project_keyword():
     id  = request.args.get('project_id', None)
+    print(id)
     
     if id:
         json_data = request.get_json('keywords_info')
@@ -959,6 +881,8 @@ def add_project_keyword():
         updated_keys = []
         for key in keys:
             updated_keys.append({"keyword": key})
+        print(updated_keys)
+            
             
         myLib.updateProjectKeys(id,updated_keys)
 
@@ -972,24 +896,8 @@ def add_project_keyword():
     
 
 
-@app.route("/project-details", methods=["GET", "POST"])
-@login_required
-def project_details():
 
-    project_id  = request.args.get('project_id', None)
-    project_email  = request.args.get('project_email', None)
-    messages  = request.args.get('messages', None)
-        
-    project_data = client.query(q.get(q.match(q.index("userEmail_index"), project_email)))
-    user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
     
-    return render_template(
-        "common/project-details.html", 
-        user = user_data, 
-        project=project_data, 
-        id = project_id, 
-        email = project_email, 
-        messages=messages)
 
 @app.route('/update-skills', methods=["POST"])
 def update_skills():
@@ -1030,10 +938,10 @@ def contacts():
     contacts_data = []
     try:
         # Get the chat list of all their contacts
-        chat_list = client.query(q.get(q.match(q.index("chat_index"), user_id)))["data"]["chat_list"]
+        contact_list = client.query(q.get(q.match(q.index("contact_index"), user_id)))["data"]["contacts"]
     except:
-        chat_list = []
-    for contacts in chat_list:
+        contact_list = []
+    for contacts in contact_list:
         # Query the database to get the user name of users in a user's chat list
         contact_data = client.query(q.get(q.ref(q.collection("users"), contacts["user_id"])))["data"]
         contacts_data.append(
@@ -1055,31 +963,36 @@ def contacts():
 @login_required
 def profile_details():
     
+    user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
     email  = request.args.get('email', None)
+    
     if email:
         self = False
-        user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
         profile_data = client.query(q.get(q.match(q.index("userEmail_index"), email)))
-        print("viewing external profile")
     else:
         self = True
-        user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
         profile_data = user_data
-
+        
     user_type = session["user"]['usertype']
-    user_id = profile_data["ref"].id()
-    print(user_id)
-    
+    profile_id = profile_data["ref"].id()
+    profile_experience = client.query(q.get(q.match(q.index("experience_index"), profile_id)))["data"]["experiences"]
+    profile_education = client.query(q.get(q.match(q.index("education_index"), profile_id)))["data"]["educations"]
+    profile_projects = client.query(
+        q.map_(
+            q.lambda_("project", q.get(q.var("project"))),
+            q.paginate(q.match(q.index("project_index"), str(profile_id)),size=100)
+        )      
+    )["data"]
+            
     contacts_data = []
     skills_list = []
 
     # get contacts
     try:
-        chat_list = client.query(q.get(q.match(q.index("chat_index"), user_id)))["data"]["chat_list"]
+        contact_list = client.query(q.get(q.match(q.index("contact_index"), profile_id)))["data"]["contacts"]
     except:
-        chat_list = []
-    for contacts in chat_list:
-        # Query the database to get the user name of users in a user's chat list
+        contact_list = []
+    for contacts in contact_list:
         contact_data = client.query(q.get(q.ref(q.collection("users"), contacts["user_id"])))["data"]
         contacts_data.append(
             {
@@ -1091,24 +1004,75 @@ def profile_details():
             }
         )  
         
-    if user_type == 'Project Manager':
+    if user_type == 'Program Manager':
+        
+        
+
         if self:
-            return render_template("pm/profile-pm-self.html", type=user_type, user=user_data, profile=profile_data, contacts = contacts_data)
-        elif (not self and profile_data["data"]["account"]["usertype"] == 'Project Manager'):
-            return render_template("pm/profile-pm.html", type=user_type, user=user_data, profile=profile_data, contacts = contacts_data)
+            return render_template(
+                "pm/profile-pm-self.html", 
+                type=user_type, user=user_data, 
+                profile=profile_data, 
+                experiences=profile_experience, 
+                educations=profile_education, 
+                projects=profile_projects,
+                contacts = contacts_data
+                )
+        elif (not self and profile_data["data"]["account"]["usertype"] == 'Program Manager'):
+            return render_template(
+                "pm/profile-pm.html", 
+                type=user_type, user=user_data, 
+                profile=profile_data, 
+                experiences=profile_experience, 
+                educations=profile_education, 
+                projects=profile_projects,
+                contacts = contacts_data
+                )
         else:
-            skills_list=myLib.getSkills(user_id)
-            return render_template("talent/profile-talent.html", type=user_type, user=user_data, profile=profile_data, contacts = contacts_data, skills = json.dumps(skills_list))
+            skills_list=myLib.getSkills(profile_id)
+            return render_template(
+                "talent/profile-talent.html",
+                type=user_type, user=user_data, 
+                profile=profile_data, 
+                experiences=profile_experience, 
+                educations=profile_education, 
+                contacts = contacts_data, 
+                skills = json.dumps(skills_list)
+                )
     
     elif user_type == 'Engineering Talent':
         if self:
-            skills_list=myLib.getSkills(user_id)
-            return render_template("talent/profile-talent-self.html", type=user_type, user=user_data, profile=profile_data, contacts = contacts_data, skills = json.dumps(skills_list))
+            skills_list=myLib.getSkills(profile_id)
+            return render_template(
+                "talent/profile-talent-self.html", 
+                type=user_type, user=user_data, 
+                profile=profile_data, 
+                experiences=profile_experience, 
+                educations=profile_education, 
+                contacts = contacts_data, 
+                skills = json.dumps(skills_list)
+                )
         elif (not self and profile_data["data"]["account"]["usertype"] == 'Engineering Talent'):
-            skills_list=myLib.getSkills(user_id)
-            return render_template("talent/profile-talent.html", type=user_type, user=user_data, profile=profile_data, contacts = contacts_data, skills = json.dumps(skills_list))
+            skills_list=myLib.getSkills(profile_id)
+            return render_template(
+                "talent/profile-talent.html",
+                type=user_type, user=user_data, 
+                profile=profile_data, 
+                experiences=profile_experience, 
+                educations=profile_education, 
+                contacts = contacts_data, 
+                skills = json.dumps(skills_list)
+                )                 
         else:
-            return render_template("pm/profile-pm.html", type=user_type, user=user_data, profile=profile_data, contacts = contacts_data)
+            return render_template(
+                "pm/profile-pm.html",
+                type=user_type, user=user_data, 
+                profile=profile_data, 
+                experiences=profile_experience, 
+                educations=profile_education, 
+                projects=profile_projects,
+                contacts = contacts_data
+                )
         
     else:
       return None
@@ -1155,26 +1119,26 @@ def new_contact():
         # print('contact not found')
         return redirect(url_for("contacts"))
     
-    # Get the chats | related to both users
-    chats = client.query(q.get(q.match(q.index("chat_index"), user_id)))
-    recepient_chats = client.query(q.get(q.match(q.index("chat_index"), new_contact_id["ref"].id())))
+    # Get the contacts | related to both users
+    contacts = client.query(q.get(q.match(q.index("contact_index"), user_id)))
+    recepient_contacts = client.query(q.get(q.match(q.index("contact_index"), new_contact_id["ref"].id())))
     
     # Check if the chat the user is trying to add has not been added before
     try:
-        chat_list = [list(i.values())[0] for i in chats["data"]["chat_list"]]
+        contact_list = [list(i.values())[0] for i in contacts["data"]["contacts"]]
     except:
-        chat_list = []
+        contact_list = []
 
-    if new_contact_id["ref"].id() not in chat_list:
+    if new_contact_id["ref"].id() not in contact_list:
         
         # Append the new chat to the chat list of the user
         room_id = str(int(new_contact_id["ref"].id()) + int(user_id))[-4:]
-        chats["data"]["chat_list"].append({
+        contacts["data"]["contacts"].append({
                 "user_id": new_contact_id["ref"].id(), 
                 "room_id": room_id
             }
         )
-        recepient_chats["data"]["chat_list"].append({
+        recepient_contacts["data"]["contacts"].append({
             "user_id": user_id, "room_id": room_id
             }
         )
@@ -1182,20 +1146,20 @@ def new_contact():
         # Update chat list for both users
         client.query(
             q.update(
-                q.ref(q.collection("chats"), chats["ref"].id()),
+                q.ref(q.collection("contacts"), contacts["ref"].id()),
                 {
                     "data": {
-                        "chat_list": chats["data"]["chat_list"]
+                        "contacts": contacts["data"]["contacts"]
                     }
                 },
             )
         )
         client.query(
             q.update(
-                q.ref(q.collection("chats"), recepient_chats["ref"].id()),
+                q.ref(q.collection("contacts"), recepient_contacts["ref"].id()),
                 {
                     "data": {
-                        "chat_list": recepient_chats["data"]["chat_list"]
+                        "contacts": recepient_contacts["data"]["contacts"]
                     }
                 },
             )
@@ -1230,19 +1194,19 @@ def text():
 
     try:
         # Get the chat list for the user in the room i.e all of the people they have a chat histor with on the application
-        chat_list = client.query(q.get(q.match(q.index("chat_index"), session["user"]["id"])))["data"]["chat_list"]
+        contact_list = client.query(q.get(q.match(q.index("contact_index"), session["user"]["id"])))["data"]["contacts"]
     except:
-        chat_list = []
+        contact_list = []
 
-    for chats in chat_list:
-        if room_id == chats["room_id"]:
+    for contacts in contact_list:
+        if room_id == contacts["room_id"]:
             # Get all the message history 
             messages = client.query(q.get(q.match(q.index("message_index"), room_id)))["data"]["conversation"]
             # Get our contact's name
-            contact_data = client.query(q.get(q.ref(q.collection("users"), chats["user_id"])))
+            contact_data = client.query(q.get(q.ref(q.collection("users"), contacts["user_id"])))
             # Try to get the last message for the room
             try:
-                last_message = client.query(q.get(q.match(q.index("message_index"), chats["room_id"])))["data"]["conversation"][-1]["message"]
+                last_message = client.query(q.get(q.match(q.index("message_index"), contacts["room_id"])))["data"]["conversation"][-1]["message"]
             except:
                 last_message = "This place is empty. No messages ..."
             

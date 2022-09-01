@@ -123,8 +123,7 @@
         <div class="tab-pane" id="saved" role="tabpanel" aria-labelledby="saved-tab">
 
             <ul class="listview image-listview media mb-2">
-
-                {% for talent in talents %} {% for usr_id in bookmarks %} {% if talent.ref.id() == usr_id %}
+                {% for talent in bookmarks %}
                 <li>
                     <a href="{{ url_for('profile_details', email = talent.data.account.email) }}" class="item">
                         <div class="imageWrapper">
@@ -139,8 +138,7 @@
                         </div>
                     </a>
                 </li>
-                {% endif %} {% endfor %} {% endfor %}
-
+                {% endfor %}
             </ul>
 
         </div>

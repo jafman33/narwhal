@@ -32,20 +32,23 @@
             "{% endif %}"
             "{% endwith %}"
 
-            '{% if id != None %}'
-            var start = '{{user["data"]["projects"][id]["start"]}}'
+            '{% if project.data.project.start %}'
+            var start = '{{project.data.project.start}}'
             const startdate = new Date(start).toISOString().slice(0, 10);
             document.getElementById("start").value = startdate;
+            '{% endif %}'
 
-            var end = '{{user["data"]["projects"][id]["end"]}}'
+            '{% if project.data.project.end %}'
+            var end = '{{project.data.project.end}}'
             const enddate = new Date(end).toISOString().slice(0, 10);
             document.getElementById("end").value = enddate;
+            '{% endif %}'
 
-            '{% if user["data"]["projects"][id]["location"] == "Remote" %}'
+            '{% if project.data.project.location == "Remote" %}'
             document.getElementById("mystatus").click();
             '{% endif %}'
 
-            '{% endif %}'
+
 
         });
 
@@ -134,11 +137,8 @@
                 <div class="section-title">Project Banner</div>
                 <div class="wide-block pb-2 pt-2">
 
-                    <!-- <div class="row"> -->
-                    <!-- <div class="image-wrapper"> -->
-                    <!--  -->
-                    {% if id and user["data"]["projects"][id]["banner"]%}
-                    <img src='{{user["data"]["projects"][id]["banner"]}}' alt="image" class="imaged" style="width: 100%; height: 150px;">
+                    {% if project.data and project.data.project.banner %}
+                    <img src='{{project.data.project.banner}}' alt="image" class="imaged" style="width: 100%; height: 150px;">
                     <!--  -->
                     {% else %}
                     <div class="custom-file-upload" id="fileUpload">
@@ -167,8 +167,8 @@
                             <div class="input-wrapper">
                                 <label class="form-label" for="sponsor">Sponsor</label>
                                 <!--  -->
-                                {% if id %}
-                                <input type="text" class="form-control" id="sponsor" name="sponsor" value='{{ user["data"]["projects"][id]["sponsor"] }}' autocomplete="off">
+                                {% if project.data.project.sponsor %}
+                                <input type="text" class="form-control" id="sponsor" name="sponsor" value='{{ project.data.project.sponsor }}' autocomplete="off">
                                 <!--  -->
                                 {% else %}
                                 <input type="text" class="form-control" id="sponsor" name="sponsor" placeholder="Ex: US NAVY" autocomplete="off">
@@ -182,8 +182,8 @@
                             <div class="input-wrapper">
                                 <label class="form-label" for="title">Title</label>
                                 <!--  -->
-                                {% if id %}
-                                <input type="text" class="form-control" id="title" name="title" value='{{ user["data"]["projects"][id]["title"] }}' autocomplete="off">
+                                {% if project.data.project.title %}
+                                <input type="text" class="form-control" id="title" name="title" value='{{ project.data.project.title }}' autocomplete="off">
                                 <!--  -->
                                 {% else %}
                                 <input type="text" class="form-control" id="title" name="title" placeholder="Ex. Project Narwhal" autocomplete="off">
@@ -197,8 +197,8 @@
                             <div class="input-wrapper">
                                 <label class="form-label" for="headline">Headline</label>
                                 <!--  -->
-                                {% if id %}
-                                <input type="text" class="form-control" id="headline" name="headline" value='{{ user["data"]["projects"][id]["headline"] }}' autocomplete="off">
+                                {% if project.data.project.headline %}
+                                <input type="text" class="form-control" id="headline" name="headline" value='{{ project.data.project.headline }}' autocomplete="off">
                                 <!--  -->
                                 {% else %}
                                 <input type="text" class="form-control" id="headline" name="headline" placeholder="Ex. Creating the NAVY's Gig-Economy App" autocomplete="off">
@@ -212,8 +212,8 @@
                             <div class="input-wrapper">
                                 <label class="form-label" for="link">External Link</label>
                                 <!--  -->
-                                {% if id %}
-                                <input type="text" class="form-control" id="link" name="link" value='{{ user["data"]["projects"][id]["link"] }}' autocomplete="off">
+                                {% if project.data.project.link %}
+                                <input type="text" class="form-control" id="link" name="link" value='{{ project.data.project.link }}' autocomplete="off">
                                 <!--  -->
                                 {% else %}
                                 <input type="text" class="form-control" id="link" name="link" placeholder="External Link" autocomplete="off">
@@ -229,8 +229,8 @@
                                 <div class="row">
                                     <div class="col-8">
                                         <!--  -->
-                                        {% if id %}
-                                        <input type="text" class="form-control" id="location" name="location" value='{{ user["data"]["projects"][id]["location"] }}' autocomplete="off">
+                                        {% if project.data.project.location %}
+                                        <input type="text" class="form-control" id="location" name="location" value='{{ project.data.project.location }}' autocomplete="off">
                                         <!--  -->
                                         {% else %}
                                         <input type="text" class="form-control" id="location" name="location" placeholder="Ex: Atlanta" autocomplete="off">
@@ -252,8 +252,8 @@
                             <div class="input-wrapper">
                                 <label class="form-label" for="summary">Summary</label>
                                 <!--  -->
-                                {% if id %}
-                                <textarea id="summary" name="summary" rows="3" class="form-control">{{ user["data"]["projects"][id]["summary"] }}</textarea>
+                                {% if project.data.project.summary %}
+                                <textarea id="summary" name="summary" rows="3" class="form-control">{{ project.data.project.summary }}</textarea>
                                 <!--  -->
                                 {% else %}
                                 <textarea id="summary" name="summary" rows="3" class="form-control" placeholder="Write a summary of your project"></textarea>
@@ -290,8 +290,8 @@
                             <div class="input-wrapper">
                                 <label class="form-label" for="talent">Talent Request Description</label>
                                 <!--  -->
-                                {% if id %}
-                                <textarea id="talent" name="talent" rows="3" class="form-control">{{ user["data"]["projects"][id]["talent"] }}</textarea>
+                                {% if project.data.project.talent %}
+                                <textarea id="talent" name="talent" rows="3" class="form-control">{{ project.data.project.talent }}</textarea>
                                 <!--  -->
                                 {% else %}
                                 <textarea id="talent" name="talent" rows="3" class="form-control" placeholder="Summary of talent requested"></textarea>
@@ -345,10 +345,10 @@
     <div class="carousel-button-footer bg-white">
         <div class="row">
             <div class="col-6">
-                <input type="submit" class="btn btn-primary btn-block" name="btn" value="Save and Back" onclick='updateDatabase()'>
+                <input type="submit" class="btn btn-primary btn-block" name="btn" value="Save and Back">
             </div>
             <div class="col-6">
-                <input type="submit" class="btn btn-success btn-block" name="btn" value="Save and Add" onclick='updateDatabase()'>
+                <input type="submit" class="btn btn-success btn-block" name="btn" value="Save and Add">
             </div>
         </div>
 
@@ -369,19 +369,9 @@
             }
         });
 
-        function loadKeys(keys) {
-            keysStr = ''
-            keys.forEach(function(key) {
-                keysStr += '<div class="chip chip-primary ms-05 mb-05"><span class="chip-label">' +
-                    key +
-                    '</span><a href="#" class="chip-delete" onclick="deleteKey(\'' + key + '\')"><ion-icon name="close-circle"></ion-icon></a></div>';
-            });
-            document.getElementById("keysContainer").innerHTML = keysStr;
-        }
 
         function updateDatabase() {
-            console.log("made it to the update phase!")
-            fetch('{{ url_for("add_project_keyword", project_id=id) | safe }}', {
+            fetch('{{ url_for("add_project_keyword", project_id=id) }}', {
                     method: "POST",
                     body: JSON.stringify({
                         keywords_info: keys,
@@ -399,11 +389,10 @@
                 console.log("no empty key words")
                 return
             }
-            // make sure it doesnt already exist -- TODO
             keys.push(newKey)
             loadKeys(keys);
             document.getElementById("newKey").value = '';
-            // updateDatabase(keys)
+            updateDatabase(keys)
         }
 
         function deleteKey(key_id) {
@@ -411,11 +400,17 @@
                 return item !== key_id
             })
             loadKeys(keys);
-            // const element = document.getElementById("addBtn");
-            // element.scrollIntoView({
-            //     block: "end"
-            // });
-            // updateDatabase(keys)
+            updateDatabase(keys)
+        }
+
+        function loadKeys(keys) {
+            keysStr = ''
+            keys.forEach(function(key) {
+                keysStr += '<div class="chip chip-primary ms-05 mb-05"><span class="chip-label">' +
+                    key +
+                    '</span><a href="#" class="chip-delete" onclick="deleteKey(\'' + key + '\')"><ion-icon name="close-circle"></ion-icon></a></div>';
+            });
+            document.getElementById("keysContainer").innerHTML = keysStr;
         }
     </script>
 

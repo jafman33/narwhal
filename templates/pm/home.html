@@ -58,10 +58,10 @@
     var calendly = '{{ user.data.profile.calendly }}';
     var phone = '{{ user.data.profile.phone }}';
 
-    var education = '{{ user.data.education|length }}';
-    var experience = '{{ user.data.experience|length }}';
+    var experience = '{{ experience.data.experiences|length }}';
+    var education = '{{ education.data.educations|length }}';
 
-    var projects = '{{ user.data.projects|length }}';
+    var projects = '{{ projects.data.projects|length }}';
 
     var keyword = '{{keyword|safe}}';
 

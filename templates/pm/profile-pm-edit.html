@@ -14,92 +14,9 @@
     <link rel="apple-touch-icon" sizes="180x180" href="../static/assets/img/icon/192x192.png">
     <link rel="stylesheet" href="../static/assets/css/style.css">
     <link rel="manifest" href="../static/manifest/manifest.json">
-
-    <style>
-        .overflow {
-            display: block;
-            width: 220px;
-            overflow: hidden;
-            white-space: nowrap;
-            text-overflow: ellipsis;
-        }
-        
-        .mytext-muted {
-            font-size: 12px;
-            color: gray;
-            margin-bottom: 0px
-        }
-        
-        .mytext-link {
-            font-size: 12px;
-            color: #1E74FD;
-        }
-    </style>
-
-    <script>
-        document.addEventListener("DOMContentLoaded", function(event) {
-
-            // Error Message Toast 
-            "{% with messages = get_flashed_messages() %}"
-            "{% if messages %}"
-            "{% for message in messages %}"
-
-            if ("{{message}}" != '') {
-                toast();
-            };
-
-            "{% endfor %}"
-            "{% endif %}"
-            "{% endwith %}"
-
-        });
-
-        // Toast Append
-        function msgToast() {
-            var check = document.getElementById("msg-toast");
-            if (document.body.contains(check)) {
-                check.classList.add("show")
-            } else {
-                // Error Message Toast 
-                "{% with messages = get_flashed_messages() %}"
-                "{% if messages %}"
-                "{% for message in messages %}"
-                // You can change the text here
-                var msg = "{{ message }} ";
-                "{% endfor %}"
-                "{% endif %}"
-                "{% endwith %}"
-                pageBody.appendChild(document.createElement("div")).id = "msg-toast";
-                var toast = document.getElementById("msg-toast");
-                toast.className = "toast-box bg-primary toast-top tap-to-close";
-                toast.innerHTML =
-                    "<div class='in'>" +
-                    "<div class='text'>" +
-                    msg +
-                    "</div>" +
-                    "</div>"
-                setTimeout(() => {
-                    toastbox('msg-toast', 3000);
-                }, 500);
-            }
-        }
-
-        // Toast Function
-        function toast() {
-            msgToast();
-            var toast = document.getElementById("msg-toast")
-            toast.addEventListener("click", function() {
-                this.classList.remove("show")
-            })
-            setTimeout(() => {
-                toast.classList.remove("show")
-            }, 6000);
-        }
-    </script>
 </head>
 
 <body>
-
 
     <!-- loader -->
     <div id="loader">
@@ -135,9 +52,7 @@
                             <div class="image-wrapper text-center">
                                 <img src="{{user.data.profile.photo}}" alt="image" class="imaged" style="width: 150px; height: 150px;">
                             </div>
-                            <!-- </div> -->
 
-                            <!-- <div class="col-6"> -->
                             <div class="custom-file-upload" id="fileUpload" style="width:150px; margin:-150px auto 0 auto;">
                                 <input type="file" id="fileuploadInput" name="file" accept="image/*,.pdf" multiple="false">
                                 <label for="fileuploadInput">
@@ -180,14 +95,7 @@
                         <div class="form-group boxed">
                             <div class="input-wrapper">
                                 <label class="form-label" for="division">Division</label>
-                                <!--  -->
-                                {% if user.data.profile.division == '' %}
-                                <input type="text" class="form-control" id="division" name="division" placeholder="Enter your division" autocomplete="off">
-                                <!--  -->
-                                {% else %}
-                                <input type="text" class="form-control" id="division" name="division" value="{{ user.data.profile.division }}" autocomplete="off">
-                                <!--  -->
-                                {% endif %}
+                                <input type="text" class="form-control" id="division" name="division" autocomplete="off">
                                 <i class="clear-input"><ion-icon name="close-circle"></ion-icon></i>
                             </div>
                         </div>
@@ -211,29 +119,15 @@
                         <div class="form-group boxed">
                             <div class="input-wrapper">
                                 <label class="form-label" for="phone">Phone</label>
-                                <!--  -->
-                                {% if user.data.profile.phone == '' %}
-                                <input type="tel" class="form-control" id="phone" name="phone" placeholder="Enter your phone" autocomplete="off">
-                                <!--  -->
-                                {% else %}
-                                <input type="tel" class="form-control" id="phone" name="phone" value="{{user.data.profile.phone}}" autocomplete="off">
-                                <!--  -->
-                                {% endif %}
+                                <input type="tel" class="form-control" id="phone" name="phone" autocomplete="off">
                                 <i class="clear-input"><ion-icon name="close-circle"></ion-icon></i>
                             </div>
                         </div>
 
                         <div class="form-group boxed">
                             <div class="input-wrapper">
-                                <label class="form-label" for="calendly">Calendly [link]</label>
-                                <!--  -->
-                                {% if user.data.profile.calendly == '' %}
-                                <input type="text" class="form-control" id="calendly" name="calendly" placeholder="Enter your calendly" autocomplete="off">
-                                <!--  -->
-                                {% else %}
-                                <input type="text" class="form-control" id="calendly" name="calendly" value="{{user.data.profile.calendly}}" autocomplete="off">
-                                <!--  -->
-                                {% endif %}
+                                <label class="form-label" for="calendly">Calendly Link</label>
+                                <input type="text" class="form-control" id="calendly" name="calendly" autocomplete="off">
                                 <i class="clear-input"><ion-icon name="close-circle"></ion-icon></i>
                             </div>
                         </div>
@@ -250,14 +144,7 @@
                         <div class="form-group boxed">
                             <div class="input-wrapper">
                                 <label class="form-label" for="headline">Headline</label>
-                                <!--  -->
-                                {% if user.data.profile.headline == '' %}
-                                <input type="text" class="form-control" id="headline" name="headline" placeholder="Enter your headline" autocomplete="off">
-                                <!--  -->
-                                {% else %}
-                                <input type="text" class="form-control" id="headline" name="headline" value="{{user.data.profile.headline}}" autocomplete="off">
-                                <!--  -->
-                                {% endif %}
+                                <input type="text" class="form-control" id="headline" name="headline" autocomplete="off">
                                 <i class="clear-input"><ion-icon name="close-circle"></ion-icon></i>
                             </div>
                         </div>
@@ -265,14 +152,7 @@
                         <div class="form-group boxed">
                             <div class="input-wrapper">
                                 <label class="form-label" for="summary">Summary</label>
-                                <!--  -->
-                                {% if user.data.profile.summary == '' %}
-                                <textarea placeholder="Write a summary to highlight your personality or work experience" id="summary" name="summary" rows="3" class="form-control"></textarea>
-                                <!--  -->
-                                {% else %}
-                                <textarea id="summary" name="summary" rows="3" class="form-control">{{user.data.profile.summary}}</textarea>
-                                <!--  -->
-                                {% endif %}
+                                <textarea id="summary" name="summary" rows="3" class="form-control"></textarea>
                                 <i class="clear-input"><ion-icon name="close-circle"></ion-icon></i>
                             </div>
                         </div>
@@ -291,14 +171,7 @@
                         <div class="form-group boxed">
                             <div class="input-wrapper">
                                 <label class="form-label" for="zipcode">Zip Code</label>
-                                <!--  -->
-                                {% if user.data.profile.zipcode == '' %}
                                 <input type="text" class="form-control" id="zipcode" name="zipcode" placeholder="Enter your zip code" autocomplete="off">
-                                <!--  -->
-                                {% else %}
-                                <input type="text" class="form-control" id="zipcode" name="zipcode" value="{{ user.data.profile.zipcode }}" autocomplete="off">
-                                <!--  -->
-                                {% endif %}
                                 <i class="clear-input"><ion-icon name="close-circle"></ion-icon></i>
                             </div>
                         </div>
@@ -306,23 +179,13 @@
                         <div class="form-group boxed">
                             <div class="input-wrapper">
                                 <label class="form-label" for="city">City</label>
-                                <!--  -->
-                                {% if user.data.profile.city == '' %}
                                 <input type="text" class="form-control" id="city" name="city" placeholder="Enter your city" autocomplete="off">
-                                <!--  -->
-                                {% else %}
-                                <input type="text" class="form-control" id="city" name="city" value="{{ user.data.profile.city }}" autocomplete="off">
-                                <!--  -->
-                                {% endif %}
                                 <i class="clear-input"><ion-icon name="close-circle"></ion-icon></i>
                             </div>
                         </div>
 
                     </div>
-
                 </div>
-
-
 
             </div>
 
@@ -348,6 +211,78 @@
     <script src="../static/assets/js/plugins/progressbar-js/progressbar.min.js"></script>
     <!-- Base Js File -->
     <script src="../static/assets/js/base.js"></script>
+
+    <script>
+        var percent = 0;
+        var hrs = 0;
+        var firstname = '{{ user.data.account.firstname }}';
+        var lastname = '{{ user.data.account.lastname}}';
+        var phone = '{{ user.data.profile.phone }}';
+        var calendly = '{{ user.data.profile.calendly }}';
+        var headline = '{{ user.data.profile.headline }}';
+        var summary = '{{ user.data.profile.summary }}';
+        var division = '{{ user.data.profile.division }}';
+        var zipcode = '{{ user.data.profile.zipcode }}';
+        var city = '{{ user.data.profile.city }}';
+
+        document.addEventListener("DOMContentLoaded", function(event) {
+
+            if (firstname) {
+                document.getElementById("firstname").value = firstname;
+            } else {
+                document.getElementById("firstname").placeholder = "Firstname"
+            }
+
+            if (lastname) {
+                document.getElementById("lastname").value = lastname;
+            } else {
+                document.getElementById("lastname").placeholder = "Lastname"
+            }
+
+            if (phone != "null") {
+                document.getElementById("phone").value = phone;
+            } else {
+                document.getElementById("phone").placeholder = "Enter your phone"
+            }
+
+            if (calendly != "null") {
+                document.getElementById("calendly").value = calendly;
+            } else {
+                document.getElementById("calendly").placeholder = "Link to your calendly"
+            }
+
+            if (headline != "null") {
+                document.getElementById("headline").value = headline;
+            } else {
+                document.getElementById("headline").placeholder = "Profile headline"
+            }
+
+            if (summary != "null") {
+                document.getElementById("summary").value = summary;
+            } else {
+                document.getElementById("summary").placeholder = "Write a summary to highlight your personality or work experience"
+            }
+
+            if (division != "null") {
+                document.getElementById("division").value = division;
+            } else {
+                document.getElementById("division").placeholder = "Enter your division"
+            }
+
+            if (zipcode != "null") {
+                document.getElementById("zipcode").value = zipcode;
+            } else {
+                document.getElementById("zipcode").placeholder = "Enter your zipcode"
+            }
+
+            if (city != "null") {
+                document.getElementById("city").value = city;
+            } else {
+                document.getElementById("city").placeholder = "Enter your city"
+            }
+
+        });
+    </script>
 
 </body>
 

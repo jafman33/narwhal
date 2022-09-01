@@ -25,23 +25,7 @@ def uploadPhotoS3(photo):
     os.remove("static/tmp/"+filename)
     return url
 
-def updateProfilePhoto(url):
-    client.query(
-        q.update(
-            q.ref(q.collection("users"), session["user"]["id"]),
-            {
-                "data": {
-                    "profile": {
-                        "photo": url,
-                        },
-                    }
-                },
-            )
-        )
-    
-    
-
-    
+ 
 def newCollectionDoc(collection,id):
     result = client.query(
         q.create(
@@ -56,49 +40,122 @@ def newCollectionDoc(collection,id):
     )
     return result
     
-
-def updateProjectDocument(id, payload):
-    client.query(
-        q.update(
-            q.ref(q.collection("projects"), id),
-            {
-                "data": {
-                    "project": payload
-                    }
-                },
-            )
-        )
-    
-def updateExperienceDocument(id, payload):
-    client.query(
-        q.update(
-            q.ref(q.collection("experiences"), id),
-            {
-                "data": {
-                    "experience": payload
-                    }
-                },
-            )
-        )
-
-def updateEducationDocument(id,payload):
-    client.query(
-        q.update(
-            q.ref(q.collection("educations"), id),
-            {
-                "data": {
-                    "education": payload
-                    }
-                },
-            )
-        )
-
     
 def deleteItem(collection,id):
     client.query(
     q.delete(q.ref(q.collection(collection), id))
 )
     
+
+
+def getDocs(var, index, id):
+    result = client.query(
+        q.map_(
+            q.lambda_(var, q.get(q.var(var))),
+            q.paginate(q.match(q.index(index), str(id)),size=100)
+        )      
+    )["data"]
+    return result
+
+def getDocsCount(var, index, id):
+    result = client.query(
+        q.count(
+            q.map_(
+                q.lambda_(var, q.get(q.var(var))),
+                q.paginate(q.match(q.index(index), str(id)),size=100)
+            )
+        )  
+    )["data"]
+    return result
+    
+    
+
+    
+def getSkills(user_id):
+    user_skills = client.query(q.get(q.match(q.index("skill_index"), user_id)))
+    try:
+        skills_list = [list(i.values())[0] for i in user_skills["data"]["skills"]]
+    except:
+        skills_list = []
+    return skills_list
+
+
+
+# New Docs
+    
+def newCollectionDoc(collection,id):
+    client.query(
+        q.create(
+            q.collection(collection),
+            {
+                "data": {
+                    "user_id": id,
+                    collection: [],
+                }
+            },
+        )
+    )
+    
+def newUserDoc(type,firstname,lastname,email,password,date):
+    user = client.query(
+        q.create(
+            q.collection("users"),
+            {
+                "data": {
+                    "account": {
+                        "usertype": type,
+                        "firstname": firstname,
+                        "lastname": lastname,
+                        "email": email,
+                        "password": password,
+                        },
+                    "profile": {
+                        "photo": "https://bidztr.s3.amazonaws.com/65463811-61ff-49d0-a714-c93369649d94-docs-avatar.png",
+                        "phone": "null",
+                        "calendly": "null",
+                        "headline": "null",
+                        "summary": "null",
+                        "division": "null",
+                        "availability": "null",
+                        "industry": "null",
+                        "zipcode": "null",
+                        "city": "null",
+                        },
+                    "sub": {
+                        "keys": {
+                            "auth": "none",
+                            },
+                        },
+                    "date": date,
+                }
+            },
+        )
+    )
+    return user
+
+def newExperiencesDoc():
+    result = client.query(
+                q.create(
+                    q.collection("experiences"),
+                    {
+                        "data": {
+                            "user_id": session["user"]["id"],
+                            "experience": {
+                                "start": "null",
+                                "end": "null",
+                                "title": "null",
+                                "type": "null",
+                                "company": "null",
+                                "location": "null",    
+                                "status": "null",    
+                                "industry": "null",    
+                                },
+                        }
+                    },
+                )
+            )
+    return result
+
 def newProjectsDoc():
     result = client.query(
                 q.create(
@@ -145,79 +202,70 @@ def newEducationsDoc():
             )
     return result
 
-def getDocs(var, index, id):
-    result = client.query(
-        q.map_(
-            q.lambda_(var, q.get(q.var(var))),
-            q.paginate(q.match(q.index(index), str(id)),size=100)
-        )      
-    )["data"]
-    return result
+# updates
 
-def getDocsCount(var, index, id):
-    result = client.query(
-        q.count(
-            q.map_(
-                q.lambda_(var, q.get(q.var(var))),
-                q.paginate(q.match(q.index(index), str(id)),size=100)
-            )
-        )  
-    )["data"]
-    return result
-
-def newExperiencesDoc():
-    result = client.query(
-                q.create(
-                    q.collection("experiences"),
-                    {
-                        "data": {
-                            "user_id": session["user"]["id"],
-                            "experience": {
-                                "start": "null",
-                                "end": "null",
-                                "title": "null",
-                                "type": "null",
-                                "company": "null",
-                                "location": "null",    
-                                "status": "null",    
-                                "industry": "null",    
-                                },
-                        }
-                    },
-                )
-            )
-    return result
+def updateUserBookmarks(id,bookmarks):
+    client.query(
+        q.update(
+            q.ref(q.collection("bookmarks"), id),
+            {
+                "data": {
+                    "bookmarks": bookmarks
+                }
+            },
+        )
+    )
     
-def updateAccountName(firstname, lastname):
+
+def updateProfile(account_payload,profile_payload):
     client.query(
         q.update(
             q.ref(q.collection("users"), session["user"]["id"]),
             {
                 "data": {
-                    "account": {
-                        "firstname": firstname,
-                        "lastname": lastname,
-                        },
+                    "account": account_payload,
+                    "profile": profile_payload,
                     }
                 },
             )
         )
     
-def updateProfileContact(phone, calendly = ""):
+def updateProjectDocument(id, payload):
     client.query(
         q.update(
-            q.ref(q.collection("users"), session["user"]["id"]),
+            q.ref(q.collection("projects"), id),
             {
                 "data": {
-                    "profile": {
-                        "phone": phone,
-                        "calendly": calendly,
-                        },
+                    "project": payload
                     }
                 },
             )
         )
     
+def updateExperienceDocument(id, payload):
+    client.query(
+        q.update(
+            q.ref(q.collection("experiences"), id),
+            {
+                "data": {
+                    "experience": payload
+                    }
+                },
+            )
+        )
+
+def updateEducationDocument(id,payload):
+    client.query(
+        q.update(
+            q.ref(q.collection("educations"), id),
+            {
+                "data": {
+                    "education": payload
+                    }
+                },
+            )
+        )
+
 def updateProjectKeys(id,keywordList):
     client.query(
             q.update(
@@ -244,171 +292,8 @@ def updateSkills(id,skills):
             )
         )   
     
-def getSkills(user_id):
-    user_skills = client.query(q.get(q.match(q.index("skill_index"), user_id)))
-    try:
-        skills_list = [list(i.values())[0] for i in user_skills["data"]["skills"]]
-    except:
-        skills_list = []
-    return skills_list
-
-
-
-def updateUserBookmarks(id,bookmarks):
-    client.query(
-        q.update(
-            q.ref(q.collection("bookmarks"), id),
-            {
-                "data": {
-                    "bookmarks": bookmarks
-                }
-            },
-        )
-    )
+# session
     
-
-def updateProfileHeadline(headline):
-    client.query(
-        q.update(
-            q.ref(q.collection("users"), session["user"]["id"]),
-            {
-                "data": {
-                    "profile": {
-                        "headline": headline,
-                        },
-                    }
-                },
-            )
-        )
-    
-def updateProfileAvailability(availability):
-    client.query(
-        q.update(
-            q.ref(q.collection("users"), session["user"]["id"]),
-            {
-                "data": {
-                    "profile": {
-                        "availability": availability,
-                        },
-                    }
-                },
-            )
-        )
-    
-def updateProfileSummary(summary):
-    client.query(
-        q.update(
-            q.ref(q.collection("users"), session["user"]["id"]),
-            {
-                "data": {
-                    "profile": {
-                        "summary": summary,
-                        },
-                    }
-                },
-            )
-        )
-
-def updateProfileIndustry(industry):
-    client.query(
-        q.update(
-            q.ref(q.collection("users"), session["user"]["id"]),
-            {
-                "data": {
-                    "profile": {
-                        "industry": industry,
-                        },
-                    }
-                },
-            )
-        )
-    
-def updateProfileDivision(division):
-    client.query(
-        q.update(
-            q.ref(q.collection("users"), session["user"]["id"]),
-            {
-                "data": {
-                    "profile": {
-                        "division": division,
-                        },
-                    }
-                },
-            )
-        )
-    
-def updateProfileLocation(zipcode,city):
-    client.query(
-        q.update(
-            q.ref(q.collection("users"), session["user"]["id"]),
-            {
-                "data": {
-                    "profile": {
-                        "zipcode": zipcode,
-                        "city": city,
-                        },
-                    }
-                },
-            )
-        )
-    
-def newUserDoc(type,firstname,lastname,email,password,date):
-    user = client.query(
-        q.create(
-            q.collection("users"),
-            {
-                "data": {
-                    "account": {
-                        "usertype": type,
-                        "firstname": firstname,
-                        "lastname": lastname,
-                        "email": email,
-                        "password": password,
-                        },
-                    "profile": {
-                        "photo": "https://bidztr.s3.amazonaws.com/65463811-61ff-49d0-a714-c93369649d94-docs-avatar.png",
-                        },
-                    "sub": {
-                        "keys": {
-                            "auth": "none",
-                            },
-                        },
-                    "date": date,
-                }
-            },
-        )
-    )
-    return user
-
-def newCollectionDoc(collection,id):
-    client.query(
-        q.create(
-            q.collection(collection),
-            {
-                "data": {
-                    "user_id": id,
-                    collection: [],
-                }
-            },
-        )
-    )
-    
-
-    
-# def newAuthorizationDoc(collection,id):
-#     client.query(
-#         q.create(
-#             q.collection(collection),
-#             {
-#                 "data": {
-#                     "user_id": id,
-#                     "keys": {
-#                         "auth": "null"
-#                     },
-#                 }
-#             },
-#         )
-#     )
     
 def createSession(user):
     session["user"] = {

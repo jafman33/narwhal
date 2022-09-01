@@ -78,8 +78,6 @@ def register():
                 )
                 myLib.newCollectionDoc("bookmarks",user["ref"].id())
                 myLib.newCollectionDoc("contacts",user["ref"].id())
-                # myLib.newCollectionDoc("educations",user["ref"].id())
-                # myLib.newCollectionDoc("experiences",user["ref"].id())
                 
                 if type == 'Engineering Talent': 
                     myLib.newCollectionDoc("applications",user["ref"].id())
@@ -136,7 +134,6 @@ def home():
     count_dict.update({"experiences":  user_experiencesNo})
     count_dict.update({"educations":  user_educationsNo})
 
-    print(count_dict)
 
     if session["user"]['usertype'] == 'Program Manager':
         user_projectsNo = myLib.getDocsCount("project","project_index",user_id)
@@ -167,15 +164,7 @@ def home():
             skills_list = []
             
         # Search skill by keyword - could be list in future
-        try:
-            matched_projects = client.query(
-                q.map_(
-                    q.lambda_("project_keyword", q.get(q.var("project_keyword"))),
-                    q.paginate(q.match(q.index("project_keyword_index"), keyword),size=100)
-                )      
-            )["data"]
-        except:
-            matched_projects = []
+        matched_projects = myLib.getDocs("project_keyword","project_keyword_index",keyword)
             
         projects_matched = [
             client.query(q.get(q.ref(q.collection("projects"), projects["ref"].id() ))
@@ -197,91 +186,81 @@ def home():
 @app.route("/profile-edit", methods=["GET","POST"])
 @login_required
 def profile_edit():
+    account_payload = {}
+    profile_payload = {}
+    user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
+
     if session["user"]['usertype'] == 'Program Manager':
-        # get values from fauna using id... pass them to render the form pre-populated
-        user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
         
         if request.method == 'POST':   
-             
+            
             photo = request.files['file']
             if photo.filename != '' and myLib.allowed_file(photo.filename):
                 photoUrl = myLib.uploadPhotoS3(photo)
-                myLib.updateProfilePhoto(photoUrl)
+                profile_payload.update({"photo": photoUrl})
             
             firstname = request.form['firstname']
             lastname = request.form['lastname']  
-            if firstname and lastname:                
-                myLib.updateAccountName(firstname, lastname)
-            
             phone = request.form['phone']
             calendly = request.form['calendly']
-            if phone:              
-                myLib.updateProfileContact(phone, calendly)
-            
             headline = request.form['headline']
-            if headline:
-                myLib.updateProfileHeadline(headline)
-                
             summary = request.form['summary']
-            if summary:
-                myLib.updateProfileSummary(summary)
-                
             division = request.form['division']
-            if division:
-                myLib.updateProfileDivision(division)
-                
             zipcode = request.form['zipcode']
             city = request.form['city']
-            if zipcode and city:
-                myLib.updateProfileLocation(zipcode, city)
             
+            account_payload.update({"firstname": firstname})
+            account_payload.update({"lastname": lastname})
+            
+            profile_payload.update({"phone": phone})
+            profile_payload.update({"calendly": calendly})
+            profile_payload.update({"headline": headline})
+            profile_payload.update({"summary": summary})
+            profile_payload.update({"division": division})
+            profile_payload.update({"zipcode": zipcode})
+            profile_payload.update({"city": city})
+                    
+            myLib.updateProfile(account_payload,profile_payload)  
+                
             if request.form['btn'] == 'Save':
                 return redirect(url_for('profile_details'))
+
         return render_template("pm/profile-pm-edit.html", user=user_data)
     
     elif session["user"]['usertype'] == 'Engineering Talent':
-        
-        # get values from fauna using id... pass them to render the form pre-populated
-        user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
-        
+                
         if request.method == 'POST':            
             
             photo = request.files['file']
             if photo.filename != '' and myLib.allowed_file(photo.filename):
                 photoUrl = myLib.uploadPhotoS3(photo)
-                myLib.updateProfilePhoto(photoUrl)
+                profile_payload.update({"photo": photoUrl})
             
             firstname = request.form['firstname']
             lastname = request.form['lastname']  
-            if firstname and lastname:                
-                myLib.updateAccountName(firstname, lastname)
-            
             phone = request.form['phone']
             calendly = request.form['calendly']
-            if phone:              
-                myLib.updateProfileContact(phone, calendly)
-            
             headline = request.form['headline']
-            if headline:
-                myLib.updateProfileHeadline(headline)
-                
-            summary = request.form['summary']
-            if summary:
-                myLib.updateProfileSummary(summary)
-                
+            summary = request.form['summary']  
             availability = request.form['availability']
-            if availability:
-                myLib.updateProfileAvailability(availability)
-                
             industry = request.form['industry']
-            if industry:
-                myLib.updateProfileIndustry(industry)
-                
             zipcode = request.form['zipcode']
             city = request.form['city']
-            if zipcode and city:
-                myLib.updateProfileLocation(zipcode, city)
-     
+            
+            account_payload.update({"firstname": firstname})
+            account_payload.update({"lastname": lastname})
+            
+            profile_payload.update({"phone": phone})
+            profile_payload.update({"calendly": calendly})
+            profile_payload.update({"headline": headline})
+            profile_payload.update({"summary": summary})
+            profile_payload.update({"availability": availability})
+            profile_payload.update({"industry": industry})
+            profile_payload.update({"zipcode": zipcode})
+            profile_payload.update({"city": city})
+            
+            myLib.updateProfile(account_payload,profile_payload)  
+
             if request.form['btn'] == 'Save':
                 return redirect(url_for('profile_details'))
 
@@ -362,19 +341,12 @@ def add_application():
 
     project_id  = request.args.get('project_id', None)
     project_email  = request.args.get('project_email', None)
-    
-    # talent_id  = request.args.get('talent_id', None)
     user_id = session["user"]["id"]
     
-    if session["user"]['usertype'] == 'Program Manager':
-        # Todo: bookmark talent!
-        return '', 204
-    
-    elif session["user"]['usertype'] == 'Engineering Talent':
+    if session["user"]['usertype'] == 'Engineering Talent':
         
-        # Get user applications document
         user_applications = client.query(q.get(q.match(q.index("application_index"), user_id)))
-        # Create current application list...
+        # Create application list...
         try:
             application_list = [list(i.values())[0] for i in user_applications["data"]["applications"]]
         except:
@@ -399,13 +371,13 @@ def add_application():
                 auth = client.query(q.get(q.match(q.index("userEmail_index"), project_email)))["data"]["sub"]["keys"]["auth"]
                 project_title = client.query(q.get(q.ref(q.collection("projects"), project_id)))["data"]["project"]["title"]
                 return jsonify({
-                "status": "success",
-                "name": "git-branch-outline",
-                "text": "Un-Apply",
-                "auth": auth,
-                "title": "New Applicant!",
-                "body": project_title,
-            })
+                    "status": "success",
+                    "name": "git-branch-outline",
+                    "text": "Un-Apply",
+                    "auth": auth,
+                    "title": "New Applicant!",
+                    "body": project_title,
+                })
             except:
                 print("[Warning]: Manager has not allowed push notifications")
                 return '', 204
@@ -440,7 +412,6 @@ def new_applicant_notification():
     if (auth != "null"):
         try:
             subscription = client.query(q.get(q.match(q.index("sub_auth_index"), auth)))["data"]["sub"]
-            print(subscription)
             
             results = trigger_push_notification(subscription,title,body)
             return jsonify({
@@ -450,8 +421,6 @@ def new_applicant_notification():
         except:
             print("[Error]: new_application_notification()")
             return '', 204
-    
-    
 
             
 @app.route("/check-application", methods=["POST"])
@@ -618,7 +587,6 @@ def projects():
         bookmark_list = [list(i.values())[0] for i in bookmarks]
     except:
         bookmark_list = []
-    print(bookmark_list)
     projects_bookmarked = [
         client.query(q.get(q.ref(q.collection("projects"), project_id))
             ) for project_id in bookmark_list
@@ -692,20 +660,22 @@ def talent():
     user_id = session["user"]["id"]
 
     # Query Engineering Talent (100)
-    talents_all = client.query(
-        q.map_(
-            q.lambda_("talent", q.get(q.var("talent"))),
-            q.paginate(q.match(q.index("user_type_index"), "Engineering Talent"),size=100)
-        )      
-    )["data"]
+    talents_all = myLib.getDocs("talent","user_type_index","Engineering Talent")
+    # talents_all = client.query(
+    #     q.map_(
+    #         q.lambda_("talent", q.get(q.var("talent"))),
+    #         q.paginate(q.match(q.index("user_type_index"), "Engineering Talent"),size=100)
+    #     )      
+    # )["data"]
     
     # Get All your projects and their key words
-    user_projects = client.query(
-        q.map_(
-            q.lambda_("project", q.get(q.var("project"))),
-            q.paginate(q.match(q.index("project_index"), user_id),size=100)
-        )      
-    )["data"]
+    user_projects = myLib.getDocs("project","project_index",user_id)
+    # user_projects = client.query(
+    #     q.map_(
+    #         q.lambda_("project", q.get(q.var("project"))),
+    #         q.paginate(q.match(q.index("project_index"), user_id),size=100)
+    #     )      
+    # )["data"]
     
     # Find matches between user skills and project key words
     project_keywords= []
@@ -835,7 +805,6 @@ def project_edit():
 @app.route('/add-keyword', methods=["POST"])
 def add_project_keyword():
     id  = request.args.get('project_id', None)
-    print(id)
     
     if id:
         json_data = request.get_json('keywords_info')
@@ -933,26 +902,29 @@ def profile_details():
     profile_id = profile_data["ref"].id()
     
     # maybe setup try method here?
-    profile_experience = client.query(
-        q.map_(
-            q.lambda_("experience", q.get(q.var("experience"))),
-            q.paginate(q.match(q.index("experience_index"), str(profile_id)),size=100)
-        )      
-    )["data"]
+    profile_experience = myLib.getDocs("experience","experience_index",profile_id)
+    # profile_experience = client.query(
+    #     q.map_(
+    #         q.lambda_("experience", q.get(q.var("experience"))),
+    #         q.paginate(q.match(q.index("experience_index"), str(profile_id)),size=100)
+    #     )      
+    # )["data"]
     
-    profile_education = client.query(
-        q.map_(
-            q.lambda_("education", q.get(q.var("education"))),
-            q.paginate(q.match(q.index("education_index"), str(profile_id)),size=100)
-        )      
-    )["data"]
+    profile_education = myLib.getDocs("education","education_index",profile_id)
+    # profile_education = client.query(
+    #     q.map_(
+    #         q.lambda_("education", q.get(q.var("education"))),
+    #         q.paginate(q.match(q.index("education_index"), str(profile_id)),size=100)
+    #     )      
+    # )["data"]
     
-    profile_projects = client.query(
-        q.map_(
-            q.lambda_("project", q.get(q.var("project"))),
-            q.paginate(q.match(q.index("project_index"), str(profile_id)),size=100)
-        )      
-    )["data"]
+    profile_projects = myLib.getDocs("project","project_index",profile_id)
+    # profile_projects = client.query(
+    #     q.map_(
+    #         q.lambda_("project", q.get(q.var("project"))),
+    #         q.paginate(q.match(q.index("project_index"), str(profile_id)),size=100)
+    #     )      
+    # )["data"]
             
     contacts_data = []
     skills_list = []
@@ -1402,7 +1374,6 @@ def trigger_push_notification(sub, title, body):
                 extra.errno,
                 extra.message
             )
-        print(ex)
         return False
 
 # loop through all subscirptions and send all the clients a push notification

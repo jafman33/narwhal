@@ -168,16 +168,16 @@
                     <ul class="listview image-listview media flush transparent" style="margin-left: 0px;">
                         {% for item in experiences %}
                         <li>
-                            <a href="#" class="item">
+                            <a href="{{ url_for('experience_edit', experience_id = item.ref.id() ) }}" class="item">
                                 <div class="imageWrapper" style="margin-left:-15px;">
                                     <ion-icon style="font-size:40px; --ionicon-stroke-width:15px; color:#1E74FD" name="id-card-outline"></ion-icon>
                                 </div>
                                 <div class="in">
                                     <div>
-                                        <div class="overflow">{{item.experience.company}}</div>
-                                        <div class="overflow mytext-muted">{{item.experience.title}}</div>
+                                        <div class="overflow">{{item.data.experience.company}}</div>
+                                        <div class="overflow mytext-muted">{{item.data.experience.title}}</div>
                                         <div class="overflow mytext-muted">
-                                            {{item.experience.start}} - {{item.experience.end}}
+                                            {{item.data.experience.start}} - {{item.data.experience.end}}
                                         </div>
                                     </div>
                                 </div>
@@ -202,16 +202,15 @@
                     <ul class="listview image-listview media flush transparent mt-1 mb-1">
                         {% for item in educations %}
                         <li class="mt-0 mb-0">
-                            <!-- url_for('education_edit', education_id = edu_id) -->
-                            <a href="#" class="item">
+                            <a href="{{ url_for('education_edit', education_id = item.ref.id() ) }}" class="item">
                                 <div class="imageWrapper" style="margin-left:-15px;">
                                     <ion-icon style="font-size:40px; --ionicon-stroke-width:15px; color:#1E74FD" name="library-outline"></ion-icon>
                                 </div>
                                 <div class="in">
                                     <div>
-                                        <div class="overflow">{{item.education.school}}</div>
-                                        <div class="text-muted">{{item.education.field}}</div>
-                                        <div class="text-muted">{{item.education.degree}}</div>
+                                        <div class="overflow">{{item.data.education.school}}</div>
+                                        <div class="text-muted">{{item.data.education.field}}</div>
+                                        <div class="text-muted">{{item.data.education.degree}}</div>
                                     </div>
                                 </div>
                             </a>
@@ -264,31 +263,7 @@
 
 <script src="../static/assets/js/plugins/progressbar-js/progressbar.min.js"></script>
 
-<!-- <script>
-    // Availability
-    var percent = 0;
-    var hrs = 0;
-    var availabilityVal = '{{ profile.data.profile.availability }}';
 
-    document.addEventListener("DOMContentLoaded", function(event) {
-
-        if (availabilityVal) {
-            hrs = availabilityVal;
-            percent = hrs / 40;
-        }
-
-        var circleProgress1 = new ProgressBar.Circle(progress1, {
-            strokeWidth: 8,
-            easing: 'easeInOut',
-            duration: 2400,
-            color: '#1E74FD',
-            trailColor: '#E5E5E5',
-            trailWidth: 8,
-            svgStyle: null
-        });
-        circleProgress1.animate(percent); // percent
-    });
-</script> -->
 
 
 {% endblock %}

@@ -58,8 +58,11 @@
     var availability = '{{ user.data.profile.availability }}';
     var phone = '{{ user.data.profile.phone }}';
 
-    var education = '{{ education.data.educations|length }}';
-    var experience = '{{ experience.data.experiences|length }}';
+
+    var counter = new Array();
+    counter = JSON.parse('{{counter|safe}}');
+    var educations = counter.educations[0]
+    var experiences = counter.experiences[0]
 
     var skills = new Array();
     skills = JSON.parse('{{skills|safe}}');
@@ -99,8 +102,8 @@
 
         // Experience
         percent = 0;
-        if (experience > 0) {
-            for (let step = 0; step <= education; step++) {
+        if (experiences > 0) {
+            for (let step = 0; step < experiences; step++) {
                 percent += 50;
                 // if (percent > 99)
                 //     percent = 100;
@@ -114,8 +117,8 @@
 
         // Education
         percent = 0;
-        if (education > 0) {
-            for (let step = 0; step <= education; step++) {
+        if (educations > 0) {
+            for (let step = 0; step < educations; step++) {
                 percent += 50;
                 // if (percent > 99)
                 //     percent = 100;
@@ -174,7 +177,7 @@
                 {% for item in projects %}
                 <div class="section mb-3">
 
-                    <a href="#">
+                    <a href="{{url_for('project_details', project_id = item.ref.id())}}">
                         <div class="card">
                             <img src='{{item.data.project.banner}}' class="card-img-top" alt="image">
                             <div class="card-body">

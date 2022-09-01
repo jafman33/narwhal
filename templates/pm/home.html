@@ -58,10 +58,11 @@
     var calendly = '{{ user.data.profile.calendly }}';
     var phone = '{{ user.data.profile.phone }}';
 
-    var experience = '{{ experience.data.experiences|length }}';
-    var education = '{{ education.data.educations|length }}';
-
-    var projects = '{{ projects.data.projects|length }}';
+    var counter = new Array();
+    counter = JSON.parse('{{counter|safe}}');
+    var educations = counter.educations[0]
+    var experiences = counter.experiences[0]
+    var projects = counter.projects[0]
 
     var keyword = '{{keyword|safe}}';
 
@@ -98,8 +99,8 @@
 
         // Experience
         percent = 0;
-        if (experience > 0) {
-            for (let step = 0; step <= education; step++) {
+        if (experiences > 0) {
+            for (let step = 0; step < experiences; step++) {
                 percent += 50;
                 // if (percent > 99)
                 //     percent = 100;
@@ -113,8 +114,8 @@
 
         // Education
         percent = 0;
-        if (education > 0) {
-            for (let step = 0; step <= education; step++) {
+        if (educations > 0) {
+            for (let step = 0; step < educations; step++) {
                 percent += 50;
                 // if (percent > 99)
                 //     percent = 100;
@@ -130,7 +131,7 @@
         // Skills
         percent = 0;
         if (projects > 0) {
-            for (let step = 0; step <= projects; step++) {
+            for (let step = 0; step < projects; step++) {
                 percent += 100;
                 if (percent > 99)
                     percent = 100;

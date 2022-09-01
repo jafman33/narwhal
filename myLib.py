@@ -39,21 +39,7 @@ def updateProfilePhoto(url):
             )
         )
     
-
-
-# def newProjectDoc(collection,id):
-#     result = client.query(
-#         q.create(
-#             q.collection(collection),
-#             {
-#                 "data": {
-#                     "user_id": id,
-#                     "project": [],
-#                 }
-#             },
-#         )
-#     )
-#     return result
+    
 
     
 def newCollectionDoc(collection,id):
@@ -82,6 +68,30 @@ def updateProjectDocument(id, payload):
                 },
             )
         )
+    
+def updateExperienceDocument(id, payload):
+    client.query(
+        q.update(
+            q.ref(q.collection("experiences"), id),
+            {
+                "data": {
+                    "experience": payload
+                    }
+                },
+            )
+        )
+
+def updateEducationDocument(id,payload):
+    client.query(
+        q.update(
+            q.ref(q.collection("educations"), id),
+            {
+                "data": {
+                    "education": payload
+                    }
+                },
+            )
+        )
 
     
 def deleteItem(collection,id):
@@ -89,6 +99,94 @@ def deleteItem(collection,id):
     q.delete(q.ref(q.collection(collection), id))
 )
     
+def newProjectsDoc():
+    result = client.query(
+                q.create(
+                    q.collection("projects"),
+                    {
+                        "data": {
+                            "user_id": session["user"]["id"],
+                            "project": {
+                                "banner": "https://bidztr.s3.amazonaws.com/profile_photo-340335658474143823-cbdf807e-aae5-4bd3-a976-2fd1f1f8f7ba",
+                                "start": "null",
+                                "end": "null",
+                                "sponsor": "null",
+                                "title": "null",
+                                "headline": "null",
+                                "link": "null",
+                                "location": "null",
+                                "summary": "null",
+                                "talent": "null",
+                                "postdate": "null",
+                            },
+                        }
+                    },
+                )
+            )
+    return result
+    
+def newEducationsDoc():
+    result = client.query(
+                q.create(
+                    q.collection("educations"),
+                    {
+                        "data": {
+                            "user_id": session["user"]["id"],
+                            "education": {
+                                "start": "null",
+                                "school": "null",
+                                "degree": "null",
+                                "field": "null",
+                                "status": "null",
+                                },
+                        }
+                    },
+                )
+            )
+    return result
+
+def getDocs(var, index, id):
+    result = client.query(
+        q.map_(
+            q.lambda_(var, q.get(q.var(var))),
+            q.paginate(q.match(q.index(index), str(id)),size=100)
+        )      
+    )["data"]
+    return result
+
+def getDocsCount(var, index, id):
+    result = client.query(
+        q.count(
+            q.map_(
+                q.lambda_(var, q.get(q.var(var))),
+                q.paginate(q.match(q.index(index), str(id)),size=100)
+            )
+        )  
+    )["data"]
+    return result
+
+def newExperiencesDoc():
+    result = client.query(
+                q.create(
+                    q.collection("experiences"),
+                    {
+                        "data": {
+                            "user_id": session["user"]["id"],
+                            "experience": {
+                                "start": "null",
+                                "end": "null",
+                                "title": "null",
+                                "type": "null",
+                                "company": "null",
+                                "location": "null",    
+                                "status": "null",    
+                                "industry": "null",    
+                                },
+                        }
+                    },
+                )
+            )
+    return result
     
 def updateAccountName(firstname, lastname):
     client.query(

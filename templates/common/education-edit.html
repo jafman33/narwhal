@@ -18,81 +18,24 @@
     <script>
         document.addEventListener("DOMContentLoaded", function(event) {
 
-            // Error Message Toast 
-            "{% with messages = get_flashed_messages() %}"
-            "{% if messages %}"
-            "{% for message in messages %}"
-
-            if ("{{message}}" != '') {
-                toast();
-            };
-
-            "{% endfor %}"
-            "{% endif %}"
-            "{% endwith %}"
-
-            '{% if id != None %}'
-            var start = '{{user["data"]["education"][id]["start"]}}'
+            '{% if education.data.education.start != "null" %}'
+            var start = '{{education.data.education.start}}'
             const startdate = new Date(start).toISOString().slice(0, 10);
             document.getElementById("start").value = startdate;
+            '{% endif %}'
 
-            '{% if user["data"]["education"][id]["end"] != "Present" %}'
-            var end = '{{user["data"]["education"][id]["end"]}}'
+            '{% if education.data.education.end != "Present" %}'
+            var end = '{{education.data.education.end}}'
             const enddate = new Date(end).toISOString().slice(0, 10);
             document.getElementById("end").value = enddate;
             '{% endif %}'
 
 
-            '{% if user["data"]["education"][id]["status"] == "Present" %}'
+            '{% if education.data.education.status == "Present" %}'
             document.getElementById("mystatus").click();
             '{% endif %}'
 
-            '{% endif %}'
-
-
         });
-
-        // Toast Append
-        function msgToast() {
-            var check = document.getElementById("msg-toast");
-            if (document.body.contains(check)) {
-                check.classList.add("show")
-            } else {
-                // Error Message Toast 
-                "{% with messages = get_flashed_messages() %}"
-                "{% if messages %}"
-                "{% for message in messages %}"
-                // You can change the text here
-                var msg = "{{ message }} ";
-                "{% endfor %}"
-                "{% endif %}"
-                "{% endwith %}"
-                pageBody.appendChild(document.createElement("div")).id = "msg-toast";
-                var toast = document.getElementById("msg-toast");
-                toast.className = "toast-box bg-primary toast-top tap-to-close";
-                toast.innerHTML =
-                    "<div class='in'>" +
-                    "<div class='text'>" +
-                    msg +
-                    "</div>" +
-                    "</div>"
-                setTimeout(() => {
-                    toastbox('msg-toast', 3000);
-                }, 500);
-            }
-        }
-
-        // Toast Function
-        function toast() {
-            msgToast();
-            var toast = document.getElementById("msg-toast")
-            toast.addEventListener("click", function() {
-                this.classList.remove("show")
-            })
-            setTimeout(() => {
-                toast.classList.remove("show")
-            }, 6000);
-        }
     </script>
 </head>
 
@@ -114,14 +57,14 @@
         </div>
         <div class="pageTitle">Edit Education</div>
         <div class="right">
-            <!--  -->{% if id %}
+
             <form action="{{ url_for('education_edit', education_id = id, erase = 'True') }}" method="POST">
                 <input hidden type="text" name="trash" id="trash" value="trash">
                 <button type="input" class="headerButton" style="background: transparent !important; border-width: 0px !important;">
                     <ion-icon name="trash-outline"></ion-icon>            
                 </button>
             </form>
-            <!--  -->{% endif %}
+
         </div>
     </div>
     <!-- * App Header -->
@@ -142,8 +85,8 @@
                             <div class="input-wrapper">
                                 <label class="form-label" for="school">School</label>
                                 <!--  -->
-                                {% if id %}
-                                <input type="text" class="form-control" id="school" name="school" value='{{ user["data"]["education"][id]["school"] }}' autocomplete="off">
+                                {% if education.data.education.school != 'null' %}
+                                <input type="text" class="form-control" id="school" name="school" value='{{ education.data.education.school }}' autocomplete="off">
                                 <!--  -->
                                 {% else %}
                                 <input type="text" class="form-control" id="school" name="school" placeholder="Ex: Georgia Tech" autocomplete="off">
@@ -157,9 +100,9 @@
                             <div class="input-wrapper">
                                 <label class="form-label" for="degree">Degree</label>
                                 <!--  -->
-                                {% if id %}
+                                {% if education.data.education.degree != 'null' %}
                                 <select class="form-control form-select" id="degree" name="degree">
-                                    <option value='{{ user["data"]["education"][id]["degree"] }}'>{{ user["data"]["education"][id]["degree"] }}</option>
+                                    <option value='{{ education.data.education.degree }}'>{{ education.data.education.degree }}</option>
                                     <option value="Associates">Associates</option>
                                     <option value="Bachelors">Bachelors</option>
                                     <option value="Masters">Masters</option>
@@ -184,8 +127,8 @@
                             <div class="input-wrapper">
                                 <label class="form-label" for="field">Field of Study</label>
                                 <!--  -->
-                                {% if id %}
-                                <input type="text" class="form-control" id="field" name="field" value='{{ user["data"]["education"][id]["field"] }}' autocomplete="off">
+                                {% if education.data.education.field != 'null' %}
+                                <input type="text" class="form-control" id="field" name="field" value='{{ education.data.education.field }}' autocomplete="off">
                                 <!--  -->
                                 {% else %}
                                 <input type="text" class="form-control" id="field" name="field" placeholder="Ex: Aerospace Engineering" autocomplete="off">
@@ -207,7 +150,7 @@
 
 
                         <!--  -->
-                        {% if id and user["data"]["education"][id]["status"] == 'Present' %}
+                        {% if education.data.education.status == 'Present' %}
                         <input hidden type="text" class="form-control" id="status" name="status" value="Present">
                         <!--  -->
                         {% else %}

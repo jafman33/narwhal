@@ -126,24 +126,25 @@ def home():
     keyword = ""
     if request.method == "POST":
         keyword = request.form["keyword"]
+    user_id = session["user"]['id']
+    count_dict = {}
         
     user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
-    user_experience = client.query(q.get(q.match(q.index("experience_index"), session["user"]['id'])))
-    user_education = client.query(q.get(q.match(q.index("education_index"), session["user"]['id'])))
+    
+    user_experiencesNo = myLib.getDocsCount("experience","experience_index",user_id)
+    user_educationsNo = myLib.getDocsCount("education","education_index",user_id)
+    count_dict.update({"experiences":  user_experiencesNo})
+    count_dict.update({"educations":  user_educationsNo})
+
+    print(count_dict)
 
     if session["user"]['usertype'] == 'Program Manager':
-        user_projects = client.query(q.get(q.match(q.index("project_index"), session["user"]['id'])))
+        user_projectsNo = myLib.getDocsCount("project","project_index",user_id)
+        count_dict.update({"projects":  user_projectsNo})
+
+        
         # Search skill by keyword - could be list in future
-        try:
-            matched_skills = client.query(
-                q.map_(
-                    q.lambda_("skill", q.get(q.var("skill"))),
-                    q.paginate(q.match(q.index("skill_match_index"), keyword),size=100)
-                )      
-            )["data"]
-        except:
-            matched_skills = []
-            
+        matched_skills =  myLib.getDocs("skill","skill_match_index",keyword)
         talents_matched = [
             client.query(q.get(q.ref(q.collection("users"), talent["data"]["user_id"] ))
             ) for talent in matched_skills
@@ -152,9 +153,7 @@ def home():
         return render_template(
             "pm/home.html",
             user=user_data,
-            experience=user_experience,
-            education=user_education,
-            projects=user_projects,
+            counter = json.dumps(count_dict),
             talents = talents_matched, 
             keyword=keyword)
     
@@ -186,8 +185,7 @@ def home():
         return render_template(
             "talent/home.html", 
             user=user_data,
-            experience=user_experience,
-            education=user_education,
+            counter = json.dumps(count_dict),
             projects = projects_matched,
             skills = json.dumps(skills_list), 
             keyword = keyword)
@@ -492,67 +490,57 @@ def experience_edit():
     
     id  = request.args.get('experience_id', None)
     erase  = request.args.get('erase', None)
+    experience_data = []
+    payload = {}
     
-    if request.method == 'POST' and erase:
-        myLib.deleteItem("experience",id)
-        return redirect(url_for('profile_details'))
-
     user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
 
-    if request.method == 'POST' and not erase:
+    if not id:
+        experience_data = myLib.newExperiencesDoc()
+        id = experience_data["ref"].id()
+    else:
+        experience_data = client.query(q.get(q.ref(q.collection("experiences"), id)))
+        
+    if request.method == 'POST' and erase:
+        myLib.deleteItem("experiences",id)
+        return redirect(url_for('profile_details'))
+
+    if request.method == 'POST' and not erase:    
+    # data
+        start = request.form['start']
+        if start:
+            date_time_obj = datetime.strptime(start, '%Y-%m-%d')
+            start = date_time_obj.strftime("%m/%d/%Y")
+            payload.update({"start": start})
+        end = request.form['end']
+        if end and end != 'Present':
+            date_time_obj = datetime.strptime(end, '%Y-%m-%d')
+            end = date_time_obj.strftime("%m/%d/%Y")
+            payload.update({"end": end})
             
         title = request.form['title']
         type = request.form['type']  
         company = request.form['company']  
         location = request.form['location']  
         status = request.form['status']  
-        start = request.form['start']  
-        end = request.form['end']  
-        industry = request.form['industry']  
-        
-        if start:
-            date_time_obj = datetime.strptime(start, '%Y-%m-%d')
-            start = date_time_obj.strftime("%m/%d/%Y")
-        if end and end != 'Present':
-            date_time_obj = datetime.strptime(end, '%Y-%m-%d')
-            end = date_time_obj.strftime("%m/%d/%Y")
-            
-        experienceID = str(uuid.uuid4())
-        if id:
-            experienceID = id
 
-        if title and type and company and location and status and start and end and industry:
-            client.query(
-                q.update(
-                    q.ref(q.collection("users"), session["user"]["id"]),
-                    {
-                        "data": {
-                            "experience": {
-                                experienceID: {
-                                    "title": title,
-                                    "type": type,
-                                    "company": company,
-                                    "location": location,
-                                    "status": status,
-                                    "start": start,
-                                    "end": end,
-                                    "industry": industry,
-                                    },
-                                },
-                            }
-                        },
-                    )
-                )
-        else:
-            flash("You need to fill out every field")
-            return redirect(url_for('experience_edit'))
+        industry = request.form['industry']  
+
+        payload.update({"title": title})
+        payload.update({"type": type})
+        payload.update({"company": company})
+        payload.update({"location": location})
+        payload.update({"status": status})
+        payload.update({"industry": industry})
+
+        myLib.updateExperienceDocument(id,payload)      
         
         if request.form['btn'] == 'Save and Back':
             return redirect(url_for('profile_details'))
         if request.form['btn'] == 'Save and Add':
             return redirect(url_for('experience_edit'))
 
-    return render_template("common/experience-edit.html", user = user_data, id = id)
+    return render_template("common/experience-edit.html", user = user_data, experience = experience_data, id = id)
 
 @app.route("/education-edit", methods=["GET","POST"])
 @login_required
@@ -560,63 +548,55 @@ def education_edit():
     
     id  = request.args.get('education_id', None)
     erase  = request.args.get('erase', None)
-    
-    if request.method == 'POST' and erase:
-        myLib.deleteItem("education",id)
-        return redirect(url_for('profile_details'))
+    education_data = []
+    payload = {}
     
     user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
 
+    if not id:
+        education_data = myLib.newEducationsDoc()
+        id = education_data["ref"].id()
+    else:
+        education_data = client.query(q.get(q.ref(q.collection("educations"), id)))
+        
+            
+    if request.method == 'POST' and erase:
+        myLib.deleteItem("educations",id)
+        return redirect(url_for('profile_details'))
+
     if request.method == 'POST' and not erase:
+                
+    # data
+        start = request.form['start']
+        if start:
+            date_time_obj = datetime.strptime(start, '%Y-%m-%d')
+            start = date_time_obj.strftime("%m/%d/%Y")
+            payload.update({"start": start})
+            
+        end = request.form['end']
+        if end and end != 'Present':
+            date_time_obj = datetime.strptime(end, '%Y-%m-%d')
+            end = date_time_obj.strftime("%m/%d/%Y")
+            payload.update({"end": end})
             
         school = request.form['school']
         degree = request.form['degree']  
         field = request.form['field']  
         status = request.form['status']  
-        start = request.form['start']  
-        end = request.form['end']  
-        
-        if start:
-            date_time_obj = datetime.strptime(start, '%Y-%m-%d')
-            start = date_time_obj.strftime("%m/%d/%Y")
-        if end and end != 'Present':
-            date_time_obj = datetime.strptime(end, '%Y-%m-%d')
-            end = date_time_obj.strftime("%m/%d/%Y")
-            
-        educationID = str(uuid.uuid4())
-        if id:
-            educationID = id
 
-        if school and degree and field and status and start and end:
-            client.query(
-                q.update(
-                    q.ref(q.collection("users"), session["user"]["id"]),
-                    {
-                        "data": {
-                            "education": {
-                                educationID: {
-                                    "school": school,
-                                    "degree": degree,
-                                    "field": field,
-                                    "status": status,
-                                    "start": start,
-                                    "end": end,
-                                    },
-                                },
-                            }
-                        },
-                    )
-                )
-        else:
-            flash("You need to fill out every field")
-            return redirect(url_for('education_edit'))
+        payload.update({"school": school})
+        payload.update({"degree": degree})
+        payload.update({"field": field})
+        payload.update({"status": status})
+                
+        myLib.updateEducationDocument(id,payload)      
         
         if request.form['btn'] == 'Save and Back':
             return redirect(url_for('profile_details'))
         if request.form['btn'] == 'Save and Add':
             return redirect(url_for('education_edit'))
 
-    return render_template("common/education-edit.html", user = user_data, id = id)
+    return render_template("common/education-edit.html", user = user_data, education = education_data, id = id)
 
 @app.route("/projects", methods=["GET", "POST"])
 @login_required
@@ -783,28 +763,10 @@ def project_edit():
     project_data = []
     payload = {}
     
-    # if erase project button clicked
-    if request.method == 'POST' and erase:
-        myLib.deleteItem("projects",id)
-        return redirect(url_for('profile_details'))
-
     user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
 
-    # if no id, call new doc! and use this id!
     if not id:
-        project_data = client.query(
-            q.create(
-                q.collection("projects"),
-                {
-                    "data": {
-                        "user_id": session["user"]["id"],
-                        "project": {
-                            "banner": "https://bidztr.s3.amazonaws.com/profile_photo-340335658474143823-cbdf807e-aae5-4bd3-a976-2fd1f1f8f7ba"
-                        },
-                    }
-                },
-            )
-        )
+        project_data = myLib.newProjectsDoc()
         id = project_data["ref"].id()
     else:
         project_data = client.query(q.get(q.ref(q.collection("projects"), id)))
@@ -814,8 +776,12 @@ def project_edit():
                 keyword_list.append(key["keyword"])
         except:
             keyword_list = []
+            
+    if request.method == 'POST' and erase:
+        myLib.deleteItem("projects",id)
+        return redirect(url_for('profile_details'))
 
-    if request.method == 'POST':
+    if request.method == 'POST' and not erase:
 
         # banner
         banner = request.files['file']
@@ -849,12 +815,12 @@ def project_edit():
         
         payload.update({"sponsor": sponsor})
         payload.update({"title": title})
-        payload.update({"title": title})
         payload.update({"headline": headline})
         payload.update({"link": link})
         payload.update({"location": location})
         payload.update({"summary": summary})
         payload.update({"talent": talent})
+        payload.update({"postdate": date})
                 
         myLib.updateProjectDocument(id,payload)                
         
@@ -862,7 +828,6 @@ def project_edit():
             return redirect(url_for('profile_details'))
         elif request.form['btn'] == 'Save and Add':
             return redirect(url_for('project_edit'))
-
         
     return render_template("pm/project-edit.html", user = user_data, project=project_data, id = id, keys=json.dumps(keyword_list))
 
@@ -876,13 +841,9 @@ def add_project_keyword():
         json_data = request.get_json('keywords_info')
         keys = json_data["keywords_info"]
 
-        # Get user skills document - user_skills document will always exist! no need to try:
-        # project_keys = client.query(q.get(q.match(q.index("skill_index"), user_id)))["data"]["projects"][id]["keys"]
         updated_keys = []
         for key in keys:
-            updated_keys.append({"keyword": key})
-        print(updated_keys)
-            
+            updated_keys.append({"keyword": key})            
             
         myLib.updateProjectKeys(id,updated_keys)
 
@@ -893,11 +854,6 @@ def add_project_keyword():
             "status": "new project: ID has not been assigned",
         })
 
-    
-
-
-
-    
 
 @app.route('/update-skills', methods=["POST"])
 def update_skills():
@@ -975,8 +931,22 @@ def profile_details():
         
     user_type = session["user"]['usertype']
     profile_id = profile_data["ref"].id()
-    profile_experience = client.query(q.get(q.match(q.index("experience_index"), profile_id)))["data"]["experiences"]
-    profile_education = client.query(q.get(q.match(q.index("education_index"), profile_id)))["data"]["educations"]
+    
+    # maybe setup try method here?
+    profile_experience = client.query(
+        q.map_(
+            q.lambda_("experience", q.get(q.var("experience"))),
+            q.paginate(q.match(q.index("experience_index"), str(profile_id)),size=100)
+        )      
+    )["data"]
+    
+    profile_education = client.query(
+        q.map_(
+            q.lambda_("education", q.get(q.var("education"))),
+            q.paginate(q.match(q.index("education_index"), str(profile_id)),size=100)
+        )      
+    )["data"]
+    
     profile_projects = client.query(
         q.map_(
             q.lambda_("project", q.get(q.var("project"))),
@@ -1005,8 +975,6 @@ def profile_details():
         )  
         
     if user_type == 'Program Manager':
-        
-        
 
         if self:
             return render_template(
@@ -1177,11 +1145,11 @@ def new_contact():
 
     return redirect(url_for("contacts"))
 
-@app.route("/save-project", methods=["POST"])
-@login_required
-def save_project():
-# 
-    return redirect(url_for("contacts"))
+# @app.route("/save-project", methods=["POST"])
+# @login_required
+# def save_project():
+# # 
+#     return redirect(url_for("contacts"))
 
 @app.route("/text", methods=["GET","POST"])
 @login_required

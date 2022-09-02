@@ -65,6 +65,7 @@
         <a href="{{ url_for('notifications') }}" class="item {{notifications_active}}">
             <div class="col">
                 <ion-icon name="notifications-outline"></ion-icon>
+                <span hidden class="badge badge-danger" id="notification_badge">0</span>
                 <strong>Alerts</strong>
             </div>
         </a>
@@ -325,6 +326,19 @@
             document.getElementById("close-notification-banner").click();
 
         }
+
+        document.addEventListener("DOMContentLoaded", function(event) {
+            fetch('{{ url_for("notificationCount") }}', {
+                    method: "POST",
+                })
+                .then((response) => response.json())
+                .then((data) => {
+                    if (data.notification_count[0] > 0) {
+                        document.getElementById("notification_badge").hidden = false;
+                        document.getElementById("notification_badge").innerHTML = data.notification_count[0];
+                    }
+                });
+        })
     </script>
 
 

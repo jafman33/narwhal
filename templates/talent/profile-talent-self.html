@@ -35,10 +35,33 @@
 </style>
 
 <script type="text/javascript">
+    //skills
     var skillsStr = ''
     var skills = new Array()
 
+    //availability
+    var percent = 0;
+    var hrs = 0;
+    var availability = '{{ profile.data.profile.availability }}';
+
+    // onLoad
     document.addEventListener("DOMContentLoaded", function(event) {
+        // Availability
+        if (availability) {
+            hrs = availability;
+            percent = hrs / 40;
+        }
+        var circleProgress1 = new ProgressBar.Circle(progress1, {
+            strokeWidth: 8,
+            easing: 'easeInOut',
+            duration: 2400,
+            color: '#1E74FD',
+            trailColor: '#E5E5E5',
+            trailWidth: 8,
+            svgStyle: null
+        });
+        circleProgress1.animate(percent);
+        // Skills
         skills = JSON.parse('{{skills|safe}}')
         if (skills.length > 0) {
             loadSkills(skills)
@@ -465,31 +488,7 @@
 
 <script src="../static/assets/js/plugins/progressbar-js/progressbar.min.js"></script>
 
-<script>
-    // Availability
-    var percent = 0;
-    var hrs = 0;
-    var availabilityVal = '{{ profile.data.profile.availability }}';
 
-    document.addEventListener("DOMContentLoaded", function(event) {
-
-        if (availabilityVal) {
-            hrs = availabilityVal;
-            percent = hrs / 40;
-        }
-
-        var circleProgress1 = new ProgressBar.Circle(progress1, {
-            strokeWidth: 8,
-            easing: 'easeInOut',
-            duration: 2400,
-            color: '#1E74FD',
-            trailColor: '#E5E5E5',
-            trailWidth: 8,
-            svgStyle: null
-        });
-        circleProgress1.animate(percent); // percent
-    });
-</script>
 
 
 {% endblock %}

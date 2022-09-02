@@ -118,10 +118,35 @@ def intro():
 @login_required
 def notifications():
     user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
-    # pull user notifications
+    user_notifications = myLib.getDocs("notification","notification_index",user_data["ref"].id())
     
+    return render_template("common/notifications.html", user=user_data, notifications = user_notifications, notifications_active = "active")
 
-    return render_template("common/notifications.html", user=user_data, notifications_active = "active")
+@app.route("/notification-count", methods=["POST"])
+@login_required
+def notificationCount():
+    try:
+        user_notificationCount = myLib.getDocsCount("notification","notification_index",session["user"]["id"])
+        return jsonify({"notification_count": user_notificationCount})
+    except:
+        return jsonify({"notification_count": 0})
+    
+    
+    
+    
+@app.route("/notification-delete", methods=["POST"])
+@login_required
+def notificationDelete():
+    notification_id  = request.args.get('notification_id', None)
+    print("notification_id: ", notification_id)
+    try:
+        myLib.deleteItem("notifications", notification_id)
+        return jsonify({"status": "Successfuly Deleted Notification"})
+    except:
+        return jsonify({"status": "Failed to delete notification"})
+
+
+
 
 @app.route("/project-applicants", methods=["GET", "POST"])
 @login_required
@@ -362,6 +387,8 @@ def add_application():
     project_id  = request.args.get('project_id', None)
     project_email  = request.args.get('project_email', None)
     user_id = session["user"]["id"]
+    user_name = session["user"]["firstname"] + " " + session["user"]["lastname"]
+    user_email = session["user"]["email"]
     
     if session["user"]['usertype'] == 'Engineering Talent':
         try:
@@ -372,11 +399,14 @@ def add_application():
             
         if project_id not in application_list:     
             user_applications["data"]["applications"].append({"project_id": project_id})
-            myLib.updateUserApplications(user_applications["ref"].id(),user_applications["data"]["applications"])
 
             try:
-                auth = client.query(q.get(q.match(q.index("userEmail_index"), project_email)))["data"]["sub"]["keys"]["auth"]
+                project_owner = client.query(q.get(q.match(q.index("userEmail_index"), project_email)))
+                auth = project_owner["data"]["sub"]["keys"]["auth"]
                 project_title = client.query(q.get(q.ref(q.collection("projects"), project_id)))["data"]["project"]["title"]
+                myLib.updateUserApplications(user_applications["ref"].id(),user_applications["data"]["applications"])
+                myLib.newNotificationDoc(project_owner["ref"].id(),"application",user_name,user_email)
+
                 return jsonify({
                     "status": "success",
                     "name": "git-branch-outline",
@@ -449,12 +479,16 @@ def new_skill_notification():
         # get project titles and owner's id
         project_title = doc["data"]["project"]["title"]
         project_owner_id = doc["data"]["user_id"]
-        # pull project owner info
-        project_owner_subscription = client.query(q.get(q.ref(q.collection("users"), project_owner_id)))["data"]["sub"]
         
+        # Create Push Notification
+        project_owner_subscription = client.query(q.get(q.ref(q.collection("users"), project_owner_id)))["data"]["sub"]
         title = "New skill match for " + project_title + "!"
         body = "The skill '" + skill + "' has been added by " + talent_name + "."
-        # link to pablos profile...
+        
+        # Create Narwhal Notification
+        # 1. check that the notification document doesnt already exist
+        
+        # 2. create the notification
         
         try:             
             results = trigger_push_notification(project_owner_subscription,title,body)

@@ -47,84 +47,92 @@
 </div>
 <!-- * Default Action Sheet Inset -->
 
+<script>
+    function erase_notification(id, action, target) {
+        fetch("{{url_for('notificationDelete', notification_id = 'ID')}}".replace("ID", id), {
+                method: "POST",
+            }).then((response) => response.json())
+            .then((data) => {
+                // console.log(data.status)
+                if (action = "profile_details") {
+                    window.location.href = "{{ url_for('profile_details', email = 'TARGET' ) }}".replace("TARGET", target)
+                } else {
+                    window.location.href = "{{ url_for('project_details', project_id = 'TARGET' ) }}".replace("TARGET", target)
+                }
+            });
+    }
+</script>
+
 <!-- App Capsule -->
 <div id="appCapsule">
 
-    <div class="listview-title bg-white">New Connections</div>
+
     <ul class="listview image-listview">
-        <!-- for notification in notifications -->
-        <!-- if notification.data.title = "new connection" -->
+        {% if notifications %}
+        <!--  -->
+        {% for item in notifications %}
+        <!-- New Connection -->
+        {% if item.data.notification.type == "connection" %}
         <li>
-            <a href="#" class="item">
+            <a href="#" class="item" onclick='erase_notification("{{item.ref.id()}}","profile_details","{{item.data.notification.target}}")'>
                 <div class="icon-box bg-primary">
                     <ion-icon name="person-outline"></ion-icon>
                 </div>
                 <div class="in">
-                    {notification.Contact_Name}
+                    New Contact! <br> {{item.data.notification.name}}
                 </div>
             </a>
         </li>
-        <!-- endif -->
-        <!-- endfor -->
-    </ul>
+        {% endif %}
+        <!-- * New Connection -->
 
-    <div class="listview-title bg-white">New Matches</div>
-    <ul class="listview image-listview">
-
-        <!-- for notification in notifications -->
-        <!-- if notification.data.title =  new match-->
+        <!-- New Match -->
+        {% if item.data.notification.type == "match" and user.data.account.usertype == "Program Manager"%}
         <li>
-            <a href="#" class="item">
-                <div class="icon-box bg-secondary">
+            <a href="#" class="item" onclick='erase_notification("{{item.ref.id()}}","profile_details","{{item.data.notification.target}}")'>
+                <div class="icon-box bg-primary">
                     <ion-icon name="git-compare-outline"></ion-icon>
                 </div>
                 <div class="in">
-                    {notification.Contact_Name} / {notification.Project_Name}
-
+                    New Match! <br> {{item.data.notification.name}}
                 </div>
             </a>
         </li>
-        <!-- endif -->
-        <!-- endfor -->
-    </ul>
-
-
-    <div class="listview-title bg-white">
-        <ul class="listview image-listview flush">
-            <li>
-                <div class="item">
-                    <div class="icon-box bg-danger" style="margin-left: -16px;">
-                        <ion-icon name="git-pull-request-outline"></ion-icon>
-                    </div>
-                    <div class="in" style="font-size:15px">
-                        NEW APPLICANTS
-                    </div>
-                </div>
-            </li>
-        </ul>
-    </div>
-
-    <ul class="listview image-listview">
-        <!-- for notification in notifications -->
-        <!-- if notification.data.title = new application -->
+        {% endif %}
+        <!-- or -->
+        {% if item.data.notification.type == "match" and user.data.account.usertype == "Engineering Talent"%}
         <li>
-            <a href="#" class="item">
-                <div class="icon-box bg-danger">
+            <a href="#" class="item" onclick='erase_notification("{{item.ref.id()}}","project_details","{{item.data.notification.target}}")'>
+                <div class="icon-box bg-primary">
+                    <ion-icon name="git-compare-outline"></ion-icon>
+                </div>
+                <div class="in">
+                    New Match! <br> {{item.data.notification.name}}
+                </div>
+            </a>
+        </li>
+        {% endif %}
+        <!-- * New Match -->
+
+        <!-- New Applicant -->
+        {% if item.data.notification.type == "application" %}
+        <li>
+            <a href="#" class="item" onclick='erase_notification("{{item.ref.id()}}","profile_details","{{item.data.notification.target}}")'>
+                <div class="icon-box bg-primary">
                     <ion-icon name="git-pull-request-outline"></ion-icon>
                 </div>
                 <div class="in">
-                    {notification.Contact_Name}
+                    New Applicant!<br> {{item.data.notification.name}}
                 </div>
             </a>
         </li>
-        <!-- endif -->
-        <!-- end for -->
+        {% endif %}
+        <!-- * New Match -->
+        {% endfor %}
+        <!--  -->
+        {% endif %}
+
     </ul>
-
-    Need: name/title, photo/banner, id:project/talent
-
-    <br> Managers also need to see project applicants!
-
 
 
 </div>

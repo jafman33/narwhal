@@ -263,6 +263,24 @@ def newEducationsDoc():
             )
     return result
 
+def newNotificationDoc(profile_id,type,name,target):
+    client.query(
+        q.create(
+            q.collection("notifications"),
+            {
+                "data": {
+                    "user_id": profile_id,
+                    "notification": {
+                        "type": type,
+                        "name": name,
+                        "target": target,
+                        },
+                    }
+                },
+            )
+        )
+
+
 # updates
 
 def updateUserBookmarks(id,bookmarks):

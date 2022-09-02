@@ -307,7 +307,7 @@
     <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
 
     <!-- and  -->
-    {% if flag and user.data.account.sub.keys.auth == "null" %}
+    {% if flag == "True" %}
     <script>
         // Trigger welcome notification after 5 seconds
         setTimeout(() => {

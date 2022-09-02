@@ -119,6 +119,7 @@ def intro():
 @app.route("/home", methods=["GET","POST"])
 @login_required
 def home():
+    from_intro  = request.args.get('flag', None)
 
     keyword = ""
     if request.method == "POST":
@@ -147,7 +148,9 @@ def home():
             user=user_data,
             counter = json.dumps(count_dict),
             talents = talents_matched, 
-            keyword=keyword)
+            keyword=keyword,
+            flag = from_intro
+            )
     
     elif session["user"]['usertype'] == 'Engineering Talent':
         
@@ -169,7 +172,9 @@ def home():
             counter = json.dumps(count_dict),
             projects = projects_matched,
             skills = json.dumps(skills_list), 
-            keyword = keyword)
+            keyword = keyword,
+            flag = from_intro
+            )
     else:
       return None
   
@@ -785,8 +790,9 @@ def contacts():
 @login_required
 def profile_details():
     
-    contacts_data = []
     skills_list = []
+    profile_contacts_data = []
+    my_contact = {"status": False}
     user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
     email  = request.args.get('email', None)
     
@@ -798,6 +804,7 @@ def profile_details():
         profile_data = user_data
         
     user_type = session["user"]['usertype']
+    user_id = user_data["ref"].id()
     profile_id = profile_data["ref"].id()
     
     profile_experience = myLib.getDocs("experience","experience_index",profile_id)
@@ -805,20 +812,32 @@ def profile_details():
     profile_projects = myLib.getDocs("project","project_index",profile_id)
 
     try:
-        contact_list = client.query(q.get(q.match(q.index("contact_index"), profile_id)))["data"]["contacts"]
+        profile_contact_list = client.query(q.get(q.match(q.index("contact_index"), profile_id)))["data"]["contacts"]
     except:
-        contact_list = []
-    for contacts in contact_list:
-        contact_data = client.query(q.get(q.ref(q.collection("users"), contacts["user_id"])))["data"]
-        contacts_data.append(
+        profile_contact_list = []
+    for contacts in profile_contact_list:
+        profile_contact_data = client.query(q.get(q.ref(q.collection("users"), contacts["user_id"])))["data"]
+        profile_contacts_data.append(
             {
-                "firstname": contact_data["account"]["firstname"],
-                "lastname": contact_data["account"]["lastname"],
-                "email": contact_data["account"]["email"],
-                "photo": contact_data["profile"]["photo"],
+                "firstname": profile_contact_data["account"]["firstname"],
+                "lastname": profile_contact_data["account"]["lastname"],
+                "email": profile_contact_data["account"]["email"],
+                "photo": profile_contact_data["profile"]["photo"],
                 "room_id": contacts["room_id"],
             }
-        )  
+        )
+    
+    try:
+        user_contact_list = client.query(q.get(q.match(q.index("contact_index"), user_id)))["data"]["contacts"]
+    except:
+        user_contact_list = []
+    for contacts in user_contact_list:
+        user_contact_data = client.query(q.get(q.ref(q.collection("users"), contacts["user_id"])))
+        if user_contact_data["ref"].id() == profile_id:
+            my_contact.update({"status": True})
+            my_contact.update({"room_id": contacts["room_id"]})
+            print(my_contact)
+    
         
     if user_type == 'Program Manager':
         if self:
@@ -829,7 +848,7 @@ def profile_details():
                 experiences=profile_experience, 
                 educations=profile_education, 
                 projects=profile_projects,
-                contacts = contacts_data
+                contacts = profile_contacts_data
                 )
         elif (not self and profile_data["data"]["account"]["usertype"] == 'Program Manager'):
             return render_template(
@@ -839,7 +858,8 @@ def profile_details():
                 experiences=profile_experience, 
                 educations=profile_education, 
                 projects=profile_projects,
-                contacts = contacts_data
+                contacts = profile_contacts_data,
+                my_contact = my_contact
                 )
         else:
             skills_list=myLib.getSkills(profile_id)
@@ -849,8 +869,9 @@ def profile_details():
                 profile=profile_data, 
                 experiences=profile_experience, 
                 educations=profile_education, 
-                contacts = contacts_data, 
-                skills = json.dumps(skills_list)
+                contacts = profile_contacts_data, 
+                skills = json.dumps(skills_list),
+                my_contact = my_contact
                 )
     elif user_type == 'Engineering Talent':
         if self:
@@ -861,7 +882,7 @@ def profile_details():
                 profile=profile_data, 
                 experiences=profile_experience, 
                 educations=profile_education, 
-                contacts = contacts_data, 
+                contacts = profile_contacts_data, 
                 skills = json.dumps(skills_list)
                 )
         elif (not self and profile_data["data"]["account"]["usertype"] == 'Engineering Talent'):
@@ -872,8 +893,9 @@ def profile_details():
                 profile=profile_data, 
                 experiences=profile_experience, 
                 educations=profile_education, 
-                contacts = contacts_data, 
-                skills = json.dumps(skills_list)
+                contacts = profile_contacts_data, 
+                skills = json.dumps(skills_list),
+                my_contact = my_contact
                 )                 
         else:
             return render_template(
@@ -883,18 +905,22 @@ def profile_details():
                 experiences=profile_experience, 
                 educations=profile_education, 
                 projects=profile_projects,
-                contacts = contacts_data
+                contacts = profile_contacts_data,
+                my_contact = my_contact
                 )
             
 
-@app.route("/calendly/<user_email>", methods=["GET","POST"])
+@app.route("/calendly", methods=["GET","POST"])
 @login_required
-def schedule(user_email):
+def schedule():
+    
+    user_email = request.args.get('email', None)
+    
     try:
-        user_data = client.query(q.get(q.match(q.index("userEmail_index"), user_email)))
+        profile_data = client.query(q.get(q.match(q.index("userEmail_index"), user_email)))
     except:
         return 'user does not have calendly setup'
-    return render_template("common/calendly.html", user=user_data, self = session)
+    return render_template("common/calendly.html", profile=profile_data, session = session)
 
 
 @app.route("/new-contact", methods=["POST"])
@@ -954,7 +980,7 @@ def text():
     
     room_id = request.args.get("rid", None)
     data = []
-    messages = []
+    message_history = []
 
     try:
         # Get the chat list for the user in the room i.e all of the people they have a chat histor with on the application
@@ -964,9 +990,7 @@ def text():
 
     for contacts in contact_list:
         if room_id == contacts["room_id"]:
-            # Get all the message history 
-            messages = client.query(q.get(q.match(q.index("message_index"), room_id)))["data"]["conversation"]
-            # Get our contact's name
+            message_history = client.query(q.get(q.match(q.index("message_index"), room_id)))["data"]["conversation"]
             contact_data = client.query(q.get(q.ref(q.collection("users"), contacts["user_id"])))
             # Try to get the last message for the room
             try:
@@ -977,6 +1001,10 @@ def text():
             data.append(
                 {
                     "name": contact_data["data"]["account"]["firstname"],
+                    "lastname": contact_data["data"]["account"]["lastname"],
+                    "photo": contact_data["data"]["profile"]["photo"],
+                    "calendly": contact_data["data"]["profile"]["calendly"],
+                    "email": contact_data["data"]["account"]["email"],
                     "room_id": room_id,
                     "is_active": True,
                     "last_message": last_message,
@@ -989,7 +1017,7 @@ def text():
         user_data=session["user"],
         room_id=room_id,
         data=data,
-        messages=messages,
+        messages=message_history,
     )
 
 # Custom time filter to be used in the jinja template

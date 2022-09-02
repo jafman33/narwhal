@@ -46,46 +46,21 @@
     </div>
     <div class="pageTitle">Narwhal Profile</div>
     <div class="right">
-        <!-- <ion-button class="headerButton" onclick="updateBookmark(this)" id="bookmark-button">
-            <ion-icon name="bookmark-outline"></ion-icon>
-        </ion-button> -->
-        {% if type != profile.data.account.usertype %}
+        {% if not my_contact.status %}
         <form action="{{ url_for('new_contact') }}" method="POST">
             <input hidden type="email" class="form-control" name="email" id="email" value="{{profile.data.account.email}}">
             <button type="input" class="headerButton" style="background: transparent !important; border-width: 0px !important;">
                 <ion-icon name="person-add-outline"></ion-icon>            
             </button>
         </form>
-        <!--  -->
+        {% else %}
+        <a href="{{ url_for('text', rid=my_contact.room_id) }}" class="headerButton">
+            <ion-icon name="chatbubble-ellipses-outline"></ion-icon>
+        </a>
         {% endif %}
     </div>
 </div>
 <!-- * App Header -->
-
-<!-- <script>
-    document.addEventListener("DOMContentLoaded", function(event) {
-
-        var bookmark_button = document.getElementById('bookmark-button')
-        fetch('{{ url_for("check_bookmark", user_id = profile.ref.id() ) }}', {
-                method: "POST",
-            })
-            .then((response) => response.json())
-            .then((data) => {
-                bookmark_button.querySelector('ion-icon').setAttribute('name', data.name);
-            });
-
-    });
-
-    function updateBookmark(el) {
-        fetch('{{ url_for("add_bookmark", user_id = profile.ref.id() ) }}', {
-                method: "POST",
-            })
-            .then((response) => response.json())
-            .then((data) => {
-                el.querySelector('ion-icon').setAttribute('name', data.name);
-            });
-    }
-</script> -->
 
 <!-- App Capsule -->
 <div id="appCapsule">

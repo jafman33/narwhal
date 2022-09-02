@@ -30,18 +30,21 @@
             <a href="#" class="headerButton goBack">
                 <ion-icon name="chevron-back-outline"></ion-icon>
             </a>
+            <!-- <img src="{{profile.data.profile.photo}}" alt="avatar" class="headerButton" style="border-radius: 50%;"> -->
         </div>
         <div class="pageTitle">Schedule Meeting</div>
         <div class="right">
-            <a href="#" class="headerButton" data-bs-toggle="offcanvas" data-bs-target="#actionSheetDefaultInset">
+            <img src="{{profile.data.profile.photo}}" alt="avatar" class="headerButton" style="border-radius: 50%;">
+
+            <!-- <a href="#" class="headerButton" data-bs-toggle="offcanvas" data-bs-target="#actionSheetDefaultInset">
                 <ion-icon name="ellipsis-horizontal"></ion-icon>
-            </a>
+            </a> -->
         </div>
     </div>
     <!-- * App Header -->
 
     <!-- Default Action Sheet Inset -->
-    <div class="offcanvas offcanvas-bottom action-sheet inset" tabindex="-1" id="actionSheetDefaultInset">
+    <!-- <div class="offcanvas offcanvas-bottom action-sheet inset" tabindex="-1" id="actionSheetDefaultInset">
         <div class="offcanvas-header">
             <h5 class="offcanvas-title">Actions</h5>
         </div>
@@ -64,22 +67,21 @@
                 </li>
             </ul>
         </div>
-    </div>
+    </div> -->
     <!-- * Default Action Sheet Inset -->
 
     <!-- App Capsule -->
     <div id="appCapsule">
 
-        <div class="login-form mt-5 pe-2 ps-2">
-            <div class="section">
-                <img src="{{user.data.profile.photo}}" alt="avatar" class="imaged rounded w86">
-            </div>
+        <!-- <div class="login-form mt-1 pe-2 ps-2"> -->
+        <!-- <div class="section">
+                <img src="{{profile.data.profile.photo}}" alt="avatar" class="imaged rounded w64">
+            </div> -->
 
-            <div class="section mt-3 mb-0" id="calendly" style="height: 500px">
-                <!-- CALENDLY HERE -->
-            </div>
+        <div class="section mt-3 mb-0" id="calendly" style="height: 610px">
+            <!-- CALENDLY HERE -->
         </div>
-
+        <!-- </div> -->
 
     </div>
     <!-- * App Capsule -->
@@ -101,13 +103,13 @@
 
     <script>
         Calendly.initInlineWidget({
-            url: '{{user.data.profile.calendly}}?hide_gdpr_banner=1?hide_event_type_details=1?hide_landing_page_details=1',
+            url: '{{profile.data.profile.calendly}}?hide_gdpr_banner=1?hide_event_type_details=1?hide_landing_page_details=1',
             parentElement: document.getElementById('calendly'),
             prefill: {
-                name: "{self.user.firstname} {self.user.lastname}",
-                email: "{self.user.email}",
+                name: "{{session.user.firstname}} {{session.user.lastname}}",
+                email: "{{session.user.email}}",
                 customAnswers: {
-                    a1: "Yes",
+                    a1: "Hi {{profile.data.account.firstname}} {{profile.data.account.lastname}}, I'd like to setup some time to chat about ...  ",
                 }
             },
             utm: {}

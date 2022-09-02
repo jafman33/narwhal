@@ -36,27 +36,17 @@
             <a href="{{ url_for('contacts') }}" class="headerButton">
                 <ion-icon name="chevron-back-outline"></ion-icon>
             </a>
+            <img src="{{data[0].photo}}" alt="avatar" class="headerButton" style="border-radius: 50%;">
         </div>
         <div class="pageTitle">
-            <div class="message-item">
-                <div class="row">
-                    <div class="col-4 mt-1">
-                        <img src="../static/assets/img/sample/avatar/avatar.png" alt="avatar" class="avatar">
-                    </div>
-                    <div class="col-8 mt-2">
-                        <!--  -->
-                        {{data[0]["name"]}}
-                    </div>
-                </div>
-            </div>
-
+            {{data[0]["name"]}} {{data[0]["lastname"]}}
         </div>
         <div class="right">
-
-            <a href="#" class="headerButton">
+            {% if data[0].calendly != "null"%}
+            <a href="{{ url_for('schedule', email = data[0].email ) }}" class="headerButton">
                 <ion-icon name="calendar-outline"></ion-icon>
-                <!-- <span class="badge badge-danger">1</span> -->
             </a>
+            {% endif %}
         </div>
     </div>
     <!-- * App Header -->

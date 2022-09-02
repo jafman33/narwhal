@@ -44,21 +44,39 @@
     </div>
     <div class="pageTitle">My Profile</div>
     <div class="right">
-        {% if type != profile.data.account.usertype %}
-        <!-- <a href="#" class="headerButton">
-            <ion-icon name="bookmark-outline"></ion-icon>
-        </a> -->
-        <form action="{{ url_for('new_contact') }}" method="POST">
-            <input hidden type="email" class="form-control" name="email" id="email" value="{{profile.data.account.email}}">
-            <button type="input" class="headerButton" style="background: transparent !important; border-width: 0px !important;">
-                <ion-icon name="person-add-outline"></ion-icon>            
-            </button>
-        </form>
-        <!--  -->
-        {% endif %}
+        <a href="#" class="headerButton" data-bs-toggle="offcanvas" data-bs-target="#actionSheetDefaultInset">
+            <ion-icon name="ellipsis-horizontal"></ion-icon>
+        </a>
     </div>
 </div>
 <!-- * App Header -->
+
+<!-- Default Action Sheet Inset -->
+<div class="offcanvas offcanvas-bottom action-sheet inset" tabindex="-1" id="actionSheetDefaultInset">
+    <div class="offcanvas-header">
+        <h5 class="offcanvas-title">Actions</h5>
+    </div>
+    <div class="offcanvas-body">
+        <ul class="action-button-list">
+            <li>
+                <a href="#" class="btn btn-list">
+                    <span>Forgot password</span>
+                </a>
+            </li>
+            <li>
+                <a href="#" class="btn btn-list">
+                    <span>Change account</span>
+                </a>
+            </li>
+            <li>
+                <a href="#" class="btn btn-list">
+                    <span>Sign out</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>
+<!-- * Default Action Sheet Inset -->
 
 <!-- App Capsule -->
 <div id="appCapsule">

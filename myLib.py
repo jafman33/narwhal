@@ -47,7 +47,21 @@ def deleteItem(collection,id):
 )
     
 
-# def getMatches_byKey(index, key):
+def getTalents_byKey(keyword):
+    matched_docs = getDocs("skill","skill_match_index",keyword)
+    matches = [
+        client.query(q.get(q.ref(q.collection("users"), user["data"]["user_id"] ))
+        ) for user in matched_docs
+    ]
+    return matches
+
+def getProjects_byKey(keyword):
+    matched_docs = getDocs("project_keyword","project_keyword_index",keyword)
+    matches = [
+        client.query(q.get(q.ref(q.collection("projects"), project["ref"].id() ))
+        ) for project in matched_docs
+    ]
+    return matches
     
 
 def getMatches_byList(index, list):

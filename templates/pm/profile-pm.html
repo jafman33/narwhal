@@ -35,8 +35,6 @@
 </style>
 
 
-
-
 <!-- App Header -->
 <div class="appHeader bg-primary text-light">
     <div class="left">
@@ -66,11 +64,7 @@
 <div id="appCapsule">
 
     <div class="section mt-2">
-        <h4>About
-            <!-- <a href="{{ url_for('profile_edit') }}">
-                <ion-icon name="create-outline-outline"></ion-icon>
-            </a> -->
-        </h4>
+        <h4>About</h4>
         <div class="profile-head">
             <div class="avatar">
                 <img src="{{profile.data.profile.photo}}" alt="avatar" class="imaged w64 rounded">
@@ -243,32 +237,6 @@
 <!-- * App Capsule -->
 
 <script src="../static/assets/js/plugins/progressbar-js/progressbar.min.js"></script>
-
-<!-- <script>
-    // Availability
-    var percent = 0;
-    var hrs = 0;
-    var availabilityVal = '{{ profile.data.profile.availability }}';
-
-    document.addEventListener("DOMContentLoaded", function(event) {
-
-        if (availabilityVal) {
-            hrs = availabilityVal;
-            percent = hrs / 40;
-        }
-
-        var circleProgress1 = new ProgressBar.Circle(progress1, {
-            strokeWidth: 8,
-            easing: 'easeInOut',
-            duration: 2400,
-            color: '#1E74FD',
-            trailColor: '#E5E5E5',
-            trailWidth: 8,
-            svgStyle: null
-        });
-        circleProgress1.animate(percent); // percent
-    });
-</script> -->
 
 
 {% endblock %}

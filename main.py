@@ -137,11 +137,7 @@ def home():
         user_projectsNo = myLib.getDocsCount("project","project_index",user_id)
         count_dict.update({"projects":  user_projectsNo})
 
-        matched_skills =  myLib.getDocs("skill","skill_match_index",keyword)
-        talents_matched = [
-            client.query(q.get(q.ref(q.collection("users"), talent["data"]["user_id"] ))
-            ) for talent in matched_skills
-        ]
+        talents_matched = myLib.getTalents_byKey(keyword) 
         
         return render_template(
             "pm/home.html",
@@ -159,13 +155,9 @@ def home():
             skills_list = [list(i.values())[0] for i in skills]
         except:
             skills_list = []
-            
-        matched_projects = myLib.getDocs("project_keyword","project_keyword_index",keyword)
-        projects_matched = [
-            client.query(q.get(q.ref(q.collection("projects"), projects["ref"].id() ))
-            ) for projects in matched_projects
-        ]
-                
+        
+        projects_matched = myLib.getProjects_byKey(keyword)
+ 
         return render_template(
             "talent/home.html", 
             user=user_data,
@@ -401,6 +393,43 @@ def new_applicant_notification():
         except:
             print("[Error]: new_application_notification()")
             return '', 204
+        
+
+@app.route('/new-skill-notification', methods=["GET","POST"])
+def new_skill_notification():
+    
+    json_data = request.get_json('skill_info')
+    data = json_data["skill_info"]
+    skill = data['skill']
+    talent_name = data['talent_name']
+    
+    # find match with project
+    try: 
+        projects_matched = myLib.getProjects_byKey(skill)
+    except: 
+        return '[new_skill_notification()][Message:] No matches found', 204
+        
+    # for loop 
+    for doc in projects_matched:
+        # get project titles and owner's id
+        project_title = doc["data"]["project"]["title"]
+        project_owner_id = doc["data"]["user_id"]
+        # pull project owner info
+        project_owner_subscription = client.query(q.get(q.ref(q.collection("users"), project_owner_id)))["data"]["sub"]
+        
+        title = "New skill match for " + project_title + "!"
+        body = "The skill '" + skill + "' has been added by " + talent_name + "."
+        # link to pablos profile...
+        
+        try:             
+            results = trigger_push_notification(project_owner_subscription,title,body)
+            return jsonify({
+                "status": "success",
+                "result": results
+            })
+        except:
+            return '[new_skill_notification()][Message:] No Authorization found for user: ' +  project_owner_id, 204
+
 
             
 @app.route("/check-application", methods=["POST"])
@@ -733,24 +762,35 @@ def add_project_keyword():
 
 @app.route('/update-skills', methods=["POST"])
 def update_skills():
-    email  = request.args.get('email', None)
-    user_id = session["user"]["id"]
+    talent_email  = request.args.get('email', None)
+    talent_id = session["user"]["id"]
+    talent_name = session["user"]["firstname"] + " " + session["user"]["lastname"]
 
-    if email:
-        user_data = client.query(q.get(q.match(q.index("userEmail_index"), email)))
-        user_id = user_data["ref"].id()
+    if talent_email:
+        talent_data = client.query(q.get(q.match(q.index("userEmail_index"), talent_email)))
+        talent_id = talent_data["ref"].id()
+        talent_name = talent_data["data"]["account"]["firstname"] + talent_data["data"]["account"]["lastname"]
     
     json_data = request.get_json('skills_info')
     skills = json_data["skills_info"]
 
-    # Get user skills
-    user_skills = client.query(q.get(q.match(q.index("skill_index"), user_id)))
+    # Get talent skills
+    talent_skils = client.query(q.get(q.match(q.index("skill_index"), talent_id)))
     updated_skills = []
+    # added_skill = ''
     for skill in skills:
         updated_skills.append({"skill": skill})
-    myLib.updateSkills(user_skills["ref"].id(),updated_skills)
-    
-    return jsonify({"status": "successfully updated database",})
+        # added_skill = skill
+    try:
+        myLib.updateSkills(talent_skils["ref"].id(),updated_skills)
+        return jsonify({
+            "status": "successfully updated database",
+            "skill": updated_skills[-1]["skill"],
+            "talent_name": talent_name
+            })
+    except:
+        return jsonify({"status": "failed to update the database"})
+        
     
 @app.route("/contacts", methods=["GET","POST"])
 @login_required
@@ -913,10 +953,8 @@ def profile_details():
 @app.route("/calendly", methods=["GET","POST"])
 @login_required
 def schedule():
-    
-    user_email = request.args.get('email', None)
-    
     try:
+        user_email = request.args.get('email', None)
         profile_data = client.query(q.get(q.match(q.index("userEmail_index"), user_email)))
     except:
         return 'user does not have calendly setup'

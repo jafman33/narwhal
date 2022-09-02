@@ -59,18 +59,23 @@
     <div class="offcanvas-body">
         <ul class="action-button-list">
             <li>
-                <a href="#" class="btn btn-list">
-                    <span>Forgot password</span>
+                <a href="{{ url_for('profile_edit') }}" class="btn btn-list">
+                    <span>Edit Profile</span>
                 </a>
             </li>
             <li>
-                <a href="#" class="btn btn-list">
-                    <span>Change account</span>
+                <a href="{{ url_for('project_edit') }}" class="btn btn-list">
+                    <span>Add New Project</span>
                 </a>
             </li>
             <li>
-                <a href="#" class="btn btn-list">
-                    <span>Sign out</span>
+                <a href="{{ url_for('education_edit') }}" class="btn btn-list">
+                    <span>Add New Experience</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('experience_edit') }}" class="btn btn-list">
+                    <span>Add New Education</span>
                 </a>
             </li>
         </ul>
@@ -82,7 +87,7 @@
 <div id="appCapsule">
 
     <div class="section mt-2">
-        <h4>About
+        <h4>Profile
             <a href="{{ url_for('profile_edit') }}">
                 <ion-icon name="create-outline"></ion-icon>
             </a>
@@ -144,17 +149,20 @@
             <!-- projects -->
             <div class="tab-pane fade show active" id="projects" role="tabpanel">
 
-                <div class="section m-2">
+                <div class="section mt-2 mb-2">
                     <h4>Projects
                         <a href="{{ url_for('project_edit') }}">
-                            <ion-icon name="create-outline"></ion-icon>
+                            <ion-icon name="add-circle-outline"></ion-icon>
                         </a>
                     </h4>
-                    <ul class="listview image-listview media flush transparent mt-1 mb-1">
+
+                    <!-- Media Multi Listview -->
+                    <ul class="listview image-listview media flush transparent mb-2">
                         {% for item in projects %}
-                        <li>
-                            <a href="{{ url_for('project_edit', project_id = item.ref.id() ) }}" class="item">
-                                <div class="imageWrapper" style="margin-left:-15px;">
+
+                        <li class="multi-level">
+                            <a href="#" class="item">
+                                <div class="imageWrapper">
                                     <img src='{{item.data.project.banner}}' alt="image" class="imaged w64">
                                 </div>
                                 <div class="in">
@@ -165,11 +173,40 @@
                                     </div>
                                 </div>
                             </a>
+                            <!-- sub menu -->
+                            <ul class="listview image-listview transparent">
+                                <li>
+                                    <a href="{{ url_for('project_details', project_id = item.ref.id()) }}" class="item">
+                                        <div class="icon-box bg-primary">
+                                            <ion-icon name="briefcase-outline"></ion-icon>
+                                        </div>
+                                        <div class="in">
+                                            View Project
+                                        </div>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ url_for('project_edit', project_id = item.ref.id() ) }}" class="item">
+                                        <div class="icon-box bg-secondary">
+                                            <ion-icon name="create-outline"></ion-icon>
+                                        </div>
+                                        <div class="in">
+                                            Edit Project
+                                        </div>
+                                    </a>
+                                </li>
+                            </ul>
+                            <!-- * sub menu -->
                         </li>
+
                         {% endfor %}
                     </ul>
+                    <!-- * Media Multi Listview -->
+
 
                 </div>
+
+
             </div>
             <!-- * projects -->
 
@@ -179,7 +216,7 @@
 
                     <h4>Experience
                         <a href="{{ url_for('experience_edit') }}">
-                            <ion-icon name="create-outline"></ion-icon>
+                            <ion-icon name="add-circle-outline"></ion-icon>
                         </a>
                     </h4>
 
@@ -214,7 +251,7 @@
                 <div class="section m-2">
                     <h4>Education
                         <a href="{{ url_for('education_edit') }}">
-                            <ion-icon name="create-outline"></ion-icon>
+                            <ion-icon name="add-circle-outline"></ion-icon>
                         </a>
                     </h4>
                     <ul class="listview image-listview media flush transparent mt-1 mb-1">
@@ -248,7 +285,7 @@
                         <div class="col-8">
                             <h4>Contacts
                                 <a href="{{ url_for('contacts') }}">
-                                    <ion-icon name="create-outline"></ion-icon>
+                                    <ion-icon name="add-circle-outline"></ion-icon>
                                 </a>
                             </h4>
                         </div>

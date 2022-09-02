@@ -35,13 +35,19 @@
 </style>
 
 <script type="text/javascript">
+    // Skill Variables
     var skillsStr = ''
     var skills = new Array()
+
+    // Availability Variables
+    var percent = 0;
+    var hrs = 0;
+    var availabilityVal = '{{ profile.data.profile.availability }}';
 
     document.addEventListener("DOMContentLoaded", function(event) {
         // Bookmarks
         var bookmark_button = document.getElementById('bookmark-button')
-        fetch('{{ url_for("check_bookmark", user_id = profile.ref.id() ) }}', {
+        fetch('{{ url_for("check_bookmark", talent_id = profile.ref.id() ) }}', {
                 method: "POST",
             })
             .then((response) => response.json())
@@ -54,6 +60,22 @@
         if (skills.length > 0) {
             displaySkills(skills)
         }
+
+        // Set Availability
+        if (availabilityVal) {
+            hrs = availabilityVal;
+            percent = hrs / 40;
+        }
+        var circleProgress1 = new ProgressBar.Circle(progress1, {
+            strokeWidth: 8,
+            easing: 'easeInOut',
+            duration: 2400,
+            color: '#1E74FD',
+            trailColor: '#E5E5E5',
+            trailWidth: 8,
+            svgStyle: null
+        });
+        circleProgress1.animate(percent); // percent
     });
 
     // Bookmarks
@@ -144,7 +166,7 @@
 <div id="appCapsule">
 
     <div class="section mt-2">
-        <h4>About
+        <h4>Profile
         </h4>
         <div class="profile-head">
             <div class="avatar">
@@ -409,31 +431,7 @@
 
 <script src="../static/assets/js/plugins/progressbar-js/progressbar.min.js"></script>
 
-<script>
-    // Availability
-    var percent = 0;
-    var hrs = 0;
-    var availabilityVal = '{{ profile.data.profile.availability }}';
 
-    document.addEventListener("DOMContentLoaded", function(event) {
-
-        if (availabilityVal) {
-            hrs = availabilityVal;
-            percent = hrs / 40;
-        }
-
-        var circleProgress1 = new ProgressBar.Circle(progress1, {
-            strokeWidth: 8,
-            easing: 'easeInOut',
-            duration: 2400,
-            color: '#1E74FD',
-            trailColor: '#E5E5E5',
-            trailWidth: 8,
-            svgStyle: null
-        });
-        circleProgress1.animate(percent); // percent
-    });
-</script>
 
 
 {% endblock %}

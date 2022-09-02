@@ -267,9 +267,11 @@ def check_bookmark():
             bookmark_list = [list(i.values())[0] for i in user_bookmarks["data"]["bookmarks"]]
         except:
             bookmark_list = []
-        if talent_id not in bookmark_list:     
+        if talent_id not in bookmark_list:
+            print("talent id not found: ", talent_id)
             return jsonify({"status": "success","name": "bookmark-outline"})
         else:
+            print("talent id found: ", talent_id)
             return jsonify({"status": "success","name": "bookmark"})
     
     elif session["user"]['usertype'] == 'Engineering Talent':
@@ -614,16 +616,28 @@ def project_details():
     project_id  = request.args.get('project_id', None)
     user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
     project = client.query(q.get(q.ref(q.collection("projects"), project_id)))
-    owner_data = client.query(q.get(q.ref(q.collection("users"), project["data"]["user_id"])))
     project_data = project["data"]["project"]
+
+    if session["user"]['usertype'] == 'Engineering Talent':
+        owner_data = client.query(q.get(q.ref(q.collection("users"), project["data"]["user_id"])))
+        return render_template(
+            "common/project-details.html", 
+            user = user_data, 
+            project=project_data, 
+            manager=owner_data,
+            id = project_id
+            )
     
-    return render_template(
-        "common/project-details.html", 
-        user = user_data, 
-        project=project_data, 
-        manager=owner_data,
-        id = project_id
-        )
+    if session["user"]['usertype'] == 'Program Manager':
+        owner_data = user_data
+        return render_template(
+            "pm/project-details-pm.html", 
+            user = user_data, 
+            project=project_data, 
+            manager=owner_data,
+            id = project_id
+            )
+
     
 @app.route("/talent", methods=["GET", "POST"])
 @login_required
@@ -875,9 +889,7 @@ def profile_details():
         user_contact_data = client.query(q.get(q.ref(q.collection("users"), contacts["user_id"])))
         if user_contact_data["ref"].id() == profile_id:
             my_contact.update({"status": True})
-            my_contact.update({"room_id": contacts["room_id"]})
-            print(my_contact)
-    
+            my_contact.update({"room_id": contacts["room_id"]})    
         
     if user_type == 'Program Manager':
         if self:

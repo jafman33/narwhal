@@ -111,10 +111,18 @@ def login():
 def intro():
     if session["user"]['usertype'] == 'Program Manager':
         return render_template("pm/intro.html", user=session["user"])
-    elif session["user"]['usertype'] == 'Engineering Talent':
+    if session["user"]['usertype'] == 'Engineering Talent':
         return render_template("talent/intro.html", user=session["user"])
-    else:
-        return None
+    
+@app.route("/notifications", methods=["GET", "POST"])
+@login_required
+def notifications():
+    user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
+    # pull user notifications
+    
+
+    return render_template("common/notifications.html", user=user_data)
+
 
 @app.route("/home", methods=["GET","POST"])
 @login_required
@@ -268,10 +276,8 @@ def check_bookmark():
         except:
             bookmark_list = []
         if talent_id not in bookmark_list:
-            print("talent id not found: ", talent_id)
             return jsonify({"status": "success","name": "bookmark-outline"})
         else:
-            print("talent id found: ", talent_id)
             return jsonify({"status": "success","name": "bookmark"})
     
     elif session["user"]['usertype'] == 'Engineering Talent':

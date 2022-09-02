@@ -216,22 +216,34 @@
             <ul class="nav nav-tabs lined iconed" role="tablist">
                 <li class="nav-item">
                     <a class="nav-link active" data-bs-toggle="tab" href="#experience" role="tab">
-                        <ion-icon name="id-card-outline"></ion-icon>
+                        <div class="col">
+                            <ion-icon name="id-card-outline"></ion-icon>
+                            <strong>Experience</strong>
+                        </div>
                     </a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" data-bs-toggle="tab" href="#education" role="tab">
-                        <ion-icon name="library-outline"></ion-icon>
+                        <div class="col">
+                            <ion-icon name="library-outline"></ion-icon>
+                            <strong>Education</strong>
+                        </div>
                     </a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" data-bs-toggle="tab" href="#skills" role="tab">
-                        <ion-icon name="flask-outline"></ion-icon>
+                        <div class="col">
+                            <ion-icon name="flask-outline"></ion-icon><br>
+                            <strong>Skills</strong>
+                        </div>
                     </a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" data-bs-toggle="tab" href="#contacts" role="tab">
-                        <ion-icon name="people-outline"></ion-icon>
+                        <div class="col">
+                            <ion-icon name="people-outline"></ion-icon>
+                            <strong>Contacts</strong>
+                        </div>
                     </a>
                 </li>
             </ul>
@@ -245,7 +257,7 @@
 
             <!-- experience -->
             <div class="tab-pane fade show active" id="experience" role="tabpanel">
-                <div class="section m-2">
+                <div class="section mt-2 mb-2">
                     <h4>Experience</h4>
 
                     <ul class="listview image-listview media flush transparent" style="margin-left: 0px;">
@@ -275,7 +287,7 @@
 
             <!--  education -->
             <div class="tab-pane fade" id="education" role="tabpanel">
-                <div class="section m-2">
+                <div class="section mt-2 mb-2">
                     <h4>Education</h4>
                     <ul class="listview image-listview media flush transparent mt-1 mb-1">
                         {% for item in educations %}
@@ -302,7 +314,7 @@
             <!-- skills -->
             <div class="tab-pane fade" id="skills" role="tabpanel">
 
-                <div class="section m-2">
+                <div class="section mt-2 mb-2">
 
                     <ul class="nav nav-tabs capsuled" role="tablist">
                         <li class="nav-item">
@@ -392,7 +404,7 @@
 
             <!-- * contacts -->
             <div class="tab-pane fade" id="contacts" role="tabpanel">
-                <div class="section m-2">
+                <div class="section mt-2 mb-2">
 
                     <div class="row">
                         <div class="col-8">

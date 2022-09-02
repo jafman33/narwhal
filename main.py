@@ -121,7 +121,32 @@ def notifications():
     # pull user notifications
     
 
-    return render_template("common/notifications.html", user=user_data)
+    return render_template("common/notifications.html", user=user_data, notifications_active = "active")
+
+@app.route("/project-applicants", methods=["GET", "POST"])
+@login_required
+def project_applicants():
+    applicants_data = []
+    project_id  = request.args.get('project_id', None)
+    user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
+
+    #create applicants list (same as contacts) 
+    try:
+        applicant_list = myLib.getApplicants_byProject(project_id)
+    except:
+        applicant_list = []
+    for applicant in applicant_list:
+        applicant_data = client.query(q.get(q.ref(q.collection("users"), applicant["ref"].id() )))["data"]
+        applicants_data.append(
+            {
+                "firstname": applicant_data["account"]["firstname"],
+                "lastname": applicant_data["account"]["lastname"],
+                "email": applicant_data["account"]["email"],
+                "photo": applicant_data["profile"]["photo"],
+            }
+        )
+
+    return render_template("pm/applicants.html", user=user_data, applicants = applicants_data)
 
 
 @app.route("/home", methods=["GET","POST"])
@@ -153,7 +178,8 @@ def home():
             counter = json.dumps(count_dict),
             talents = talents_matched, 
             keyword=keyword,
-            flag = from_intro
+            flag = from_intro,
+            home_active = "active"
             )
     
     elif session["user"]['usertype'] == 'Engineering Talent':
@@ -173,7 +199,8 @@ def home():
             projects = projects_matched,
             skills = json.dumps(skills_list), 
             keyword = keyword,
-            flag = from_intro
+            flag = from_intro,
+            home_active = "active"
             )
     else:
       return None
@@ -613,7 +640,8 @@ def projects():
         projects=projects_all, 
         bookmarks=projects_bookmarked, 
         applications=projects_applied, 
-        matches=matched_projects
+        matches=matched_projects,
+        projects_active="active"
         )
     
 @app.route("/project-details", methods=["GET", "POST"])
@@ -684,7 +712,8 @@ def talent():
         user=user_data, 
         talents=talents_all, 
         matches=talents_matched,
-        bookmarks=talents_bookmarked
+        bookmarks=talents_bookmarked,
+        talent_active="active"
         )
 
 @app.route("/project-edit", methods=["GET","POST"])
@@ -906,7 +935,8 @@ def profile_details():
                 experiences=profile_experience, 
                 educations=profile_education, 
                 projects=profile_projects,
-                contacts = profile_contacts_data
+                contacts = profile_contacts_data,
+                profile_active="active"
                 )
         elif (not self and profile_data["data"]["account"]["usertype"] == 'Program Manager'):
             return render_template(
@@ -917,7 +947,8 @@ def profile_details():
                 educations=profile_education, 
                 projects=profile_projects,
                 contacts = profile_contacts_data,
-                my_contact = my_contact
+                my_contact = my_contact,
+                profile_active="active"
                 )
         else:
             skills_list=myLib.getSkills(profile_id)
@@ -929,7 +960,8 @@ def profile_details():
                 educations=profile_education, 
                 contacts = profile_contacts_data, 
                 skills = json.dumps(skills_list),
-                my_contact = my_contact
+                my_contact = my_contact,
+                profile_active="active"
                 )
     elif user_type == 'Engineering Talent':
         if self:
@@ -941,7 +973,8 @@ def profile_details():
                 experiences=profile_experience, 
                 educations=profile_education, 
                 contacts = profile_contacts_data, 
-                skills = json.dumps(skills_list)
+                skills = json.dumps(skills_list),
+                profile_active="active"
                 )
         elif (not self and profile_data["data"]["account"]["usertype"] == 'Engineering Talent'):
             skills_list=myLib.getSkills(profile_id)
@@ -953,7 +986,8 @@ def profile_details():
                 educations=profile_education, 
                 contacts = profile_contacts_data, 
                 skills = json.dumps(skills_list),
-                my_contact = my_contact
+                my_contact = my_contact,
+                profile_active="active"
                 )                 
         else:
             return render_template(
@@ -964,7 +998,8 @@ def profile_details():
                 educations=profile_education, 
                 projects=profile_projects,
                 contacts = profile_contacts_data,
-                my_contact = my_contact
+                my_contact = my_contact,
+                profile_active="active"
                 )
             
 

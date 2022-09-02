@@ -80,6 +80,13 @@ def getMatches_byList(index, list):
     )["data"]
     return result
 
+def getApplicants_byProject(project_id):
+    matched_docs = getDocs("applicant","project_applicant_index",project_id)
+    matches = [
+        client.query(q.get(q.ref(q.collection("users"), application["data"]["user_id"] ))
+        ) for application in matched_docs
+    ]
+    return matches
     
 
 def getDocs(var, index, id):

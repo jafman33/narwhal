@@ -41,33 +41,38 @@
 
     <!-- App Bottom Menu -->
     <div class="appBottomMenu">
-        <a href="{{ url_for('home') }}" class="item {#{{home_active}}#}">
+        <a href="{{ url_for('home') }}" class="item {{home_active}}">
             <div class="col">
                 <ion-icon name="home-outline"></ion-icon>
+                <strong>Home</strong>
             </div>
         </a>
 
-        <a href="{{ url_for('profile_details') }}" class="item">
+        <a href="{{ url_for('profile_details') }}" class="item {{profile_active}}">
             <div class="col">
                 <ion-icon name="person-outline"></ion-icon>
+                <strong>Profile</strong>
             </div>
         </a>
 
-        <a href="{{ url_for('projects') }}" class="item">
+        <a href="{{ url_for('projects') }}" class="item {{projects_active}}">
             <div class="col">
                 <ion-icon name="briefcase-outline"></ion-icon>
+                <strong>Projects</strong>
             </div>
         </a>
 
-        <a href="{{ url_for('notifications') }}" class="item">
+        <a href="{{ url_for('notifications') }}" class="item {{notifications_active}}">
             <div class="col">
                 <ion-icon name="notifications-outline"></ion-icon>
+                <strong>Alerts</strong>
             </div>
         </a>
 
         <a href="#sidebarPanel" class="item" data-bs-toggle="offcanvas">
             <div class="col">
                 <ion-icon name="menu-outline"></ion-icon>
+                <strong>Menu</strong>
             </div>
         </a>
     </div>

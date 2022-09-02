@@ -1,0 +1,54 @@
+<!doctype html>
+
+<!--  -->
+{% if user.data.account.usertype == 'Engineering Talent' %}
+<!--  -->
+{% extends 'talent/layout.html' %}
+<!--  -->
+{% else %}
+<!--  -->
+{% extends 'pm/layout.html' %}
+<!--  -->
+{% endif %}
+<!--  -->
+{% block content %}
+
+
+<!-- App Header -->
+<div class="appHeader bg-primary text-light">
+    <div class="left">
+        <a href="#" class="headerButton goBack">
+            <ion-icon name="chevron-back-outline"></ion-icon>
+        </a>
+    </div>
+    <div class="pageTitle">Applicants</div>
+    <div class="right">
+    </div>
+</div>
+<!-- * App Header -->
+
+<!-- * Search Component -->
+
+<!-- App Capsule -->
+<div id="appCapsule">
+
+    <!-- project title here... -->
+    <ul class="listview image-listview">
+        {% for applicant in applicants %}
+
+        <li>
+            <a href="{{ url_for('profile_details', email=applicant.email) }}" class="item">
+                <img src="{{ applicant.photo }}" alt="image" class="image">
+                <div class="in">
+                    <div>{{ applicant.firstname }} {{ applicant.lastname }}</div>
+                </div>
+            </a>
+        </li>
+
+        {% endfor %}
+
+    </ul>
+
+</div>
+<!-- * App Capsule -->
+{% endblock %}

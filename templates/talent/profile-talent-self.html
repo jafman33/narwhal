@@ -88,7 +88,7 @@
                 })
                 .then((response) => response.json())
                 .then((data) => {
-                    console.log(data.status);
+                    // console.log(data.status);
                     if (data.status = "successfully updated database") {
                         fetch('{{ url_for("new_skill_notification") }}', {
                             method: "POST",

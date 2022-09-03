@@ -48,17 +48,21 @@
 <!-- * Default Action Sheet Inset -->
 
 <script>
-    function erase_notification(id, action, target) {
-        fetch("{{url_for('notificationDelete', notification_id = 'ID')}}".replace("ID", id), {
+    function profile_notification(id, email) {
+        fetch("{{url_for('notificationViewed', notification_id = 'ID')}}".replace("ID", id), {
                 method: "POST",
             }).then((response) => response.json())
             .then((data) => {
-                // console.log(data.status)
-                if (action = "profile_details") {
-                    window.location.href = "{{ url_for('profile_details', email = 'TARGET' ) }}".replace("TARGET", target)
-                } else {
-                    window.location.href = "{{ url_for('project_details', project_id = 'TARGET' ) }}".replace("TARGET", target)
-                }
+                window.location.href = "{{ url_for('profile_details', email = 'EMAIL' ) }}".replace("EMAIL", email);
+            });
+    }
+
+    function project_notification(id, target) {
+        fetch("{{url_for('notificationViewed', notification_id = 'ID')}}".replace("ID", id), {
+                method: "POST",
+            }).then((response) => response.json())
+            .then((data) => {
+                window.location.href = "{{ url_for('project_details', project_id = 'PROJECTID' ) }}".replace("PROJECTID", target)
             });
     }
 </script>
@@ -74,7 +78,7 @@
         <!-- New Connection -->
         {% if item.data.notification.type == "connection" %}
         <li>
-            <a href="#" class="item" onclick='erase_notification("{{item.ref.id()}}","profile_details","{{item.data.notification.target}}")'>
+            <a href="#" class="item" onclick='profile_notification("{{item.ref.id()}}","{{item.data.notification.target}}")'>
                 <div class="icon-box bg-primary">
                     <ion-icon name="person-outline"></ion-icon>
                 </div>
@@ -87,27 +91,27 @@
         <!-- * New Connection -->
 
         <!-- New Match -->
-        {% if item.data.notification.type == "match" and user.data.account.usertype == "Program Manager"%}
+        {% if item.data.notification.type == "talent_match" %}
         <li>
-            <a href="#" class="item" onclick='erase_notification("{{item.ref.id()}}","profile_details","{{item.data.notification.target}}")'>
+            <a href="#" class="item" onclick='profile_notification("{{item.ref.id()}}","{{item.data.notification.target}}")'>
                 <div class="icon-box bg-primary">
                     <ion-icon name="git-compare-outline"></ion-icon>
                 </div>
                 <div class="in">
-                    New Match! <br> {{item.data.notification.name}}
+                    New Talent Match! <br> {{item.data.notification.name}}
                 </div>
             </a>
         </li>
         {% endif %}
         <!-- or -->
-        {% if item.data.notification.type == "match" and user.data.account.usertype == "Engineering Talent"%}
+        {% if item.data.notification.type == "project_match" %}
         <li>
-            <a href="#" class="item" onclick='erase_notification("{{item.ref.id()}}","project_details","{{item.data.notification.target}}")'>
+            <a href="#" class="item" onclick='project_notification("{{item.ref.id()}}","{{item.data.notification.target}}")'>
                 <div class="icon-box bg-primary">
                     <ion-icon name="git-compare-outline"></ion-icon>
                 </div>
                 <div class="in">
-                    New Match! <br> {{item.data.notification.name}}
+                    New Project Match! <br> {{item.data.notification.name}}
                 </div>
             </a>
         </li>
@@ -117,7 +121,7 @@
         <!-- New Applicant -->
         {% if item.data.notification.type == "application" %}
         <li>
-            <a href="#" class="item" onclick='erase_notification("{{item.ref.id()}}","profile_details","{{item.data.notification.target}}")'>
+            <a href="#" class="item" onclick='profile_notification("{{item.ref.id()}}","{{item.data.notification.target}}")'>
                 <div class="icon-box bg-primary">
                     <ion-icon name="git-pull-request-outline"></ion-icon>
                 </div>

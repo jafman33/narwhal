@@ -117,6 +117,7 @@ def getDocsCount(var, index, id):
         )  
     )["data"]
     return result
+
     
     
 def getSkills(user_id):
@@ -274,6 +275,7 @@ def newNotificationDoc(profile_id,type,name,target):
                         "type": type,
                         "name": name,
                         "target": target,
+                        "status": "new",
                         },
                     }
                 },
@@ -282,6 +284,19 @@ def newNotificationDoc(profile_id,type,name,target):
 
 
 # updates
+def updateUserNotification(id):
+    client.query(
+        q.update(
+            q.ref(q.collection("notifications"), id),
+            {
+                "data": {
+                    "notification": {
+                        "status": "viewed",
+                    },
+                }
+            },
+        )
+    )
 
 def updateUserBookmarks(id,bookmarks):
     client.query(

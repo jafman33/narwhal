@@ -1,6 +1,3 @@
-from curses import erasechar
-from platform import python_branch
-from urllib.parse import uses_relative
 from app import app
 from config import (
     socketio, 
@@ -118,35 +115,40 @@ def intro():
 @login_required
 def notifications():
     user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
-    user_notifications = myLib.getDocs("notification","notification_index",user_data["ref"].id())
+    user_notifications = myLib.getDocs("notification","notification_index",session["user"]["id"])
     
-    return render_template("common/notifications.html", user=user_data, notifications = user_notifications, notifications_active = "active")
+    new_notifications = []
+    for item in user_notifications:
+        if item["data"]["notification"]["status"] == "new":
+            new_notifications.append(item)
+    
+    return render_template("common/notifications.html", user=user_data, notifications = new_notifications, notifications_active = "active")
 
 @app.route("/notification-count", methods=["POST"])
 @login_required
 def notificationCount():
     try:
-        user_notificationCount = myLib.getDocsCount("notification","notification_index",session["user"]["id"])
+        user_notifications = myLib.getDocs("notification","notification_index",session["user"]["id"])
+
+        count = 0
+        for item in user_notifications:
+            if item["data"]["notification"]["status"] == "new":
+                count += 1
+        user_notificationCount=[count]
         return jsonify({"notification_count": user_notificationCount})
     except:
         return jsonify({"notification_count": 0})
     
-    
-    
-    
-@app.route("/notification-delete", methods=["POST"])
+@app.route("/notification-viewed", methods=["POST"])
 @login_required
-def notificationDelete():
+def notificationViewed():
     notification_id  = request.args.get('notification_id', None)
-    print("notification_id: ", notification_id)
     try:
-        myLib.deleteItem("notifications", notification_id)
-        return jsonify({"status": "Successfuly Deleted Notification"})
+        myLib.updateUserNotification(notification_id)
+        # myLib.deleteItem("notifications", notification_id)
+        return jsonify({"status": "Successfuly Viewed Notification"})
     except:
-        return jsonify({"status": "Failed to delete notification"})
-
-
-
+        return jsonify({"status": "Failed to view notification"})
 
 @app.route("/project-applicants", methods=["GET", "POST"])
 @login_required
@@ -405,6 +407,7 @@ def add_application():
                 auth = project_owner["data"]["sub"]["keys"]["auth"]
                 project_title = client.query(q.get(q.ref(q.collection("projects"), project_id)))["data"]["project"]["title"]
                 myLib.updateUserApplications(user_applications["ref"].id(),user_applications["data"]["applications"])
+                # TOdo: Check it doesnt exist?
                 myLib.newNotificationDoc(project_owner["ref"].id(),"application",user_name,user_email)
 
                 return jsonify({
@@ -462,12 +465,15 @@ def new_applicant_notification():
 
 @app.route('/new-skill-notification', methods=["GET","POST"])
 def new_skill_notification():
+    # in the future, add endorsement option from update_skills call from profile-talent.html...
+    # body would change to Pablo has been endorsed...
     
     json_data = request.get_json('skill_info')
     data = json_data["skill_info"]
     skill = data['skill']
     talent_name = data['talent_name']
-    
+    talent_email = data['talent_email']
+
     # find match with project
     try: 
         projects_matched = myLib.getProjects_byKey(skill)
@@ -487,8 +493,10 @@ def new_skill_notification():
         
         # Create Narwhal Notification
         # 1. check that the notification document doesnt already exist
-        
+        # check that project_owner_id doesnt have "project_match" notification from talent_email
         # 2. create the notification
+        myLib.newNotificationDoc(project_owner_id,"talent_match",talent_name,talent_email)
+
         
         try:             
             results = trigger_push_notification(project_owner_subscription,title,body)
@@ -638,6 +646,9 @@ def education_edit():
 def projects():
     user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
     user_id = session["user"]['id']
+    user_email = session["user"]['email']
+    user_name = session["user"]['firstname'] + " " + session["user"]['lastname']
+    
     
     projects_all = myLib.getCollection("project","projects")
     
@@ -664,9 +675,25 @@ def projects():
     try:
         skills = client.query(q.get(q.match(q.index("skill_index"), user_id)))["data"]["skills"]
         skills_list = [list(i.values())[0] for i in skills]
+        matched_projects = myLib.getMatches_byList("project_keyword_index", skills_list)
     except:
-        skills_list = []
-    matched_projects = myLib.getMatches_byList("project_keyword_index", skills_list)
+        matched_projects = []
+     
+    # ################################   
+    # notifications creation and check
+    # ################################
+    for project in matched_projects:
+        project_owner_id = project["data"]["user_id"]
+        try:
+            pmNotification_docs = myLib.getDocs("notification","notification_index",project_owner_id)
+            if pmNotification_docs == []:
+                myLib.newNotificationDoc(project_owner_id,"talent_match",user_name,user_email)
+            else:
+                for doc in pmNotification_docs:
+                    if user_email not in doc["data"]["notification"]["target"] and "talent_match" not in doc["data"]["notification"]["type"]:
+                        myLib.newNotificationDoc(project_owner_id,"talent_match",user_name,user_email)
+        except:
+            pmNotification_docs = []
 
     return render_template(
         "common/project-list.html", 
@@ -717,19 +744,34 @@ def talent():
     user_projects = myLib.getDocs("project","project_index",user_id)
     
     # Find matches
+    talents_matched = []
+
     project_keywords= []
     for item in user_projects:
         for key in item["data"]["project"]["keywords"]:
             project_keywords.append(key["keyword"])
-    try:
-        matched_docs = myLib.getMatches_byList("skill_match_index", project_keywords)
-    except:
-        matched_docs = []
-    talents_matched = [
-        client.query(q.get(q.ref(q.collection("users"), doc["data"]["user_id"] ))
-            ) for doc in matched_docs
-    ]
-                
+        try:
+            matchedSkill_docs = myLib.getMatches_byList("skill_match_index", project_keywords)
+            matchedProject_id = item["ref"].id()
+            matchedProject_title = item["data"]["project"]["title"]
+        except:
+            matchedSkill_docs = []
+
+        for doc in matchedSkill_docs:
+            talent_id = doc["data"]["user_id"]
+            talents_matched.append(client.query(q.get(q.ref(q.collection("users"), talent_id ))))
+            # Check if the notification document from user already exists
+            try:
+                talentNotification_docs = myLib.getDocs("notification","notification_index",talent_id)
+                if talentNotification_docs == []:
+                    myLib.newNotificationDoc(talent_id,"project_match",matchedProject_title,matchedProject_id)
+                else:
+                    for doc2 in talentNotification_docs:
+                        if matchedProject_id not in doc2["data"]["notification"]["target"] and "project_match" not in doc2["data"]["notification"]["type"]:
+                            myLib.newNotificationDoc(talent_id,"project_match",matchedProject_title,matchedProject_id)
+            except:
+                talentNotification_docs = []
+
     # Query User's Bookmarks
     try:
         bookmarks = client.query(q.get(q.match(q.index("bookmark_index"), user_id)))["data"]["bookmarks"]
@@ -845,14 +887,17 @@ def add_project_keyword():
 
 @app.route('/update-skills', methods=["POST"])
 def update_skills():
-    talent_email  = request.args.get('email', None)
     talent_id = session["user"]["id"]
     talent_name = session["user"]["firstname"] + " " + session["user"]["lastname"]
+    talent_email = session["user"]["email"]
+    
+    email  = request.args.get('email', None)
 
-    if talent_email:
-        talent_data = client.query(q.get(q.match(q.index("userEmail_index"), talent_email)))
+    if email:
+        talent_data = client.query(q.get(q.match(q.index("userEmail_index"), email)))
         talent_id = talent_data["ref"].id()
         talent_name = talent_data["data"]["account"]["firstname"] + talent_data["data"]["account"]["lastname"]
+        talent_email = email
     
     json_data = request.get_json('skills_info')
     skills = json_data["skills_info"]
@@ -860,16 +905,15 @@ def update_skills():
     # Get talent skills
     talent_skils = client.query(q.get(q.match(q.index("skill_index"), talent_id)))
     updated_skills = []
-    # added_skill = ''
     for skill in skills:
         updated_skills.append({"skill": skill})
-        # added_skill = skill
     try:
         myLib.updateSkills(talent_skils["ref"].id(),updated_skills)
         return jsonify({
             "status": "successfully updated database",
             "skill": updated_skills[-1]["skill"],
-            "talent_name": talent_name
+            "talent_name": talent_name,
+            "talent_email": talent_email
             })
     except:
         return jsonify({"status": "failed to update the database"})
@@ -917,8 +961,13 @@ def profile_details():
     profile_contacts_data = []
     my_contact = {"status": False}
     user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
-    email  = request.args.get('email', None)
     
+    email  = request.args.get('email', None)
+    print("--------------")
+    print(email)
+    print("--------------")
+
+
     if email:
         self = False
         profile_data = client.query(q.get(q.match(q.index("userEmail_index"), email)))

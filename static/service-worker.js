@@ -64,8 +64,8 @@ self.addEventListener("push", function(event) {
 
     var title = data.title
     var body = data.body;
-    var icon = "{{url_for('static', filename='assets/img/sample/alerts/icon.png')}}";
-    var badge = "{{url_for('static', filename='assets/img/sample/alerts/badge.png')}}";
+    var icon = "../static/assets/img/sample/alerts/icon.png";
+    var badge = "../static/assets/img/sample/alerts/badge.png";
     var tag = 'simple-push-demo-notification-tag';
 
     event.waitUntil(
@@ -84,5 +84,7 @@ self.addEventListener("push", function(event) {
 self.addEventListener("notificationclick", function(event) {
     console.log("[Service Worker] Notification click Received.");
     event.notification.close();
-    event.waitUntil(clients.openWindow("document.domain + ':' + location.port + '/notifications'"));
+    event.waitUntil(clients.openWindow('http://0.0.0.0:5000/notifications'));
+
+    // event.waitUntil(clients.openWindow('http://' + document.domain + ':' + location.port + '/notifications'));
 });

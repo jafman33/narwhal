@@ -1,3 +1,4 @@
+from xml.etree.ElementTree import TreeBuilder
 from app import app
 from config import (
     socketio, 
@@ -84,6 +85,26 @@ def register():
             
     return render_template("common/register.html")
 
+# Register a new user and hash password
+@app.route("/password", methods=["GET", "POST"])
+@login_required
+def update_password():
+
+    if request.method == "POST":
+        
+        password1 = request.form["password1"]
+        password2 = request.form["password2"]
+        
+        if password1 != password2:
+            flash("Passwords do not match!")
+            return redirect(url_for('update_password'))
+        else:
+            myLib.updatePassword(hashlib.sha512(password1.encode()).hexdigest())
+            flash("Password updated successfully")
+            return redirect(url_for("home"))
+            
+    return render_template("common/password.html")
+
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -94,7 +115,7 @@ def login():
             user = client.query(q.get(q.match(q.index("userEmail_index"), email)))
             if (hashlib.sha512(password.encode()).hexdigest() == user["data"]["account"]["password"]):
                 myLib.createSession(user)   
-                return redirect(url_for("home"))
+                return redirect(url_for("intro"))
             else:
                 raise Exception()
         except Exception as e:
@@ -573,7 +594,6 @@ def experience_edit():
         company = request.form['company']  
         location = request.form['location']  
         status = request.form['status']  
-        print(end)
         industry = request.form['industry']  
 
         payload.update({"title": title})
@@ -964,10 +984,6 @@ def profile_details():
     user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
     
     email  = request.args.get('email', None)
-    print("--------------")
-    print(email)
-    print("--------------")
-
 
     if email:
         self = False

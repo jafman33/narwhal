@@ -189,8 +189,8 @@
             <a href="#" class="button" onclick='AddtoHome("10");'>
                 <ion-icon name="cloud-download-outline"></ion-icon>
             </a>
-            <a href="{{ url_for('under_construction') }}" class="button">
-                <ion-icon name="settings-outline"></ion-icon>
+            <a href="{{ url_for('update_password') }}" class="button">
+                <ion-icon name="key-outline"></ion-icon>
             </a>
             <a href="{{ url_for('logout') }}" class="button">
                 <ion-icon name="log-out-outline"></ion-icon>
@@ -327,7 +327,64 @@
 
         }
 
+        // Toast Append
+        function msgToast() {
+            var check = document.getElementById("msg-toast");
+            if (document.body.contains(check)) {
+                check.classList.add("show")
+            } else {
+                // Error Message Toast 
+                "{% with messages = get_flashed_messages() %}"
+                "{% if messages %}"
+                "{% for message in messages %}"
+                // You can change the text here
+                var msg = "{{ message }} ";
+                "{% endfor %}"
+                "{% endif %}"
+                "{% endwith %}"
+                pageBody.appendChild(document.createElement("div")).id = "msg-toast";
+                var toast = document.getElementById("msg-toast");
+                toast.className = "toast-box bg-primary toast-top tap-to-close";
+                toast.innerHTML =
+                    "<div class='in'>" +
+                    "<div class='text'>" +
+                    msg +
+                    "</div>" +
+                    "</div>"
+                setTimeout(() => {
+                    toastbox('msg-toast', 3000);
+                }, 500);
+            }
+        }
+
+        // Toast Function
+        function toast() {
+            msgToast();
+            var toast = document.getElementById("msg-toast")
+            toast.addEventListener("click", function() {
+                this.classList.remove("show")
+            })
+            setTimeout(() => {
+                toast.classList.remove("show")
+            }, 3000);
+        }
+
         document.addEventListener("DOMContentLoaded", function(event) {
+
+            // Error Message Toast 
+            "{% with messages = get_flashed_messages() %}"
+            "{% if messages %}"
+            "{% for message in messages %}"
+
+            if ("{{message}}" != '') {
+                toast();
+            };
+
+            "{% endfor %}"
+            "{% endif %}"
+            "{% endwith %}"
+
+
             fetch('{{ url_for("notificationCount") }}', {
                     method: "POST",
                 })

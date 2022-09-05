@@ -347,6 +347,20 @@ def updateProfile(account_payload,profile_payload):
                 },
             )
         )
+
+def updatePassword(password):
+    client.query(
+        q.update(
+            q.ref(q.collection("users"), session["user"]["id"]),
+            {
+                "data": {
+                    "account": {
+                        "password": password,
+                    }
+                    }
+                },
+            )
+        )
     
 def updateProjectDocument(id, payload):
     client.query(

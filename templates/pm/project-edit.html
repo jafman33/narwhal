@@ -18,19 +18,19 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function(event) {
-            '{% if project.data.project.start  != "null" %}'
+            '{% if project.data and project.data.project.start  != "null" %}'
             var start = '{{project.data.project.start}}'
             const startdate = new Date(start).toISOString().slice(0, 10);
             document.getElementById("start").value = startdate;
             '{% endif %}'
 
-            '{% if project.data.project.end != "null" %}'
+            '{% if project.data and project.data.project.end != "null" %}'
             var end = '{{project.data.project.end}}'
             const enddate = new Date(end).toISOString().slice(0, 10);
             document.getElementById("end").value = enddate;
             '{% endif %}'
 
-            '{% if project.data.project.location == "Remote" %}'
+            '{% if project.data and project.data.project.location == "Remote" %}'
             document.getElementById("mystatus").click();
             '{% endif %}'
 
@@ -57,12 +57,14 @@
 
         <div class="pageTitle">Edit Project</div>
         <div class="right">
+            {% if id %}
             <form action="{{ url_for('project_edit', project_id = id, erase = 'True') }}" method="POST">
                 <input hidden type="text" name="trash" id="trash" value="trash">
                 <button type="input" class="headerButton" style="background: transparent !important; border-width: 0px !important;">
                     <ion-icon name="trash-outline"></ion-icon>            
                 </button>
             </form>
+            {% endif %}
         </div>
     </div>
     <!-- * App Header -->
@@ -107,7 +109,7 @@
                             <div class="input-wrapper">
                                 <label class="form-label" for="sponsor">Sponsor</label>
                                 <!--  -->
-                                {% if project.data.project.sponsor != 'null' %}
+                                {% if project.data and project.data.project.sponsor != 'null' %}
                                 <input type="text" class="form-control" id="sponsor" name="sponsor" value='{{ project.data.project.sponsor }}' autocomplete="off">
                                 <!--  -->
                                 {% else %}
@@ -122,7 +124,7 @@
                             <div class="input-wrapper">
                                 <label class="form-label" for="title">Title</label>
                                 <!--  -->
-                                {% if project.data.project.title != 'null' %}
+                                {% if project.data and project.data.project.title != 'null' %}
                                 <input type="text" class="form-control" id="title" name="title" value='{{ project.data.project.title }}' autocomplete="off">
                                 <!--  -->
                                 {% else %}
@@ -137,7 +139,7 @@
                             <div class="input-wrapper">
                                 <label class="form-label" for="headline">Headline</label>
                                 <!--  -->
-                                {% if project.data.project.headline != 'null' %}
+                                {% if project.data and project.data.project.headline != 'null' %}
                                 <input type="text" class="form-control" id="headline" name="headline" value='{{ project.data.project.headline }}' autocomplete="off">
                                 <!--  -->
                                 {% else %}
@@ -152,7 +154,7 @@
                             <div class="input-wrapper">
                                 <label class="form-label" for="link">External Link</label>
                                 <!--  -->
-                                {% if project.data.project.link != 'null' %}
+                                {% if project.data and project.data.project.link != 'null' %}
                                 <input type="text" class="form-control" id="link" name="link" value='{{ project.data.project.link }}' autocomplete="off">
                                 <!--  -->
                                 {% else %}
@@ -169,7 +171,7 @@
                                 <div class="row">
                                     <div class="col-8">
                                         <!--  -->
-                                        {% if project.data.project.location != 'null' %}
+                                        {% if project.data and project.data.project.location != 'null' %}
                                         <input type="text" class="form-control" id="location" name="location" value='{{ project.data.project.location }}' autocomplete="off">
                                         <!--  -->
                                         {% else %}
@@ -192,7 +194,7 @@
                             <div class="input-wrapper">
                                 <label class="form-label" for="summary">Summary</label>
                                 <!--  -->
-                                {% if project.data.project.summary != 'null' %}
+                                {% if project.data and project.data.project.summary != 'null' %}
                                 <textarea id="summary" name="summary" rows="3" class="form-control">{{ project.data.project.summary }}</textarea>
                                 <!--  -->
                                 {% else %}
@@ -230,7 +232,7 @@
                             <div class="input-wrapper">
                                 <label class="form-label" for="talent">Talent Request Description</label>
                                 <!--  -->
-                                {% if project.data.project.talent != 'null' %}
+                                {% if project.data and project.data.project.talent != 'null' %}
                                 <textarea id="talent" name="talent" rows="3" class="form-control">{{ project.data.project.talent }}</textarea>
                                 <!--  -->
                                 {% else %}

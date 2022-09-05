@@ -18,20 +18,20 @@
     <script>
         document.addEventListener("DOMContentLoaded", function(event) {
 
-            '{% if experience.data.experience.start != "null" %}'
+            '{% if experience.data and experience.data.experience.start != "null" %}'
             var start = '{{experience.data.experience.start}}'
             const startdate = new Date(start).toISOString().slice(0, 10);
             document.getElementById("start").value = startdate;
             '{% endif %}'
 
 
-            '{% if experience.data.experience.end != "Present" and experience.data.experience.end != "null" %}'
+            '{% if experience.data and experience.data.experience.end != "Present" and experience.data.experience.end != "null" %}'
             var end = '{{experience.data.experience.end}}'
             const enddate = new Date(end).toISOString().slice(0, 10);
             document.getElementById("end").value = enddate;
             '{% endif %}'
 
-            '{% if experience.data.experience.status == "Present" %}'
+            '{% if experience.data and experience.data.experience.status == "Present" %}'
             document.getElementById("mystatus").click();
             '{% endif %}'
 
@@ -57,14 +57,14 @@
         </div>
         <div class="pageTitle">Edit Experience</div>
         <div class="right">
-
+            {% if id %}
             <form action="{{ url_for('experience_edit', experience_id = id, erase = 'True') }}" method="POST">
                 <input hidden type="text" name="trash" id="trash" value="trash">
                 <button type="input" class="headerButton" style="background: transparent !important; border-width: 0px !important;">
                     <ion-icon name="trash-outline"></ion-icon>            
                 </button>
             </form>
-
+            {% endif %}
         </div>
     </div>
     <!-- * App Header -->
@@ -86,7 +86,7 @@
                             <div class="input-wrapper">
                                 <label class="form-label" for="title">Title</label>
                                 <!--  -->
-                                {% if experience.data.experience.title != 'null' %}
+                                {% if experience.data and experience.data.experience.title != 'null' %}
                                 <input type="text" class="form-control" id="title" name="title" value='{{ experience.data.experience.title }}' autocomplete="off">
                                 <!--  -->
                                 {% else %}
@@ -101,7 +101,7 @@
                             <div class="input-wrapper">
                                 <label class="form-label" for="type">Employment Type</label>
                                 <!--  -->
-                                {% if experience.data.experience.type != 'null' %}
+                                {% if experience.data and experience.data.experience.type != 'null' %}
                                 <select class="form-control form-select" id="type" name="type">
                                     <option value='{{ experience.data.experience.type }}'>{{ experience.data.experience.type }}</option>
                                     <option value="Full-Time">Full-Time</option>
@@ -132,7 +132,7 @@
                             <div class="input-wrapper">
                                 <label class="form-label" for="company">Company Name</label>
                                 <!--  -->
-                                {% if experience.data.experience.company != 'null' %}
+                                {% if experience.data and experience.data.experience.company != 'null' %}
                                 <input type="text" class="form-control" id="company" name="company" value='{{ experience.data.experience.company }}' autocomplete="off">
                                 <!--  -->
                                 {% else %}
@@ -147,7 +147,7 @@
                             <div class="input-wrapper">
                                 <label class="form-label" for="location">Location</label>
                                 <!--  -->
-                                {% if experience.data.experience.location != 'null' %}
+                                {% if experience.data and experience.data.experience.location != 'null' %}
                                 <input type="text" class="form-control" id="location" name="location" value='{{ experience.data.experience.location }}' autocomplete="off">
                                 <!--  -->
                                 {% else %}
@@ -170,7 +170,7 @@
 
 
                         <!--  -->
-                        {% if experience.data.experience.status == 'Present' %}
+                        {% if experience.data and experience.data.experience.status == 'Present' %}
                         <input hidden type="text" class="form-control" id="status" name="status" value="Present">
                         <!--  -->
                         {% else %}
@@ -198,7 +198,7 @@
                             <div class="input-wrapper">
                                 <label class="form-label" for="industry">Industry</label>
                                 <!--  -->
-                                {% if experience.data.experience.industry != 'null' %}
+                                {% if experience.data and experience.data.experience.industry != 'null' %}
                                 <input type="text" class="form-control" id="industry" name="industry" value='{{ experience.data.experience.industry }}' autocomplete="off">
                                 <!--  -->
                                 {% else %}

@@ -18,19 +18,19 @@
     <script>
         document.addEventListener("DOMContentLoaded", function(event) {
 
-            '{% if education.data.education.start != "null" %}'
+            '{% if education.data and education.data.education.start != "null" %}'
             var start = '{{education.data.education.start}}'
             const startdate = new Date(start).toISOString().slice(0, 10);
             document.getElementById("start").value = startdate;
             '{% endif %}'
 
-            '{% if education.data.education.end != "Present" and education.data.education.end != "null" %}'
+            '{% if education.data and education.data.education.end != "Present" and education.data.education.end != "null" %}'
             var end = '{{education.data.education.end}}'
             const enddate = new Date(end).toISOString().slice(0, 10);
             document.getElementById("end").value = enddate;
             '{% endif %}'
 
-            '{% if education.data.education.status == "Present" %}'
+            '{% if education.data and education.data.education.status == "Present" %}'
             document.getElementById("mystatus").click();
             '{% endif %}'
 
@@ -56,14 +56,14 @@
         </div>
         <div class="pageTitle">Edit Education</div>
         <div class="right">
-
+            {% if id %}
             <form action="{{ url_for('education_edit', education_id = id, erase = 'True') }}" method="POST">
                 <input hidden type="text" name="trash" id="trash" value="trash">
                 <button type="input" class="headerButton" style="background: transparent !important; border-width: 0px !important;">
                     <ion-icon name="trash-outline"></ion-icon>            
                 </button>
             </form>
-
+            {% endif %}
         </div>
     </div>
     <!-- * App Header -->
@@ -84,7 +84,7 @@
                             <div class="input-wrapper">
                                 <label class="form-label" for="school">School</label>
                                 <!--  -->
-                                {% if education.data.education.school != 'null' %}
+                                {% if education.data and education.data.education.school != 'null' %}
                                 <input type="text" class="form-control" id="school" name="school" value='{{ education.data.education.school }}' autocomplete="off">
                                 <!--  -->
                                 {% else %}
@@ -99,7 +99,7 @@
                             <div class="input-wrapper">
                                 <label class="form-label" for="degree">Degree</label>
                                 <!--  -->
-                                {% if education.data.education.degree != 'null' %}
+                                {% if education.data and education.data.education.degree != 'null' %}
                                 <select class="form-control form-select" id="degree" name="degree">
                                     <option value='{{ education.data.education.degree }}'>{{ education.data.education.degree }}</option>
                                     <option value="Associates">Associates</option>
@@ -126,7 +126,7 @@
                             <div class="input-wrapper">
                                 <label class="form-label" for="field">Field of Study</label>
                                 <!--  -->
-                                {% if education.data.education.field != 'null' %}
+                                {% if education.data and education.data.education.field != 'null' %}
                                 <input type="text" class="form-control" id="field" name="field" value='{{ education.data.education.field }}' autocomplete="off">
                                 <!--  -->
                                 {% else %}
@@ -149,7 +149,7 @@
 
 
                         <!--  -->
-                        {% if education.data.education.status == 'Present' %}
+                        {% if education.data and education.data.education.status == 'Present' %}
                         <input hidden type="text" class="form-control" id="status" name="status" value="Present">
                         <!--  -->
                         {% else %}

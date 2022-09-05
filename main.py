@@ -545,17 +545,18 @@ def experience_edit():
     experience_data = []
     payload = {}
     
-    if not id:
-        experience_data = myLib.newExperiencesDoc()
-        id = experience_data["ref"].id()
-    else:
+    
+    if id:
         experience_data = client.query(q.get(q.ref(q.collection("experiences"), id)))
-        
-    if request.method == 'POST' and erase:
-        myLib.deleteItem("experiences",id)
-        return redirect(url_for('profile_details'))
+        if request.method == 'POST' and erase:
+            myLib.deleteItem("experiences",id)
+            return redirect(url_for('profile_details'))
 
     if request.method == 'POST' and not erase:    
+        if not id:
+            experience_data = myLib.newExperiencesDoc()
+            id = experience_data["ref"].id()
+        
         start = request.form['start']
         if start:
             date_time_obj = datetime.strptime(start, '%Y-%m-%d')
@@ -565,13 +566,14 @@ def experience_edit():
         if end and end != 'Present':
             date_time_obj = datetime.strptime(end, '%Y-%m-%d')
             end = date_time_obj.strftime("%m/%d/%Y")
-            payload.update({"end": end})
+        payload.update({"end": end})
             
         title = request.form['title']
         type = request.form['type']  
         company = request.form['company']  
         location = request.form['location']  
         status = request.form['status']  
+        print(end)
         industry = request.form['industry']  
 
         payload.update({"title": title})
@@ -598,19 +600,18 @@ def education_edit():
     erase  = request.args.get('erase', None)
     education_data = []
     payload = {}
-
-    if not id:
-        education_data = myLib.newEducationsDoc()
-        id = education_data["ref"].id()
-    else:
+    
+    if id:
         education_data = client.query(q.get(q.ref(q.collection("educations"), id)))
-        
-    if request.method == 'POST' and erase:
-        myLib.deleteItem("educations",id)
-        return redirect(url_for('profile_details'))
+        if request.method == 'POST' and erase:
+            myLib.deleteItem("educations",id)
+            return redirect(url_for('profile_details'))
 
     if request.method == 'POST' and not erase:
-                
+        if not id:
+            education_data = myLib.newEducationsDoc()
+            id = education_data["ref"].id()
+        
         start = request.form['start']
         if start:
             date_time_obj = datetime.strptime(start, '%Y-%m-%d')
@@ -621,7 +622,7 @@ def education_edit():
         if end and end != 'Present':
             date_time_obj = datetime.strptime(end, '%Y-%m-%d')
             end = date_time_obj.strftime("%m/%d/%Y")
-            payload.update({"end": end})
+        payload.update({"end": end})
             
         school = request.form['school']
         degree = request.form['degree']  
@@ -804,11 +805,8 @@ def project_edit():
     payload = {}
     
     user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
-
-    if not id:
-        project_data = myLib.newProjectsDoc()
-        id = project_data["ref"].id()
-    else:
+    
+    if id:
         try:
             project_data = client.query(q.get(q.ref(q.collection("projects"), id)))
             keywords = project_data["data"]["project"]["keywords"]
@@ -817,11 +815,14 @@ def project_edit():
         except:
             keyword_list = []
             
-    if request.method == 'POST' and erase:
-        myLib.deleteItem("projects",id)
-        return redirect(url_for('profile_details'))
+        if request.method == 'POST' and erase:
+            myLib.deleteItem("projects",id)
+            return redirect(url_for('profile_details'))
 
     if request.method == 'POST' and not erase:
+        if not id:
+            project_data = myLib.newProjectsDoc()
+            id = project_data["ref"].id()
 
         banner = request.files['file']
         if banner.filename != '':
@@ -834,12 +835,12 @@ def project_edit():
             date_time_obj = datetime.strptime(start, '%Y-%m-%d')
             start = date_time_obj.strftime("%m/%d/%Y")
             payload.update({"start": start})
-        end = request.form['end']  
         
+        end = request.form['end']  
         if end and end != 'Present':
             date_time_obj = datetime.strptime(end, '%Y-%m-%d')
             end = date_time_obj.strftime("%m/%d/%Y")   
-            payload.update({"end": end})
+        payload.update({"end": end})
             
         sponsor = request.form['sponsor']
         title = request.form['title']  

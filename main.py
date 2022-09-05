@@ -1420,6 +1420,6 @@ def get_public_key():
 #     return app.send_from_directory('static', 'manifest.json')
 
 if __name__ == "__main__":
-    socketio.run(app, debug=True)
+    socketio.run(app, debug=True, host='0.0.0.0')
 
 

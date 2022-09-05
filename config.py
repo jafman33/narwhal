@@ -8,12 +8,25 @@ import os
 # reads key-value pairs from a .env file and can set them as environment variables
 load_dotenv()
 
-client = FaunaClient(
-    secret=os.getenv("FAUNA_KEY"),
-    domain="db.us.fauna.com",
-    port=443,
-    scheme="https"
-    )
+default="linode"
+
+if default == "linode":
+    client = FaunaClient(
+        secret=os.getenv("FAUNA_KEY"),
+        domain="db.us.fauna.com",
+        port=443,
+        scheme="http"
+        )
+    
+if default == "cloud":    
+    client = FaunaClient(
+        secret=os.getenv("FAUNA_KEY"),
+        domain="db.us.fauna.com",
+        port=443,
+        scheme="https"
+        )
+
+
 
 socketio = SocketIO(app)
 

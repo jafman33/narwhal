@@ -23,17 +23,17 @@ An fully functional online demo of this project is provided through access to [n
 The objective of this demo is to provide you with the complete experience of the Narwhal progressive web application.
 
 You may log in using an engineering talent account, or a program manager account:
-#### Browse Narwhal as: `engineering talent`
+#### Browse Narwhal as: `Engineering Talent`
 `Email:` talent@narwhal.app
 `Password:` NarwhalApp
 
-When browsing under the `engineering talent` account, your profile will be setup and you'll be able to browse through several projects from 3 different program managers, each with 2 active projects.
+When browsing under the `Engineering Talent` account, your profile will be setup and you'll be able to browse through several projects from 3 different program managers, each with 2 active projects.
 
-#### Browse Narwhal as: `program manager`
+#### Browse Narwhal as: `Program Manager`
 `Email:` pm@narwhal.app
 `Password:` NarwhalApp
 
-When browsing under the `program manager` account, your profile and projects will be setup and you'll be able to browse through 5 talented
+When browsing under the `Program Manager` account, your profile and projects will be setup and you'll be able to browse through 5 talented
 
 
 ## 1. About
@@ -43,7 +43,7 @@ When browsing under the `program manager` account, your profile and projects wil
 The Naval Warfare Centers work on ever changing Research, Development, Test, and Evaluation (RDT&E) projects for various customers/sponsors across the DoD. However, being able to match project needs with available personnel is a challenge. With the help of a workshop with Begin Morning Nautical Twilight (BMNT), the Naval Information Warfare Center Pacific (NIWC Pacific) have derived that the Naval workforce could benefit from an online, interactive Gig economy. Therefore, we are looking to leverage novel concepts and new technologies currently being used to create the emergent “Gig Economy” and develop an internal capability to more efficiently and effectively solicit short-term project needs and find skilled workers to help with tasks. For additional information, please check out the full [challenge details.](https://www.challenge.gov/?challenge=project-narwhal)
 
 ### 1.2 Project Requirements
-Submissions will be judged based on ability to adhere to the 7 feature requests provided below:
+The project objectives are laid out by the following 7 feature requests:
 1.  **Talent profiles**
     - Intuitive and fun user interface (UI) that allows engineers to create profiles.  
 	    - Requires the ability to easily input both pre-populated and manually entered skills
@@ -76,12 +76,12 @@ Submissions will be judged based on ability to adhere to the 7 feature requests 
 |2| Program Manager Profiles 	|    Success    | . |
 |3| Matching Algorithm 				|    Success    | . |
 |4| Intuitive Home-Page 			|    Success    | . |
-|5| Push Notifications 				|    Success    | . |
-|6| Containerized 						|    Success    | `docker pull jafman3/narwhal_web` |
-|7| Repository 								|    Success    | `git@github.com:jafman33/narwhal.git` |
+|5| Notifications 					|    Success    | Both in-app and web-push          |
+|6| Containerized 					|    Success    | `docker pull jafman3/narwhal_web` |
+|7| Repository 						|    Success    | `git@github.com:jafman33/narwhal.git` |
 
 
-### 2.2 Technology
+### 2.2 Technology Employed
 I have been intrigued with PWAs for a while and finally decided to make something serious with it. iOS to release push notifications in 2023! Web Push is to be expected in 2023 on iOS and iPadOS. https://webkit.org/blog/12945/meet-web-push/
 The Narwhal project is a progressive web application **PWA**, built using python **Flask**, taking advantage of **Fauna**'s server-less database.
 

@@ -22,12 +22,14 @@ The Naval Warfare Centers work on ever changing Research, Development, Test, and
 ### 1.2 Project Requirements
 The project objectives are laid out by the following 7 feature requests:
 1.	Talent profiles: Narwhal provides an intuitive and fun UI that allows talent to create profiles where they
-	-	can visualize an overview of their profile progress to incentivize users to fully complete profiles
-	-	can easily input both pre-populated and manually entered content
-	-	can provide information about their availability, skills, objective, and much more!
+	- can visualize an overview of their profile progress to engage users to fully complete their profiles!
+	- can easily input both pre-populated and manually entered content.
+	- can provide information about their availability, skills, objective, and much more!
+	- automatically get matched with projects that meet one or more of their skills and talents.
 2.	Program manager profiles: Intuitive and fun UI for Program Managers that allows them to break down a task.
-	-	requires both the ability to input free text and suggest text.
-	-	requires the ability to search through past and active projects easily by different filters
+	- create blog-post style projects that talent can then bookmark, share, and apply to
+	- input both free text and suggest text while searching for talent
+	- automatically get matched with active talents that meet one or more of their project requirements.
 3.	Matching algorithm: Narwhal provides the ability for both talent and program managers to
 	-	perform efficient searches through active projects or talent respectively via key words 
 	-	be proposed automatic matches of projects or talent respectively without the need for user input
@@ -50,22 +52,27 @@ The project objectives are laid out by the following 7 feature requests:
 |3| Matching Algorithm 				|    Success    | Basic but fully scalable demonstration. Automatic and Keyword Based |
 |4| Intuitive Home-Page 			|    Success    | Talent can find projects and program managers can find talent |
 |5| Notifications 					|    Success    | Both in-app and web-push          |
-|6| Containerized 					|    Success    | `docker pull jafman3/narwhal_web:firsttry` |
+|6| Containerized 					|    Success    | `docker pull jafman3/narwhal_web:submission` |
 |7| Repository 						|    Success    | `git@github.com:jafman33/narwhal.git` |
 
+DockerHub and GitHub repositories are private. Please request access per instructions by Dr. Jamie R. Lukos
 
 ## 2. Get Started
 
+The link to the Narwhal image can be obtained by:
+
+`docker pull jafman3/narwhal_web:submission`
+
+Note that this is a private repository and permission will be granted upon request.
+Ref: Conversation with Dr. Jamie R. Lukos
+
 ### 2.1 Docker Compose
 
-In compliance with ```Project Requirement 6```,  both a ```Dockerfile``` and a ```docker-compose.yml``` has been provided with this submission. 
-
-The link to the Narwhal image is stored in [Dockerhub](#).
+In compliance with ```Project Requirement 6```,  both a ```Dockerfile``` and a ```docker-compose.yml``` have been provided with this submission. 
 
 Assuming you have docker installed, you may build and run the narwhal project with the following command:
 
 ```docker compose up```
-
 
 Verify the deployment by navigating to your server address in your preferred browser.
 
@@ -99,6 +106,8 @@ You should see a (venv) appear at the beginning of your terminal prompt indicati
 Now simply install the packages using:
 
 `pip install -r requirements.txt`
+
+Note that this project uses Python3.8.9. Python versions above this may result in compilations errors.
 
 ## 3. Contact
 

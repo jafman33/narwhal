@@ -970,8 +970,10 @@ def add_project_keyword():
         updated_keys = []
         for key in keys:
             updated_keys.append({"keyword": key})            
-            
         myLib.updateProjectKeys(id,updated_keys)
+        
+        # here... 
+        # todo... notifications!
 
         return jsonify({"status": "successfully updated database",})
     return jsonify({"status": "new project: ID has not been assigned",})

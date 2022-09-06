@@ -425,7 +425,10 @@ def add_application():
 
             try:
                 project_owner = client.query(q.get(q.match(q.index("userEmail_index"), project_email)))
-                auth = project_owner["data"]["sub"]["keys"]["auth"]
+                if project_owner["data"]["sub"]["keys"]["auth"]:
+                    auth = project_owner["data"]["sub"]["keys"]["auth"]
+                else:
+                    auth = "null"
                 project_title = client.query(q.get(q.ref(q.collection("projects"), project_id)))["data"]["project"]["title"]
                 myLib.updateUserApplications(user_applications["ref"].id(),user_applications["data"]["applications"])
                 # TOdo: Check it doesnt exist?
@@ -670,8 +673,22 @@ def projects():
     user_email = session["user"]['email']
     user_name = session["user"]['firstname'] + " " + session["user"]['lastname']
     
+    project_search = []
+    keywords_list = []
     
-    projects_all = myLib.getCollection("project","projects")
+    # Pull all skills collection documnets and create a list!!
+    # Need to optimize this in the future... or create an all skills collection!
+    try:
+        project_docs = myLib.getCollection("project","projects")
+        for doc in project_docs:
+            keywords_in_doc = [list(i.values())[0] for i in doc["data"]["project"]["keywords"]]
+            for keyword in keywords_in_doc:
+                keywords_list.append(keyword)
+        # remove duplicates
+        keywords_list = [*set(keywords_list)]
+    except:
+        keywords_list = []
+
     
     try:
         bookmarks = client.query(q.get(q.match(q.index("bookmark_index"), user_id)))["data"]["bookmarks"]
@@ -715,14 +732,31 @@ def projects():
                         myLib.newNotificationDoc(project_owner_id,"talent_match",user_name,user_email)
         except:
             pmNotification_docs = []
+            
+    # #########
+    # Filter 
+    # #########
+    # Filter all
+    if request.method == 'POST' and request.form['btn'] == 'Show All Projects':
+        try:
+            project_search = myLib.getCollection("project","projects")
+        except:
+            project_search = []
+            
+    # Filter by keyword
+    if request.method == 'POST' and request.form['btn'] == 'Search':
+        searchword = request.form["keyword"]
+        project_search = myLib.getProjects_byKey(searchword) 
+
 
     return render_template(
         "common/project-list.html", 
         user=user_data, 
-        projects=projects_all, 
+        projects=project_search, 
         bookmarks=projects_bookmarked, 
         applications=projects_applied, 
         matches=matched_projects,
+        keywords=json.dumps(keywords_list),
         projects_active="active"
         )
     
@@ -760,12 +794,26 @@ def project_details():
 def talent():
     user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
     user_id = session["user"]["id"]
-
-    talents_all = myLib.getDocs("talent","user_type_index","Engineering Talent")
-    user_projects = myLib.getDocs("project","project_index",user_id)
+    talent_search = []
+    skills_list = []
     
-    # Find matches
+    
+    # Pull all skills collection documnets and create a list!!
+    # Need to optimize this in the future... or create an all skills collection!
+    try:
+        skill_docs = myLib.getCollection("skills","skills")
+        for doc in skill_docs:
+            skills_in_doc = [list(i.values())[0] for i in doc["data"]["skills"]]
+            for skill in skills_in_doc:
+                skills_list.append(skill)
+        # remove duplicates
+        skills_list = [*set(skills_list)]
+    except:
+        skills_list = []
+    
+    # Auto-Match
     talents_matched = []
+    user_projects = myLib.getDocs("project","project_index",user_id)
 
     project_keywords= []
     for item in user_projects:
@@ -793,7 +841,7 @@ def talent():
             except:
                 talentNotification_docs = []
 
-    # Query User's Bookmarks
+    # User's Bookmarks
     try:
         bookmarks = client.query(q.get(q.match(q.index("bookmark_index"), user_id)))["data"]["bookmarks"]
         bookmark_list = [list(i.values())[0] for i in bookmarks]
@@ -803,13 +851,36 @@ def talent():
         client.query(q.get(q.ref(q.collection("users"), user_id ))
             ) for user_id in bookmark_list
     ]
-
+    
+    # #########
+    # Filter 
+    # #########
+    
+    # Filter all
+    if request.method == 'POST' and request.form['btn'] == 'Show All Talent':
+        try:
+            talent_search = myLib.getDocs("talent","user_type_index","Engineering Talent")
+        except:
+            talent_search = []
+            
+    # Filter by skill
+    if request.method == 'POST' and request.form['btn'] == 'Search':
+        skill = [request.form["skill"]]
+        try: 
+            skill_search_docs = myLib.getMatches_byList("skill_match_index", skill)
+        except:
+            skill_search_docs = []
+        for doc in skill_search_docs:
+            talent_id = doc["data"]["user_id"]
+            talent_search.append(client.query(q.get(q.ref(q.collection("users"), talent_id ))))
+        
     return render_template(
         "common/talent-list.html", 
         user=user_data, 
-        talents=talents_all, 
+        talents=talent_search, 
         matches=talents_matched,
         bookmarks=talents_bookmarked,
+        skills=json.dumps(skills_list),
         talent_active="active"
         )
 

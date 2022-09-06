@@ -82,7 +82,7 @@
                 // update icons and button
                 el.querySelector('ion-icon').setAttribute('name', data.name);
                 el.querySelector('span').textContent = data.text
-                if (data.text == 'Un-Apply') {
+                if (data.text == 'Un-Apply' && data.auth != "null") {
                     fetch('{{ url_for("new_applicant_notification") }}', {
                         method: "POST",
                         body: JSON.stringify({

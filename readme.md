@@ -1,5 +1,5 @@
 # Project Narwhal
-
+Narwhal is an interactive Progressive Web Application designed with the intent of creating employment connections for the Naval Workforce. Narwhal leverages novel concepts and new technologies currently being employed to create the emergent “Gig Economy”. We have developed the internal capability for project managers to more effectively solicit short-term project needs while connecting them with skilled engineers to take their projects to the next level.
 ### Table of contents
 0. **Demo**
 1. **About**
@@ -7,10 +7,6 @@
 	1.2 Project Requirements
 2. **Submission**
 	2.1 Compliance Matrix
-	2.2 Technology
-	2.3 User Experience
-	2.4 Features
-	2.5 Future Integration
 3. **Get Started**
 	3.1 Docker Compose
 	3.3 Docker File
@@ -19,7 +15,7 @@
 5. **License**
 
 ## 0. Demo
-An fully functional online demo of this project is provided through access to [narwhal.app](https://narwhal.app) 
+An fully functional online demo of this project is provided through access to [Narwhal](http://139.144.26.69) 
 The objective of this demo is to provide you with the complete experience of the Narwhal progressive web application.
 
 You may log in using an engineering talent account, or a program manager account:
@@ -27,13 +23,13 @@ You may log in using an engineering talent account, or a program manager account
 `Email:` talent@narwhal.app
 `Password:` NarwhalApp
 
-When browsing under the `Engineering Talent` account, your profile will be setup and you'll be able to browse through several projects from 3 different program managers, each with 2 active projects.
+When browsing under the `Engineering Talent` account, your profile will be setup and you'll be able to browse through one or more projects from 2 different program managers.
 
 #### Browse Narwhal as: `Program Manager`
 `Email:` pm@narwhal.app
 `Password:` NarwhalApp
 
-When browsing under the `Program Manager` account, your profile and projects will be setup and you'll be able to browse through 5 talented
+When browsing under the `Program Manager` account, your profile and projects will be setup and you'll be able to browse through 2 talented individuals.
 
 
 ## 1. About
@@ -80,48 +76,6 @@ The project objectives are laid out by the following 7 feature requests:
 |6| Containerized 					|    Success    | `docker pull jafman3/narwhal_web` |
 |7| Repository 						|    Success    | `git@github.com:jafman33/narwhal.git` |
 
-
-### 2.2 Technology Employed
-I have been intrigued with PWAs for a while and finally decided to make something serious with it. iOS to release push notifications in 2023! Web Push is to be expected in 2023 on iOS and iPadOS. https://webkit.org/blog/12945/meet-web-push/
-The Narwhal project is a progressive web application **PWA**, built using python **Flask**, taking advantage of **Fauna**'s server-less database.
-
-Websites have many reasons to notify their users of time-sensitive or high-priority events, even if the user does not currently have the site open. This feature is called Web Push, and is enabled by the W3C standards for Push API, Notifications API, and Service Workers, all working together. WebKit now supports the relevant parts of those standards to enable Web Push.
-
-**[Flask](https://www.fullstackpython.com/flask.html)** is a web development micro-framework developed in Python. Flask is known as a _micro-framework_ because it is _lightweight_ and _only_ provides components that are _essential_. It only provides the necessary components for web development, such as routing, request handling, sessions, and so on.
-
-**[PWAs](https://web.dev/what-are-pwas/)** are web apps developed using a number of specific technologies and standard patterns to allow them to take advantage of both web apps and native app features. PWA's are built and enhanced with modern APIs to deliver enhanced capabilities, reliability, and installability while reaching _anyone, anywhere, on any device_ with a single code-base. The best practical examples of PWA's can be found at Google as they created the concept. YouTube, Twitter, and the Chinese retail giant Alibaba serve all mobile traffic via PWAs 
-{picture here}
-You can start a PWA from the browser, and just like with a native app, you can install an icon on the home screen. The PWA is extremely fast and offers the ability to work offline or on slow networks. You don't have to download the PWA unlike a native app, and therefore, the PWA is always up to date. Having a PWA also helps a lot with SEO best practices, resulting in a higher Google ranking. Google provides tools to test if your PWA is good enough, load times and security (an HTTPS connection is required) are particularly important.
-
-In terms of maintenance, a PWA means less work. You would normally maintain the website plus two apps (Android and iOS). With a PWA, the content is now delivered from a single platform. On top of that, you don't have to deal with the requirements and possible geographical restrictions of app stores.
-
-**[Fauna](https://fauna.com/)** is a distributed document-relational database delivered as a cloud API. You can build existing applications to Fauna and scale without worrying about operations.
-
-Additional integrations
-talk about S3
-talk about Calendly
-
-### 2.3 User Experience
-
-
-### 2.4 Features
-
-calendly + zoom
-messenger
-
-Push Notifications let your Progressive Web App go far beyond the browser and are an incredibly useful way to (re)engage with your website visitors. You're in control of exactly when you want to show your visitors something that's intended for them, such as a confirmation, update, or discount at your chosen time. This makes visitors personally feel more engaged with your company and the information you would like to share with them. The chance of returning visitors is enormous and as a result, your brand awareness will increase enormously. Therefore, we see Web Push Notifications as a great value extension for higher user engagement. it feels very native and particularly on Android, where web notifications work and there is better support in general for theming and browser apis.
-
-for pms, ability to edit projects easily.
-for 
-
-### 2.4 Future Integrations
-
-LinkedIn API - Noticed a lot of work on the side of the engineer. 
-Sharing Projects 
-Sharing Engineer Profiles
-
-
-it feels very native and particularly on Android, where web notifications work and there is better support in general for theming and browser apis.
 
 ## 3. Get Started
 
@@ -170,8 +124,10 @@ If there is a requirements.txt file, run it as follows:
 For any questions, please contact the creator of this work, please contact the sole developer and creator of this submission.
 
 `Name:` Juan-Pablo Afman
+
 `LinkedIn:`  [linkedin.com/in/jp-afman](https://www.linkedin.com/in/jp-afman/)
-`Email:` [jafman3@gmail.com](mailto:jafman3@gmail.com)
+
+`Email:` [jafman3@gmail.com](mailto:jp-afman@atlrobotics.com)
 
 ## 5. License
 [MIT](https://choosealicense.com/licenses/mit/)

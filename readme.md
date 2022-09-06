@@ -1,38 +1,19 @@
 # Project Narwhal
 Narwhal is an interactive Progressive Web Application designed with the intent of creating employment connections for the Naval Workforce. Narwhal leverages novel concepts and new technologies currently being employed to create the emergent “Gig Economy”. We have developed the internal capability for project managers to more effectively solicit short-term project needs while connecting them with skilled engineers to take their projects to the next level.
 ### Table of contents
-0. **Demo**
-1. **About**
-	1.1 Creating the Navy’s Gig Economy App
-	1.2 Project Requirements
-2. **Submission**
-	2.1 Compliance Matrix
-3. **Get Started**
-	3.1 Docker Compose
-	3.3 Docker File
-	3.3 Build from Scratch
-4. **Contact**
-5. **License**
+1. **Project Submission**
+	- 1.1 Creating the Navy’s Gig Economy App
+	- 1.2 Project Requirements
+	- 1.3 Compliance Matrix
+2. **Get Started**
+	- 2.1 Docker Compose
+	- 2.3 Docker File
+	- 2.3 Build from Scratch
+3. **Contact**
+4. **License**
+5. **Demo**
 
-## 0. Demo
-An fully functional online demo of this project is provided through access to [Narwhal](http://139.144.26.69) 
-The objective of this demo is to provide you with the complete experience of the Narwhal progressive web application.
-
-You may log in using an engineering talent account, or a program manager account:
-#### Browse Narwhal as: `Engineering Talent`
-`Email:` talent@narwhal.app
-`Password:` NarwhalApp
-
-When browsing under the `Engineering Talent` account, your profile will be setup and you'll be able to browse through one or more projects from 2 different program managers.
-
-#### Browse Narwhal as: `Program Manager`
-`Email:` pm@narwhal.app
-`Password:` NarwhalApp
-
-When browsing under the `Program Manager` account, your profile and projects will be setup and you'll be able to browse through 2 talented individuals.
-
-
-## 1. About
+## 1. Project Submission
 
 ### 1.1 Creating the Navy's Gig Economy App
 
@@ -40,54 +21,57 @@ The Naval Warfare Centers work on ever changing Research, Development, Test, and
 
 ### 1.2 Project Requirements
 The project objectives are laid out by the following 7 feature requests:
-1.  **Talent profiles**
-    - Intuitive and fun user interface (UI) that allows engineers to create profiles.  
-	    - Requires the ability to easily input both pre-populated and manually entered skills
-	    - Requires the ability of the engineers to provide information about their availability and interests 
-	    - The Challenge winner would have a way to engage the engineer to make this fun.
-2.  **Program manager profiles**
-    - Intuitive and fun UI for Program Managers that allows them to break down a task.  
-	    - Requires both the ability to input free text and suggest text. 
-	    - Requires the ability to search through past and active projects easily by different filters 
-3.  **Matching algorithm**
-    -   Requires the ability to easily search through matches.
-    -   Every successful match is then used to reinforce the algorithm and update a “rating” for the engineer.
-4.  **Intuitive and user-friendly homepage**
-	- Includes robust search algorithm that lets:
-		- project managers to easily search through engineer profiles and,
-		- allows talent to see posted projects.
-5.  **Push notifications**
-	- Ability to set alerts that will ping users when certain key words, skills, or project tasks are posted.
-6.  **Container**
-	- The entire application needs to be able to be built with a DockerFile.
-7.  **Repository**
-	- The complete code repository needs to be provided for review.
+1.	Talent profiles: Narwhal provides an intuitive and fun UI that allows talent to create profiles where they
+	-	can visualize an overview of their profile progress to incentivize users to fully complete profiles
+	-	can easily input both pre-populated and manually entered content
+	-	can provide information about their availability, skills, objective, and much more!
+2.	Program manager profiles: Intuitive and fun UI for Program Managers that allows them to break down a task.
+	-	requires both the ability to input free text and suggest text.
+	-	requires the ability to search through past and active projects easily by different filters
+3.	Matching algorithm: Narwhal provides the ability for both talent and program managers to
+	-	perform efficient searches through active projects or talent respectively via key words 
+	-	be proposed automatic matches of projects or talent respectively without the need for user input
+	-	enter and endorse skills respectively.
+4.	Intuitive and user-friendly homepage: Includes robust search algorithm that lets:
+	-	project managers to easily search through engineer profiles and,
+	-	allows talent to see posted projects.
+5.	Push notifications: Narwhal supports both web-push notifications and in-app notifications that ping users when 
+	-	a new match between a project and a talent has been automatically detected
+	-	a new contact has been requested
+	-	a new application to a project has been submitted
+6.	Docker Container: The Narwhal PWA builds both from source and a DockerFile has been provided.
+7.	Shared Repository: The Narwhal PWA code repository has been provided for review. 
 
-## 2. Submission
-
-### 2.1 Compliance Matrix
+### 1.3 Compliance Matrix
 | |      Requirement          |     Status    |     Notes     |
 |-|---------------------------|:-------------:|---------------|
-|1| Talent Profiles 					|    Success    | . |
-|2| Program Manager Profiles 	|    Success    | . |
-|3| Matching Algorithm 				|    Success    | . |
-|4| Intuitive Home-Page 			|    Success    | . |
+|1| Talent Profiles 				|    Success    | Intuitive and fun UI for engaging talent to create robust profiles |
+|2| Program Manager Profiles 		|    Success    | Intuitive and fun UI for program managers to create project posts |
+|3| Matching Algorithm 				|    Success    | Basic but fully scalable demonstration. Automatic and Keyword Based |
+|4| Intuitive Home-Page 			|    Success    | Talent can find projects and program managers can find talent |
 |5| Notifications 					|    Success    | Both in-app and web-push          |
-|6| Containerized 					|    Success    | `docker pull jafman3/narwhal_web` |
+|6| Containerized 					|    Success    | `docker pull jafman3/narwhal_web:firsttry` |
 |7| Repository 						|    Success    | `git@github.com:jafman33/narwhal.git` |
 
 
-## 3. Get Started
+## 2. Get Started
 
-### 3.1 Docker Compose
+### 2.1 Docker Compose
 
-In compliance with ```Project Requirement 6```,  both a ```Dockerfile``` and a ```docker-compose.yml``` has been provided with this submission. Assuming you have docker installed, you may build and run the narwhal project with the following command:
-
-```docker compose up```
+In compliance with ```Project Requirement 6```,  both a ```Dockerfile``` and a ```docker-compose.yml``` has been provided with this submission. 
 
 The link to the Narwhal image is stored in [Dockerhub](#).
 
-### 3.2 Dockerfile
+Assuming you have docker installed, you may build and run the narwhal project with the following command:
+
+```docker compose up```
+
+
+Verify the deployment by navigating to your server address in your preferred browser.
+
+``` 127.0.0.1:5000 ```
+
+### 2.2 Dockerfile
 Alternatively, you may build and run the narwhal project without using docker compose. 
 
 ```docker build --tag narwhal-docker:latest .```
@@ -96,7 +80,7 @@ Alternatively, you may build and run the narwhal project without using docker co
 
 For additional questions, visit [Docker](https://docker-curriculum.com/).
 
-### 3.3 Build from scratch 
+### 2.3 Build from scratch 
 In VS Code, open a terminal and navigate to the current directory if not already there.
 
 `cd <my-project>/`
@@ -111,15 +95,12 @@ These commands create a venv/ directory in your project where all dependencies a
 
 `source venv/bin/activate`
 
-You should see a (venv) appear at the beginning of your terminal prompt indicating that you are working inside the virtualenv. Now when you install something like this:
-
-`pip install <package>`
-
-If there is a requirements.txt file, run it as follows:
+You should see a (venv) appear at the beginning of your terminal prompt indicating that you are working inside the virtualenv. 
+Now simply install the packages using:
 
 `pip install -r requirements.txt`
 
-## 4. Author
+## 3. Contact
 
 For any questions, please contact the creator of this work, please contact the sole developer and creator of this submission.
 
@@ -129,5 +110,23 @@ For any questions, please contact the creator of this work, please contact the s
 
 `Email:` [jafman3@gmail.com](mailto:jp-afman@atlrobotics.com)
 
-## 5. License
-[MIT](https://choosealicense.com/licenses/mit/)
+## 4. License
+
+No license has been assigned to this project yet.
+
+## 5. Demo
+An fully functional online demo of this project is provided through access to [Narwhal](http://139.144.26.69) 
+The objective of this demo is to provide you with the complete experience of the Narwhal progressive web application.
+
+You may log in using an engineering talent account, or a program manager account:
+#### Browse Narwhal as: `Engineering Talent`
+- `Email:` talent@narwhal.app
+- `Password:` NarwhalApp
+
+When browsing under the `Engineering Talent` account, your profile will be setup and you'll be able to browse through one or more projects from two different program managers.
+
+#### Browse Narwhal as: `Program Manager`
+- `Email:` pm@narwhal.app
+- `Password:` NarwhalApp
+
+When browsing under the `Program Manager` account, your profile and projects will be setup and you'll be able to browse through two talented individuals.

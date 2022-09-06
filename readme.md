@@ -124,18 +124,18 @@ For any questions, please contact the creator of this work, please contact the s
 No license has been assigned to this project yet.
 
 ## 5. Demo
-An fully functional online demo of this project is provided through access to [Narwhal](http://139.144.26.69) 
+An fully functional online demo of this project is provided through access to [Narwhal](https://narwhal-app.com/login) 
 The objective of this demo is to provide you with the complete experience of the Narwhal progressive web application.
 
 You may log in using an engineering talent account, or a program manager account:
 #### Browse Narwhal as: `Engineering Talent`
-- `Email:` talent@narwhal.app
+- `Email:` talent@narwhal-app.com
 - `Password:` NarwhalApp
 
 When browsing under the `Engineering Talent` account, your profile will be setup and you'll be able to browse through one or more projects from two different program managers.
 
 #### Browse Narwhal as: `Program Manager`
-- `Email:` pm@narwhal.app
+- `Email:` pm@narwhal-app.com
 - `Password:` NarwhalApp
 
 When browsing under the `Program Manager` account, your profile and projects will be setup and you'll be able to browse through two talented individuals.

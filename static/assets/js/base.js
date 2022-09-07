@@ -714,56 +714,74 @@ function androidAddtoHome() {
     offcanvas.toggle();
 }
 
+
 function AddtoHome(time, once) {
+
     if (once) {
+        // console.log("entered with once = true")
         var AddHomeStatus = localStorage.getItem("MobilekitAddHomeStatus");
         if (AddHomeStatus === "1" || AddHomeStatus === 1) {
             // already showed up
+            // console.log("already showed up")
         } else {
             localStorage.setItem("MobilekitAddHomeStatus", 1)
-            window.addEventListener('load', () => {
-                if (navigator.standalone) {
-                    // if app installed ios home screen
-                } else if (matchMedia('(display-mode: standalone)').matches) {
-                    // if app installed android home screen
-                } else {
-                    // if app is not installed
-                    if (androidDetection) {
-                        setTimeout(() => {
-                            androidAddtoHome()
-                        }, time);
-                    }
-                    if (iosDetection) {
-                        setTimeout(() => {
-                            iosAddtoHome()
-                        }, time);
-                    }
-                }
-            });
-        }
-    } else {
-        window.addEventListener('load', () => {
+                // window.addEventListener('load', () => {
             if (navigator.standalone) {
-                // app loaded to ios
+                // if app installed ios home screen
+                // console.log("nav.standalond = true")
             } else if (matchMedia('(display-mode: standalone)').matches) {
-                // app loaded to android
+                // console.log("display-mode is standalone")
+                // if app installed android home screen
             } else {
-                // app not loaded
+                // if app is not installed
                 if (androidDetection) {
+                    // console.log("Android Detected")
                     setTimeout(() => {
                         androidAddtoHome()
                     }, time);
-                }
-                if (iosDetection) {
+                } else if (iosDetection) {
+                    // console.log("iPhone Detected")
                     setTimeout(() => {
                         iosAddtoHome()
                     }, time);
+                } else {
+                    // console.log("not mobile detected")
                 }
+
             }
-        });
+            // });
+        }
+    } else {
+        // console.log("else status triggered")
+        // window.onload = (event) => {
+        // console.log("loaded!")
+        if (navigator.standalone) {
+            // app loaded to ios
+            // console.log("nav.standalond = true")
+        } else if (matchMedia('(display-mode: standalone)').matches) {
+            // console.log("display-mode is standalone")
+            // app loaded to android
+        } else {
+            // app not loaded
+            if (androidDetection) {
+                // console.log("Android Detected")
+                setTimeout(() => {
+                    androidAddtoHome()
+                }, time);
+            } else if (iosDetection) {
+                // console.log("iPhone Detected")
+                setTimeout(() => {
+                    iosAddtoHome()
+                }, time);
+            } else {
+                // console.log("not mobile detected")
+            }
+        }
+        // };
     }
 
 }
+
 //-----------------------------------------------------------------------
 
 

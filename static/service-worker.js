@@ -84,7 +84,9 @@ self.addEventListener("push", function(event) {
 self.addEventListener("notificationclick", function(event) {
     console.log("[Service Worker] Notification click Received.");
     event.notification.close();
-    event.waitUntil(clients.openWindow('http://0.0.0.0:5000/notifications'));
+    // event.waitUntil(clients.openWindow('http://0.0.0.0:5000/notifications'));
+    event.waitUntil(clients.openWindow('https://narwhal-app.com/notifications'));
+
 
     // event.waitUntil(clients.openWindow('http://' + document.domain + ':' + location.port + '/notifications'));
 });

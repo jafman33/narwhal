@@ -168,7 +168,7 @@
 
             // ----- SOCKET CODE
             // var socket = io.connect(document.domain + ':' + location.port + '/?rid=' + '{{ room_id }}');
-            var socket = io.connect('http://127.0.0.1:8000/?rid=' + '{{ room_id }}');
+            var socket = io.connect('http://' + document.domain + ':' + location.port + '/?rid=' + '{{ room_id }}');
 
 
             scrollDown();

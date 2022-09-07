@@ -204,7 +204,8 @@ def home():
 
     keyword = ""
     if request.method == "POST":
-        keyword = request.form["keyword"]
+        keyword = request.form["keyword"].lower()
+        
     user_id = session["user"]['id']
     count_dict = {}
         

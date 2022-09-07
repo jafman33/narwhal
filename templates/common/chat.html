@@ -167,7 +167,9 @@
             };
 
             // ----- SOCKET CODE
-            var socket = io.connect(document.domain + ':' + location.port + '/?rid=' + '{{ room_id }}');
+            // var socket = io.connect(document.domain + ':' + location.port + '/?rid=' + '{{ room_id }}');
+            var socket = io.connect('https://narwhal-app.com/?rid=' + '{{ room_id }}');
+
 
             scrollDown();
 

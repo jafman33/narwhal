@@ -4,10 +4,10 @@
 //--------------------------------------------------------------------------
 
 // Cache version
-var CACHE_VERSION = '2.9'
+var CACHE_VERSION = '1.0'
 
 // Cache name
-var CACHE_NAME = '3l-ranch-cache-v' + CACHE_VERSION;
+var CACHE_NAME = 'narwhal-cache-v' + CACHE_VERSION;
 
 // Files
 var REQUIRED_ROUTES = [

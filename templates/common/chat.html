@@ -130,13 +130,13 @@
         <!-- Chat Socket Js File -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.1/socket.io.js" integrity="sha512-9mpsATI0KClwt+xVZfbcf2lJ8IFBAwsubJ6mI3rtULwyM3fBmQFzj0It4tGqxLOGQwGfJdk/G+fANnxfq9/cew==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
         <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
-        <!-- <script src="../static/assets/js/msg.js"></script> -->
+
+
+
+
 
         <!-- javascript -->
         <script type="text/javascript">
-            // // THIS FUNCTION SHOULD SCROLL DOWN AUTOMATICALLY
-            // // list of div elements whose immediate parent element is of class .msg_history
-
             let msgH = document.querySelectorAll(".msg_history > div");
             let CurrentLen;
 
@@ -167,13 +167,14 @@
             };
 
             // ----- SOCKET CODE
-            // var socket = io.connect(document.domain + ':' + location.port + '/?rid=' + '{{ room_id }}');
-            var socket = io.connect('http://' + document.domain + ':' + location.port + '/?rid=' + '{{ room_id }}');
-
+            // var socket = io.connect('https://' + document.domain + ':' + location.port + '/?rid=' + '{{ room_id }}');
+            // If your front is served on the same domain as your server, you can simply use:
+            var socket = io();
 
             scrollDown();
 
             socket.on('connect', function() {
+                console.log("socket connection successful!")
                 socket.emit('join-chat', {
                     rid: '{{ room_id }}'
                 })
@@ -246,6 +247,9 @@
                 scrollDown();
             });
         </script>
+
+
+
 
 
 

@@ -208,6 +208,7 @@
     var keywords = new Array()
     document.addEventListener("DOMContentLoaded", function(event) {
         keywords = JSON.parse('{{keywords|safe}}')
+        console.log(keywords)
             // initiate the autocomplete function on the "myInput" element, and pass along the skills array as possible autocomplete values:
         autocomplete(document.getElementById("myInput"), keywords);
     });

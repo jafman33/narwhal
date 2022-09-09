@@ -690,7 +690,10 @@ def projects():
     try:
         project_docs = myLib.getCollection("project","projects")
         for doc in project_docs:
-            keywords_in_doc = [list(i.values())[0] for i in doc["data"]["project"]["keywords"]]
+            try:
+                keywords_in_doc = [list(i.values())[0] for i in doc["data"]["project"]["keywords"]]
+            except:
+                keywords_in_doc = []
             for keyword in keywords_in_doc:
                 keywords_list.append(keyword)
         # remove duplicates
@@ -754,7 +757,7 @@ def projects():
             
     # Filter by keyword
     if request.method == 'POST' and request.form['btn'] == 'Search':
-        searchword = request.form["keyword"]
+        searchword = request.form["keyword"].lower()
         project_search = myLib.getProjects_byKey(searchword) 
 
 
@@ -812,7 +815,10 @@ def talent():
     try:
         skill_docs = myLib.getCollection("skills","skills")
         for doc in skill_docs:
-            skills_in_doc = [list(i.values())[0] for i in doc["data"]["skills"]]
+            try:
+                skills_in_doc = [list(i.values())[0] for i in doc["data"]["skills"]]
+            except:
+                skills_in_doc = []
             for skill in skills_in_doc:
                 skills_list.append(skill)
         # remove duplicates
@@ -874,7 +880,7 @@ def talent():
             
     # Filter by skill
     if request.method == 'POST' and request.form['btn'] == 'Search':
-        skill = [request.form["skill"]]
+        skill = [request.form["skill"].lower()]
         try: 
             skill_search_docs = myLib.getMatches_byList("skill_match_index", skill)
         except:

@@ -516,12 +516,20 @@ def new_skill_notification():
         title = "New skill match for " + project_title + "!"
         body = "The skill '" + skill + "' has been added by " + talent_name + "."
         
-        # Create Narwhal Notification
-        # 1. check that the notification document doesnt already exist
-        # check that project_owner_id doesnt have "project_match" notification from talent_email
-        # 2. create the notification
-        myLib.newNotificationDoc(project_owner_id,"talent_match",talent_name,talent_email)
-
+        # ################################   
+        # notifications creation and check
+        # ################################
+        try:
+            pmNotification_docs = myLib.getDocs("notification","notification_index",project_owner_id)
+            if pmNotification_docs == []:
+                myLib.newNotificationDoc(project_owner_id,"talent_match",talent_name,talent_email)
+            else:
+                for doc in pmNotification_docs:
+                    if talent_email not in doc["data"]["notification"]["target"] and "talent_match" not in doc["data"]["notification"]["type"]:
+                        myLib.newNotificationDoc(project_owner_id,"talent_match",talent_name,talent_email)
+        except:
+            pmNotification_docs = []
+        
         
         try:             
             results = trigger_push_notification(project_owner_subscription,title,body)

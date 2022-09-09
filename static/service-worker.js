@@ -28,12 +28,12 @@ var CACHE_NAME = 'narwhal-cache-v' + CACHE_VERSION;
 
 var REQUIRED_ROUTES = [
     // routes
-    '/home',
-    '/profile-details',
-    '/talent',
-    '/projects',
-    '/notifications,',
-    '/contacts',
+    // '/home',
+    // '/profile-details',
+    // '/talent',
+    // '/projects',
+    // '/notifications,',
+    // '/contacts',
     // local js
     '/static/assets/js/lib/bootstrap.min.js',
     '/static/assets/js/plugins/splide/splide.min.js',

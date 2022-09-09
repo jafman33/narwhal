@@ -49,22 +49,22 @@ var REQUIRED_ROUTES = [
     '/static/assets/css/inc/splide/splide.min.css',
 
     // web js
-    // 'https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js',
-    // 'https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js',
-    // 'https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js',
+    'https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js',
+    'https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js',
+    'https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js',
 
     // web css
-    // 'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css',
-    // 'https://fonts.googleapis.com/css?family=Inter:400,500,700&display=swap',
+    'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css',
+    'https://fonts.googleapis.com/css?family=Inter:400,500,700&display=swap',
 
     // lootie
-    // 'https://assets3.lottiefiles.com/packages/lf20_z5kmjeap.json',
-    // 'https://assets2.lottiefiles.com/private_files/lf30_7BCPlZ.json',
-    // 'https://assets2.lottiefiles.com/packages/lf20_qdmxvg00.json',
-    // 'https://assets1.lottiefiles.com/packages/lf20_DMgKk1.json',
-    // 'https://assets2.lottiefiles.com/private_files/lf30_obidsi0t.json',
-    // 'https://assets5.lottiefiles.com/packages/lf20_dts7rqmw.json',
-    // 'https://assets9.lottiefiles.com/temp/lf20_hT22rr.json',
+    'https://assets3.lottiefiles.com/packages/lf20_z5kmjeap.json',
+    'https://assets2.lottiefiles.com/private_files/lf30_7BCPlZ.json',
+    'https://assets2.lottiefiles.com/packages/lf20_qdmxvg00.json',
+    'https://assets1.lottiefiles.com/packages/lf20_DMgKk1.json',
+    'https://assets2.lottiefiles.com/private_files/lf30_obidsi0t.json',
+    'https://assets5.lottiefiles.com/packages/lf20_dts7rqmw.json',
+    'https://assets9.lottiefiles.com/temp/lf20_hT22rr.json',
 
     // ion icons
     'https://unpkg.com/ionicons@5.5.2/dist/ionicons/svg/chevron-back-outline.svg',

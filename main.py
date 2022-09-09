@@ -677,100 +677,103 @@ def education_edit():
 @app.route("/projects", methods=["GET", "POST"])
 @login_required
 def projects():
-    user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
-    user_id = session["user"]['id']
-    user_email = session["user"]['email']
-    user_name = session["user"]['firstname'] + " " + session["user"]['lastname']
-    
-    project_search = []
-    keywords_list = []
-    
-    # Pull all skills collection documnets and create a list!!
-    # Need to optimize this in the future... or create an all skills collection!
-    try:
-        project_docs = myLib.getCollection("project","projects")
-        for doc in project_docs:
-            try:
-                keywords_in_doc = [list(i.values())[0] for i in doc["data"]["project"]["keywords"]]
-            except:
-                keywords_in_doc = []
-            for keyword in keywords_in_doc:
-                keywords_list.append(keyword)
-        # remove duplicates
-        keywords_list = [*set(keywords_list)]
-    except:
+    if session["user"]['usertype'] == 'Engineering Talent':
+        user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
+        user_id = session["user"]['id']
+        user_email = session["user"]['email']
+        user_name = session["user"]['firstname'] + " " + session["user"]['lastname']
+        
+        project_search = []
         keywords_list = []
-
-    
-    try:
-        bookmarks = client.query(q.get(q.match(q.index("bookmark_index"), user_id)))["data"]["bookmarks"]
-        bookmark_list = [list(i.values())[0] for i in bookmarks]
-    except:
-        bookmark_list = []
-    projects_bookmarked = [
-        client.query(q.get(q.ref(q.collection("projects"), project_id))
-            ) for project_id in bookmark_list
-    ]
-
-    try:
-        applications = client.query(q.get(q.match(q.index("application_index"), user_id)))["data"]["applications"]
-        application_list = [list(i.values())[0] for i in applications]
-    except:
-        application_list = []
-    projects_applied = [
-        client.query(q.get(q.ref(q.collection("projects"), project_id))
-            ) for project_id in application_list
-    ]
-    
-    try:
-        skills = client.query(q.get(q.match(q.index("skill_index"), user_id)))["data"]["skills"]
-        skills_list = [list(i.values())[0] for i in skills]
-        matched_projects = myLib.getMatches_byList("project_keyword_index", skills_list)
-    except:
-        matched_projects = []
-     
-    # ################################   
-    # notifications creation and check
-    # ################################
-    for project in matched_projects:
-        project_owner_id = project["data"]["user_id"]
+        
+        # Pull all skills collection documnets and create a list!!
+        # Need to optimize this in the future... or create an all skills collection!
         try:
-            pmNotification_docs = myLib.getDocs("notification","notification_index",project_owner_id)
-            if pmNotification_docs == []:
-                myLib.newNotificationDoc(project_owner_id,"talent_match",user_name,user_email)
-            else:
-                for doc in pmNotification_docs:
-                    if user_email not in doc["data"]["notification"]["target"] and "talent_match" not in doc["data"]["notification"]["type"]:
-                        myLib.newNotificationDoc(project_owner_id,"talent_match",user_name,user_email)
+            project_docs = myLib.getCollection("project","projects")
+            for doc in project_docs:
+                try:
+                    keywords_in_doc = [list(i.values())[0] for i in doc["data"]["project"]["keywords"]]
+                except:
+                    keywords_in_doc = []
+                for keyword in keywords_in_doc:
+                    keywords_list.append(keyword)
+            # remove duplicates
+            keywords_list = [*set(keywords_list)]
         except:
-            pmNotification_docs = []
-            
-    # #########
-    # Filter 
-    # #########
-    # Filter all
-    if request.method == 'POST' and request.form['btn'] == 'Show All Projects':
+            keywords_list = []
+
+        
         try:
-            project_search = myLib.getCollection("project","projects")
+            bookmarks = client.query(q.get(q.match(q.index("bookmark_index"), user_id)))["data"]["bookmarks"]
+            bookmark_list = [list(i.values())[0] for i in bookmarks]
         except:
-            project_search = []
-            
-    # Filter by keyword
-    if request.method == 'POST' and request.form['btn'] == 'Search':
-        searchword = request.form["keyword"].lower()
-        project_search = myLib.getProjects_byKey(searchword) 
+            bookmark_list = []
+        projects_bookmarked = [
+            client.query(q.get(q.ref(q.collection("projects"), project_id))
+                ) for project_id in bookmark_list
+        ]
+
+        try:
+            applications = client.query(q.get(q.match(q.index("application_index"), user_id)))["data"]["applications"]
+            application_list = [list(i.values())[0] for i in applications]
+        except:
+            application_list = []
+        projects_applied = [
+            client.query(q.get(q.ref(q.collection("projects"), project_id))
+                ) for project_id in application_list
+        ]
+        
+        try:
+            skills = client.query(q.get(q.match(q.index("skill_index"), user_id)))["data"]["skills"]
+            skills_list = [list(i.values())[0] for i in skills]
+            matched_projects = myLib.getMatches_byList("project_keyword_index", skills_list)
+        except:
+            matched_projects = []
+        
+        # ################################   
+        # notifications creation and check
+        # ################################
+        for project in matched_projects:
+            project_owner_id = project["data"]["user_id"]
+            try:
+                pmNotification_docs = myLib.getDocs("notification","notification_index",project_owner_id)
+                if pmNotification_docs == []:
+                    myLib.newNotificationDoc(project_owner_id,"talent_match",user_name,user_email)
+                else:
+                    for doc in pmNotification_docs:
+                        if user_email not in doc["data"]["notification"]["target"] and "talent_match" not in doc["data"]["notification"]["type"]:
+                            myLib.newNotificationDoc(project_owner_id,"talent_match",user_name,user_email)
+            except:
+                pmNotification_docs = []
+                
+        # #########
+        # Filter 
+        # #########
+        # Filter all
+        if request.method == 'POST' and request.form['btn'] == 'Show All Projects':
+            try:
+                project_search = myLib.getCollection("project","projects")
+            except:
+                project_search = []
+                
+        # Filter by keyword
+        if request.method == 'POST' and request.form['btn'] == 'Search':
+            searchword = request.form["keyword"].lower()
+            project_search = myLib.getProjects_byKey(searchword) 
 
 
-    return render_template(
-        "common/project-list.html", 
-        user=user_data, 
-        projects=project_search, 
-        bookmarks=projects_bookmarked, 
-        applications=projects_applied, 
-        matches=matched_projects,
-        keywords=json.dumps(keywords_list),
-        projects_active="active"
-        )
+        return render_template(
+            "common/project-list.html", 
+            user=user_data, 
+            projects=project_search, 
+            bookmarks=projects_bookmarked, 
+            applications=projects_applied, 
+            matches=matched_projects,
+            keywords=json.dumps(keywords_list),
+            projects_active="active"
+            )
+    else:
+        return '',204
     
 @app.route("/project-details", methods=["GET", "POST"])
 @login_required
@@ -804,100 +807,102 @@ def project_details():
 @app.route("/talent", methods=["GET", "POST"])
 @login_required
 def talent():
-    user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
-    user_id = session["user"]["id"]
-    talent_search = []
-    skills_list = []
-    
-    
-    # Pull all skills collection documnets and create a list!!
-    # Need to optimize this in the future... or create an all skills collection!
-    try:
-        skill_docs = myLib.getCollection("skills","skills")
-        for doc in skill_docs:
-            try:
-                skills_in_doc = [list(i.values())[0] for i in doc["data"]["skills"]]
-            except:
-                skills_in_doc = []
-            for skill in skills_in_doc:
-                skills_list.append(skill)
-        # remove duplicates
-        skills_list = [*set(skills_list)]
-    except:
+    if session["user"]['usertype'] == 'Program Manager':
+        user_data = client.query(q.get(q.match(q.index("userEmail_index"), session["user"]['email'])))
+        user_id = session["user"]["id"]
+        talent_search = []
         skills_list = []
-    
-    # Auto-Match
-    talents_matched = []
-    user_projects = myLib.getDocs("project","project_index",user_id)
-
-    project_keywords= []
-    for item in user_projects:
-        for key in item["data"]["project"]["keywords"]:
-            project_keywords.append(key["keyword"])
+        # Pull all skills collection documnets and create a list!!
+        # Need to optimize this in the future... or create an all skills collection!
         try:
-            matchedSkill_docs = myLib.getMatches_byList("skill_match_index", project_keywords)
-            matchedProject_id = item["ref"].id()
-            matchedProject_title = item["data"]["project"]["title"]
+            skill_docs = myLib.getCollection("skills","skills")
+            for doc in skill_docs:
+                try:
+                    skills_in_doc = [list(i.values())[0] for i in doc["data"]["skills"]]
+                except:
+                    skills_in_doc = []
+                for skill in skills_in_doc:
+                    skills_list.append(skill)
+            # remove duplicates
+            skills_list = [*set(skills_list)]
         except:
-            matchedSkill_docs = []
-
-        for doc in matchedSkill_docs:
-            talent_id = doc["data"]["user_id"]
-            talents_matched.append(client.query(q.get(q.ref(q.collection("users"), talent_id ))))
-            # Check if the notification document from user already exists
-            try:
-                talentNotification_docs = myLib.getDocs("notification","notification_index",talent_id)
-                if talentNotification_docs == []:
-                    myLib.newNotificationDoc(talent_id,"project_match",matchedProject_title,matchedProject_id)
-                else:
-                    for doc2 in talentNotification_docs:
-                        if matchedProject_id not in doc2["data"]["notification"]["target"] and "project_match" not in doc2["data"]["notification"]["type"]:
-                            myLib.newNotificationDoc(talent_id,"project_match",matchedProject_title,matchedProject_id)
-            except:
-                talentNotification_docs = []
-
-    # User's Bookmarks
-    try:
-        bookmarks = client.query(q.get(q.match(q.index("bookmark_index"), user_id)))["data"]["bookmarks"]
-        bookmark_list = [list(i.values())[0] for i in bookmarks]
-    except:
-        bookmark_list = []
-    talents_bookmarked = [
-        client.query(q.get(q.ref(q.collection("users"), user_id ))
-            ) for user_id in bookmark_list
-    ]
-    
-    # #########
-    # Filter 
-    # #########
-    
-    # Filter all
-    if request.method == 'POST' and request.form['btn'] == 'Show All Talent':
-        try:
-            talent_search = myLib.getDocs("talent","user_type_index","Engineering Talent")
-        except:
-            talent_search = []
-            
-    # Filter by skill
-    if request.method == 'POST' and request.form['btn'] == 'Search':
-        skill = [request.form["skill"].lower()]
-        try: 
-            skill_search_docs = myLib.getMatches_byList("skill_match_index", skill)
-        except:
-            skill_search_docs = []
-        for doc in skill_search_docs:
-            talent_id = doc["data"]["user_id"]
-            talent_search.append(client.query(q.get(q.ref(q.collection("users"), talent_id ))))
+            skills_list = []
         
-    return render_template(
-        "common/talent-list.html", 
-        user=user_data, 
-        talents=talent_search, 
-        matches=talents_matched,
-        bookmarks=talents_bookmarked,
-        skills=json.dumps(skills_list),
-        talent_active="active"
-        )
+        # Auto-Match
+        talents_matched = []
+        user_projects = myLib.getDocs("project","project_index",user_id)
+
+        project_keywords= []
+        for item in user_projects:
+            for key in item["data"]["project"]["keywords"]:
+                project_keywords.append(key["keyword"])
+            try:
+                matchedSkill_docs = myLib.getMatches_byList("skill_match_index", project_keywords)
+                matchedProject_id = item["ref"].id()
+                matchedProject_title = item["data"]["project"]["title"]
+            except:
+                matchedSkill_docs = []
+
+            for doc in matchedSkill_docs:
+                talent_id = doc["data"]["user_id"]
+                talents_matched.append(client.query(q.get(q.ref(q.collection("users"), talent_id ))))
+                # Check if the notification document from user already exists
+                try:
+                    talentNotification_docs = myLib.getDocs("notification","notification_index",talent_id)
+                    if talentNotification_docs == []:
+                        myLib.newNotificationDoc(talent_id,"project_match",matchedProject_title,matchedProject_id)
+                    else:
+                        for doc2 in talentNotification_docs:
+                            if matchedProject_id not in doc2["data"]["notification"]["target"] and "project_match" not in doc2["data"]["notification"]["type"]:
+                                myLib.newNotificationDoc(talent_id,"project_match",matchedProject_title,matchedProject_id)
+                except:
+                    talentNotification_docs = []
+
+        # User's Bookmarks
+        try:
+            bookmarks = client.query(q.get(q.match(q.index("bookmark_index"), user_id)))["data"]["bookmarks"]
+            bookmark_list = [list(i.values())[0] for i in bookmarks]
+        except:
+            bookmark_list = []
+
+        talents_bookmarked = [
+            client.query(q.get(q.ref(q.collection("users"), user_id ))
+                ) for user_id in bookmark_list
+        ]
+        
+        # #########
+        # Filter 
+        # #########
+        
+        # Filter all
+        if request.method == 'POST' and request.form['btn'] == 'Show All Talent':
+            try:
+                talent_search = myLib.getDocs("talent","user_type_index","Engineering Talent")
+            except:
+                talent_search = []
+                
+        # Filter by skill
+        if request.method == 'POST' and request.form['btn'] == 'Search':
+            skill = [request.form["skill"].lower()]
+            try: 
+                skill_search_docs = myLib.getMatches_byList("skill_match_index", skill)
+            except:
+                skill_search_docs = []
+            for doc in skill_search_docs:
+                talent_id = doc["data"]["user_id"]
+                talent_search.append(client.query(q.get(q.ref(q.collection("users"), talent_id ))))
+            
+        return render_template(
+            "common/talent-list.html", 
+            user=user_data, 
+            talents=talent_search, 
+            matches=talents_matched,
+            bookmarks=talents_bookmarked,
+            skills=json.dumps(skills_list),
+            talent_active="active"
+            )
+    else:
+        return '',204
 
 @app.route("/project-edit", methods=["GET","POST"])
 @login_required

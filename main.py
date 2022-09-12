@@ -832,12 +832,12 @@ def talent():
         talents_matched = []
         user_projects = myLib.getDocs("project","project_index",user_id)
 
-        project_keywords= []
         for item in user_projects:
-            if item["data"]["project"]["keywords"]:
+            project_keywords= []
+
+            try:
                 for key in item["data"]["project"]["keywords"]:
                     project_keywords.append(key["keyword"])
-            try:
                 matchedSkill_docs = myLib.getMatches_byList("skill_match_index", project_keywords)
                 matchedProject_id = item["ref"].id()
                 matchedProject_title = item["data"]["project"]["title"]

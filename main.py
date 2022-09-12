@@ -843,8 +843,12 @@ def talent():
                 matchedProject_title = item["data"]["project"]["title"]
             except:
                 matchedSkill_docs = []
-
+                
             for doc in matchedSkill_docs:
+                # 
+                # todo.. make sure profile does not show more than once... 
+                # i.e. doc["data"]["user_id"] may show up more than once if user has skills for two projects...
+                # 
                 talent_id = doc["data"]["user_id"]
                 talents_matched.append(client.query(q.get(q.ref(q.collection("users"), talent_id ))))
                 # Check if the notification document from user already exists

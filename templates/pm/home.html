@@ -63,6 +63,7 @@
     var educations = counter.educations[0]
     var experiences = counter.experiences[0]
     var projects = counter.projects[0]
+    console.log(projects)
 
     var keyword = '{{keyword|safe}}';
 
@@ -128,17 +129,17 @@
         }
 
 
-        // Skills
+        // projects
         percent = 0;
         if (projects > 0) {
             for (let step = 0; step < projects; step++) {
-                percent += 100;
-                if (percent > 99)
-                    percent = 100;
+                percent += 50;
+                // if (percent > 99)
+                //     percent = 100;
             }
             document.getElementById("projects").style.width = String(percent) + '%';
         }
-        document.getElementById("projects").innerText = '\xa0\xa0\xa0' + ' Projects: ' + String(percent / 100) + ' / 1';
+        document.getElementById("projects").innerText = '\xa0\xa0\xa0' + ' Projects: ' + String(percent / 50) + ' / 1';
         if (percent == 100) {
             // document.getElementById("project-progress").style.display = "none";
         }
